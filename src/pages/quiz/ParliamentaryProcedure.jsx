@@ -1,0 +1,42 @@
+import Tabs from "../../components/Tabs";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+
+export default function ParliamentaryProcedure() {
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    getUserId();
+  }, []);
+
+  function getUserId() {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000; // Current time in seconds
+        console.log(decodedToken, currentTime);
+        if (decodedToken.exp < currentTime) {
+          // Check if the token is expired
+          console.log("Token expired");
+          localStorage.removeItem("jwtToken");
+        } else {
+          console.log(decodedToken.userId);
+          setUserId(decodedToken.userId);
+        }
+      } catch (error) {
+        console.error("Invalid token", error);
+        localStorage.removeItem("jwtToken");
+      }
+    } else {
+      console.log("User is logged out");
+    }
+  }
+
+  return (
+    <div className="w-11/12 md:w-10/12 mx-auto mt-2">
+      <p> This is Parliamentary Procedure Page</p>
+      <Tabs userId={userId} topicName={"Parliamentary_Procedure"} />
+    </div>
+  );
+}
