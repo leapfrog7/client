@@ -44,6 +44,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       try {
         const response = await axios.get(`${BASE_URL}/quiz/fetchAllBookmarks`, {
           params: { userId, topicId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         console.log("fetchBookmarks", response.data.bookmarks);
         const topicBookmark = response.data.bookmarks.find(
@@ -74,11 +77,19 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
     try {
       if (!bookmarkedQuestions.includes(currentQuestionId.toString())) {
-        await axios.post(`${BASE_URL}/quiz/addBookmark`, {
-          userId,
-          topicName,
-          questionId: currentQuestionId,
-        });
+        await axios.post(
+          `${BASE_URL}/quiz/addBookmark`,
+          {
+            userId,
+            topicName,
+            questionId: currentQuestionId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add the token to the headers
+            },
+          }
+        );
         setBookmarkedQuestions([
           ...bookmarkedQuestions,
           currentQuestionId.toString(),
@@ -86,6 +97,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       } else {
         await axios.delete(`${BASE_URL}/quiz/removeBookmark`, {
           data: { userId, topicName, questionId: currentQuestionId },
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the token to the headers
+          },
         });
         setBookmarkedQuestions(
           bookmarkedQuestions.filter(
@@ -105,11 +119,19 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(`${BASE_URL}/quiz/submitQuiz`, {
-        userId,
-        topicName,
-        attemptedQuestions: quizData.map((question) => question._id),
-      });
+      await axios.post(
+        `${BASE_URL}/quiz/submitQuiz`,
+        {
+          userId,
+          topicName,
+          attemptedQuestions: quizData.map((question) => question._id),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the token to the headers
+          },
+        }
+      );
       setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to submit quiz:", error);
