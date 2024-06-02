@@ -19,7 +19,7 @@ const SignOutButton = ({ verifyToken }) => {
   return (
     <button
       onClick={handleSignOut}
-      className="bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2"
+      className="bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2 mx-auto"
     >
       <span> Sign Out</span>
       <PiSignOutLight className="text-yellow-700 text-xl" />

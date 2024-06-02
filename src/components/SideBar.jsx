@@ -49,7 +49,7 @@ export default function SideBar({ isSidebarOpen, toggleSidebar }) {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform lg:hidden md:hidden`}
       >
-        <div className="p-4 w-2/3 bg-gray-800 h-full">
+        <div className="p-4 w-4/5 bg-gray-800 h-full">
           {/* Logo in Sidebar with close button */}
           <div className="flex items-center justify-between mb-8 mt-1">
             <div className="flex items-center space-x-2">
@@ -57,7 +57,7 @@ export default function SideBar({ isSidebarOpen, toggleSidebar }) {
             </div>
             {/* close button icon */}
             <button className="text-white" onClick={toggleSidebar}>
-              <IoMdCloseCircle className="text-4xl" />
+              <IoMdCloseCircle className="text-3xl" />
             </button>
           </div>
 
