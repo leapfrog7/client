@@ -82,11 +82,7 @@ const App = () => {
 
               <NavBar />
             </div>
-            {isLoggedIn ? (
-              <SignOutButton verifyToken={verifyClientToken} />
-            ) : (
-              <SignInButton verifyToken={verifyClientToken} />
-            )}
+
             <button
               className="text-white lg:hidden md:hidden"
               onClick={toggleSidebar}
@@ -95,6 +91,22 @@ const App = () => {
             </button>
           </div>
         </nav>
+
+        <div className="bg-white w-full px-6 md:w-10/12 py-3 flex justify-between items-center mx-auto">
+          {isLoggedIn ? (
+            <>
+              <span className="text-lg font-semibold">{`Hello, ${username}`}</span>
+              <div>
+                <SignOutButton verifyToken={verifyClientToken} />
+              </div>
+            </>
+          ) : (
+            <>
+              <span></span>
+              <SignInButton verifyToken={verifyClientToken} />
+            </>
+          )}
+        </div>
 
         <div className="flex-grow min-h-screen">
           <Routes>
@@ -149,7 +161,11 @@ const App = () => {
         <Footer />
       </div>
 
-      <SideBar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <SideBar
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        isLoggedIn={isLoggedIn}
+      />
     </BrowserRouter>
   );
 };

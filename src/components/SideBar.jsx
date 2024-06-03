@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate } from "react-router-dom";
 import SignOutButton from "./SignOutButton";
+import SignInButton from "./SignInButton";
 import { navItems } from "../data/menuItems";
 import Logo from "./Logo";
 import { IoMdCloseCircle } from "react-icons/io";
@@ -9,9 +10,10 @@ import { IoMdCloseCircle } from "react-icons/io";
 SideBar.propTypes = {
   isSidebarOpen: PropTypes.bool,
   toggleSidebar: PropTypes.func,
+  isLoggedIn: PropTypes.bool,
 };
 
-export default function SideBar({ isSidebarOpen, toggleSidebar }) {
+export default function SideBar({ isSidebarOpen, toggleSidebar, isLoggedIn }) {
   const [expanded, setExpanded] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -105,7 +107,9 @@ export default function SideBar({ isSidebarOpen, toggleSidebar }) {
                 )}
               </div>
             ))}
-            <SignOutButton />
+            <div onClick={toggleSidebar}>
+              {isLoggedIn ? <SignOutButton /> : <SignInButton />}
+            </div>
           </div>
         </div>
       </div>

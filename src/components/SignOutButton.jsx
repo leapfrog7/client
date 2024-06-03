@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { PiSignOutLight } from "react-icons/pi";
 import PropTypes from "prop-types";
 
-const SignOutButton = ({ verifyToken }) => {
+const SignOutButton = () => {
   console.log("inside Signout");
   const navigate = useNavigate();
   //When User Clicks on Sign Out button
@@ -13,7 +13,7 @@ const SignOutButton = ({ verifyToken }) => {
     console.log(localStorage.getItem("jwtToken"));
     navigate("/");
     localStorage.removeItem("jwtToken");
-    verifyToken();
+    //verifyToken();
   };
 
   return (

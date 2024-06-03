@@ -5,7 +5,6 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 import Button from "../components/Button";
-const serverURL = "http://localhost:5000/api/v1/";
 export default function Register() {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -16,6 +15,8 @@ export default function Register() {
   const [msg, setMsg] = useState("");
   const [decodedToken, setDecodedToken] = useState(null);
   const [username, setUsername] = useState(null);
+
+  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
 
   function handleNameChange(event) {
     setName(event.target.value);
@@ -39,7 +40,7 @@ export default function Register() {
 
   const registerUser = async () => {
     try {
-      const response = await axios.post(serverURL + "register", {
+      const response = await axios.post(BASE_URL + "/register", {
         name: name,
         password: password,
         mobile: mobile,
