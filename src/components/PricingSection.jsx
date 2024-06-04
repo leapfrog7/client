@@ -5,20 +5,20 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 const PricingSection = () => {
   const originalPrice = 1200;
-  const discountedPrice = 1000;
+  const discountedPrice = 999;
 
   return (
-    <div className="bg-white shadow-md rounded-lg max-w-md mx-auto p-6 text-center">
+    <div className="bg-white shadow-md rounded-lg max-w-md mx-auto p-4 text-center">
       <h2 className="text-2xl font-bold mb-4 text-customBlue">Pricing</h2>
       <div className="mb-4">
-        <div className="flex justify-center items-baseline space-x-2">
+        <div className="text-sm flex justify-center items-baseline space-x-1">
           <PiCurrencyInr />{" "}
-          <span className="text-gray-500 line-through text-lg">
+          <span className="text-gray-500 line-through text-base">
             {originalPrice}
           </span>
           <PiCurrencyInr />{" "}
-          <span className="text-yellow-500 text-3xl font-bold">
-            {discountedPrice}/yr
+          <span className="text-yellow-500 text-2xl font-semibold">
+            {discountedPrice}/year
           </span>
         </div>
         <p className="text-gray-600 text-sm">Limited time offer!</p>

@@ -11,9 +11,15 @@ SideBar.propTypes = {
   isSidebarOpen: PropTypes.bool,
   toggleSidebar: PropTypes.func,
   isLoggedIn: PropTypes.bool,
+  verifyToken: PropTypes.func,
 };
 
-export default function SideBar({ isSidebarOpen, toggleSidebar, isLoggedIn }) {
+export default function SideBar({
+  isSidebarOpen,
+  toggleSidebar,
+  isLoggedIn,
+  verifyToken,
+}) {
   const [expanded, setExpanded] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -108,7 +114,11 @@ export default function SideBar({ isSidebarOpen, toggleSidebar, isLoggedIn }) {
               </div>
             ))}
             <div onClick={toggleSidebar}>
-              {isLoggedIn ? <SignOutButton /> : <SignInButton />}
+              {isLoggedIn ? (
+                <SignOutButton verifyToken={verifyToken} />
+              ) : (
+                <SignInButton />
+              )}
             </div>
           </div>
         </div>

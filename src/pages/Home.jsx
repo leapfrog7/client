@@ -50,7 +50,7 @@ const Home = ({ isLoggedIn, username }) => {
   };
 
   return (
-    <div className="bg-white flex flex-col mt-8 w-full  xl:w-5/6 mx-auto">
+    <div className="bg-white flex flex-col w-full xl:w-5/6 mx-auto">
       <div
         className={`flex flex-col lg:flex-row mx-auto items-center justify-center ${
           isLoggedIn ? "hidden" : ""

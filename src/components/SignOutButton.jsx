@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { PiSignOutLight } from "react-icons/pi";
 import PropTypes from "prop-types";
 
-const SignOutButton = () => {
+const SignOutButton = ({ isLoggedIn, verifyToken }) => {
   console.log("inside Signout");
   const navigate = useNavigate();
   //When User Clicks on Sign Out button
@@ -11,8 +11,11 @@ const SignOutButton = () => {
     console.log(localStorage.getItem("jwtToken") + 4);
     console.log("inside handlesignout");
     console.log(localStorage.getItem("jwtToken"));
-    navigate("/");
+
     localStorage.removeItem("jwtToken");
+    console.log(isLoggedIn);
+    verifyToken();
+    navigate("/");
     //verifyToken();
   };
 
@@ -28,6 +31,7 @@ const SignOutButton = () => {
 };
 SignOutButton.propTypes = {
   verifyToken: PropTypes.func,
+  isLoggedIn: PropTypes.bool,
 };
 
 export default SignOutButton;

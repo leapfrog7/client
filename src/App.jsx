@@ -92,12 +92,15 @@ const App = () => {
           </div>
         </nav>
 
-        <div className="bg-white w-full px-6 md:w-10/12 py-3 flex justify-between items-center mx-auto">
+        <div className="bg-white w-full px-6 md:w-10/12 pt-2 flex justify-between items-center mx-auto">
           {isLoggedIn ? (
             <>
               <span className="text-lg font-semibold">{`Hello, ${username}`}</span>
               <div>
-                <SignOutButton verifyToken={verifyClientToken} />
+                <SignOutButton
+                  verifyToken={verifyClientToken}
+                  isLoggedIn={isLoggedIn}
+                />
               </div>
             </>
           ) : (
@@ -165,6 +168,7 @@ const App = () => {
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
         isLoggedIn={isLoggedIn}
+        verifyToken={verifyClientToken}
       />
     </BrowserRouter>
   );
