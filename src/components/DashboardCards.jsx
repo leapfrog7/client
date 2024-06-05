@@ -10,12 +10,12 @@ const DashboardCard = ({ title, progress, path }) => {
       className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center hover:bg-gradient-to-t from-cyan-50 to-gray-50"
     >
       <h3 className="text-base md:text-lg font-semibold mb-4">{title}</h3>
-      <div className="w-16 h-16 mb-2">
+      <div className="w-16 h-16 mb-2 ">
         <CircularProgressbar
           value={parseFloat(progress)}
           text={`${progress}`}
           styles={buildStyles({
-            textSize: "24px",
+            textSize: "22px",
             pathColor: "#220790",
             textColor: "#000",
             trailColor: "#ddd",

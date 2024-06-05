@@ -22,10 +22,10 @@ const SignOutButton = ({ isLoggedIn, verifyToken }) => {
   return (
     <button
       onClick={handleSignOut}
-      className="bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2 mx-auto"
+      className="bg-yellow-500 text-gray-900 px-2 text-xs md:text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-1 mx-auto"
     >
       <span> Sign Out</span>
-      <PiSignOutLight className="text-yellow-700 text-xl" />
+      <PiSignOutLight className="text-yellow-800 text-lg" />
     </button>
   );
 };

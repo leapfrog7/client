@@ -4,6 +4,7 @@ import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
 
 const Home = ({ isLoggedIn, username }) => {
+  //This contains the path for various pages of topics.
   const userStats = {
     paperI: [
       {
