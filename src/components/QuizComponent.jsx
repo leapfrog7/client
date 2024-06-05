@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { MdOutlineBookmarkAdded } from "react-icons/md";
+import { MdOutlineBookmarkRemove } from "react-icons/md";
 
 const QuizComponent = ({ userId, topicName, topicId }) => {
   const [quizData, setQuizData] = useState([]);
@@ -172,7 +174,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     <div className="min-h-screen">
       <div className="flex justify-end mb-4 mr-4">
         <label className="inline-flex items-center">
-          <span className="mr-4">Random Questions</span>
+          <span className="mr-4 text-sm md:text-lg">Random Questions</span>
           <input
             type="checkbox"
             checked={showAllQuestions}
@@ -205,7 +207,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               currentQuestionIndex + 1
             }`}</h2>
             <p
-              className="text-gray-800 mb-4 font-semibold"
+              className="text-gray-800 mb-4 font-semibold text-sm md:text-lg"
               style={{ whiteSpace: "pre-line" }}
             >
               {currentQuestion.questionText}
@@ -214,9 +216,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               <button
                 key={index}
                 onClick={() => handleOptionClick(option)}
-                className={`block w-full text-left p-2 mb-2 border rounded ${
+                className={`block w-full text-left p-2 mb-2 border rounded-lg text-sm ${
                   selectedAnswers[currentQuestionIndex] === option
-                    ? "bg-blue-500 text-white"
+                    ? "bg-customCyan text-white"
                     : "bg-white text-black"
                 }`}
               >
@@ -237,15 +239,18 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               )}
             </button>
             {showExplanation[currentQuestionIndex] && (
-              <div className="mt-2 text-gray-700">
-                <p>
-                  {currentQuestion.correctAnswer} <br />{" "}
-                  {currentQuestion.explanation}
+              <div className="mt-2 text-gray-700 text-sm md:text-lg">
+                <p style={{ whiteSpace: "pre-line" }}>
+                  <span className="text-green-700 font-semibold ">
+                    {" "}
+                    Answer -{currentQuestion.correctAnswer}
+                  </span>
+                  <br /> {currentQuestion.explanation}
                 </p>
               </div>
             )}
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between text-sm md:text-lg">
             <button
               onClick={() => handleNavigation(-1)}
               disabled={currentQuestionIndex === 0}
@@ -255,15 +260,17 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
             </button>
             <button
               onClick={handleBookmark}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 rounded text-xl ${
                 bookmarkedQuestions.includes(currentQuestion._id)
                   ? "bg-yellow-500"
                   : "bg-gray-300"
               }`}
             >
-              {bookmarkedQuestions.includes(currentQuestion._id)
-                ? "Unbookmark"
-                : "Bookmark"}
+              {bookmarkedQuestions.includes(currentQuestion._id) ? (
+                <MdOutlineBookmarkRemove />
+              ) : (
+                <MdOutlineBookmarkAdded />
+              )}
             </button>
             <button
               onClick={() => handleNavigation(1)}

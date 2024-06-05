@@ -92,7 +92,11 @@ const App = () => {
           </div>
         </nav>
 
-        <div className="bg-gradient-to-tl from-amber-50 to-yellow-200 w-full px-6 md:w-10/12 py-2 flex justify-between items-center mx-auto">
+        <div
+          className={`${
+            isLoggedIn ? "bg-gradient-to-tl from-amber-50 to-yellow-200" : ""
+          } w-full px-6 md:w-10/12 py-2 flex justify-between items-center mx-auto`}
+        >
           {isLoggedIn ? (
             <>
               <span className="text-yellow-700 text-sm md:text-xl font-semibold">{`Welcome, ${username}`}</span>
