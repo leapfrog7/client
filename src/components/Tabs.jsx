@@ -40,7 +40,7 @@ const Tabs = ({ userId, topicName }) => {
   }, [topicName, topicId, error]);
 
   return (
-    <div className="min-h-screen w-full md:w-4/5 bg-blue-50 mx-auto">
+    <div className="min-h-screen w-full md:w-4/5 bg-gradient-to-t from-slate-50 to-sky-50 mx-auto">
       <div className="mb-4 flex text-sm md:text-lg">
         <button
           onClick={() => handleTabClick("quiz")}

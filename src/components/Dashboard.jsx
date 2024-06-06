@@ -10,7 +10,7 @@ const Dashboard = ({ userStats }) => {
       </h1>
 
       <div className="mb-8">
-        <h2 className=" font-bold mb-4 rounded-lg bg-gradient-to-r from-pink-400 to-rose-300 px-4 py-2 text-gray-600">
+        <h2 className=" font-bold mb-4 rounded-lg bg-gradient-to-r from-pink-200 to-rose-300 px-4 py-2 text-pink-700">
           Paper I Topics
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -25,7 +25,7 @@ const Dashboard = ({ userStats }) => {
         </div>
       </div>
       <div>
-        <h2 className="font-bold mb-4 text-gray-600 bg-gradient-to-r from-purple-300 to-blue-100 rounded-lg px-4 py-2">
+        <h2 className="font-bold mb-4 text-purple-800 bg-gradient-to-r from-purple-300 to-blue-100 rounded-lg px-4 py-2">
           Paper II Topics
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6  ">

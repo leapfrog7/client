@@ -4,6 +4,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { MdOutlineBookmarkAdded } from "react-icons/md";
 import { MdOutlineBookmarkRemove } from "react-icons/md";
+import { TailSpin } from "react-loader-spinner"; // Importing the loading spinner
 
 const QuizComponent = ({ userId, topicName, topicId }) => {
   const [quizData, setQuizData] = useState([]);
@@ -13,6 +14,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadingBM, setLoadingBM] = useState(false);
   const [error, setError] = useState(null);
   const [showAllQuestions, setShowAllQuestions] = useState(false);
 
@@ -76,7 +78,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   const handleBookmark = async () => {
     const currentQuestionId = quizData[currentQuestionIndex]._id;
-
+    setLoadingBM(true);
     try {
       if (!bookmarkedQuestions.includes(currentQuestionId.toString())) {
         await axios.post(
@@ -96,6 +98,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
           ...bookmarkedQuestions,
           currentQuestionId.toString(),
         ]);
+        //setLoadingBM(false)
       } else {
         await axios.delete(`${BASE_URL}/quiz/removeBookmark`, {
           data: { userId, topicName, questionId: currentQuestionId },
@@ -112,6 +115,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     } catch (error) {
       console.error("Failed to update bookmark:", error);
       setError("Failed to update bookmark");
+    } finally {
+      setLoadingBM(false);
     }
   };
 
@@ -170,6 +175,18 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     }, 0);
   };
 
+  const score = calculateScore();
+
+  const getScoreClass = (score) => {
+    if (score >= 8) {
+      return "bg-green-300 text-green-800";
+    } else if (score >= 5) {
+      return "bg-yellow-300 text-yellow-800";
+    } else {
+      return "bg-red-300 text-red-800";
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <div className="flex justify-end mb-4 mr-4">
@@ -216,7 +233,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               <button
                 key={index}
                 onClick={() => handleOptionClick(option)}
-                className={`block w-full text-left p-2 mb-2 border rounded-lg text-sm ${
+                className={`block w-full text-left p-2 mb-2 border rounded-lg text-sm md:text-base ${
                   selectedAnswers[currentQuestionIndex] === option
                     ? "bg-customCyan text-white"
                     : "bg-white text-black"
@@ -225,30 +242,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                 {option}
               </button>
             ))}
-            <button
-              onClick={() => toggleExplanation(currentQuestionIndex)}
-              className="mt-2 px-4 py-2 bg-gray-200 text-black rounded flex items-center min-w-24"
-            >
-              {showExplanation[currentQuestionIndex]
-                ? "Hide Explanation"
-                : "Show Explanation"}
-              {showExplanation[currentQuestionIndex] ? (
-                <FaChevronUp className="ml-2" />
-              ) : (
-                <FaChevronDown className="ml-2" />
-              )}
-            </button>
-            {showExplanation[currentQuestionIndex] && (
-              <div className="mt-2 text-gray-700 text-sm md:text-lg">
-                <p style={{ whiteSpace: "pre-line" }}>
-                  <span className="text-green-700 font-semibold ">
-                    {" "}
-                    Answer -{currentQuestion.correctAnswer}
-                  </span>
-                  <br /> {currentQuestion.explanation}
-                </p>
-              </div>
-            )}
           </div>
           <div className="flex justify-between text-sm md:text-lg">
             <button
@@ -266,10 +259,14 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                   : "bg-gray-300"
               }`}
             >
-              {bookmarkedQuestions.includes(currentQuestion._id) ? (
-                <MdOutlineBookmarkRemove />
+              {!loadingBM ? (
+                bookmarkedQuestions.includes(currentQuestion._id) ? (
+                  <MdOutlineBookmarkRemove />
+                ) : (
+                  <MdOutlineBookmarkAdded />
+                )
               ) : (
-                <MdOutlineBookmarkAdded />
+                <TailSpin color="#fff" height={20} width={20} />
               )}
             </button>
             <button
@@ -280,11 +277,39 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               Next
             </button>
           </div>
+
+          <div>
+            <button
+              onClick={() => toggleExplanation(currentQuestionIndex)}
+              className="my-6 px-4 py-2 bg-yellow-300 text-black rounded mx-auto flex items-center min-w-24 text-sm md:text-base"
+            >
+              {showExplanation[currentQuestionIndex]
+                ? "Hide Answer"
+                : "Show Answer"}
+              {showExplanation[currentQuestionIndex] ? (
+                <FaChevronUp className="ml-2" />
+              ) : (
+                <FaChevronDown className="ml-2" />
+              )}
+            </button>
+            {showExplanation[currentQuestionIndex] && (
+              <div className="mt-2 text-gray-700 text-sm md:text-base">
+                <p style={{ whiteSpace: "pre-line" }}>
+                  <span className="text-green-800 font-semibold ">
+                    {" "}
+                    Answer -{currentQuestion.correctAnswer}
+                  </span>
+                  <br /> {currentQuestion.explanation}
+                </p>
+              </div>
+            )}
+          </div>
+
           {currentQuestionIndex === quizData.length - 1 && (
-            <div className="mt-4">
+            <div className="mt-4 flex justify-center">
               <button
                 onClick={handleSubmit}
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                className="px-12 py-2 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded items-center"
               >
                 Submit
               </button>
@@ -294,7 +319,11 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       ) : (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-bold mb-4">Quiz Results</h2>
-          <p className="text-lg font-bold">
+          <p
+            className={`text-lg font-bold my-4 p-1 text-center rounded-lg ${getScoreClass(
+              score
+            )}`}
+          >
             Your Score: {calculateScore()} / {quizData.length}
           </p>
           {quizData.map((question, index) => (
@@ -307,16 +336,16 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                   selectedAnswers[index] === question.correctAnswer
                     ? "green"
                     : "red"
-                }-700`}
+                }-700 my-2`}
               >
                 {`Your Answer: ${selectedAnswers[index]}`}
               </p>
               {selectedAnswers[index] !== question.correctAnswer && (
-                <p className="text-green-700">{`Correct Answer: ${question.correctAnswer}`}</p>
+                <p className="text-green-800 font-semibold">{`Correct Answer: ${question.correctAnswer}`}</p>
               )}
               <button
                 onClick={() => toggleExplanation(index)}
-                className="mt-2 px-4 py-2 bg-gray-200 text-black rounded flex items-center"
+                className="mt-4 px-4 py-2 bg-yellow-200 text-black rounded flex items-center"
               >
                 {showExplanation[index]
                   ? "Hide Explanation"
