@@ -50,7 +50,7 @@ const Tabs = ({ userId, topicName }) => {
               : "bg-white text-gray-500 border border-white border-b-4"
           } `}
         >
-          Take Quiz
+          Attempt Quiz
         </button>
         <button
           onClick={() => handleTabClick("bookmarked")}
@@ -60,7 +60,7 @@ const Tabs = ({ userId, topicName }) => {
               : "bg-white text-gray-500 border border-white border-b-4"
           } `}
         >
-          Bookmarked Questions
+          My Bookmarks
         </button>
       </div>
       <div>

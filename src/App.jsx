@@ -95,7 +95,7 @@ const App = () => {
         <div
           className={`${
             isLoggedIn ? "bg-gradient-to-tl from-amber-50 to-yellow-200" : ""
-          } w-full px-6 md:w-10/12 py-2 flex justify-between items-center mx-auto`}
+          } w-full px-6  py-2 flex justify-between items-center mx-auto`}
         >
           {isLoggedIn ? (
             <>
