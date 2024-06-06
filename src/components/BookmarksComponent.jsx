@@ -67,11 +67,16 @@ const BookmarkComponent = ({ userId, topicId }) => {
   return (
     <div className="min-h-screen">
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Bookmarked Questions</h2>
+        <h2 className="text-xl md:text-2xl font-bold mb-4 w-full text-center text-gray-800">
+          Bookmarked Questions
+        </h2>
         {bookmarkedQuestions.map((question, index) => (
-          <div key={index} className="mb-4">
+          <div
+            key={index}
+            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 bg-white"
+          >
             <p
-              className="font-semibold cursor-pointer"
+              className=" cursor-pointer"
               onClick={() => toggleExpand(question._id)}
             >
               {`Question ${index + 1}: ${question.questionText}`}
@@ -84,6 +89,11 @@ const BookmarkComponent = ({ userId, topicId }) => {
                   </p>
                 ))}
                 <p className="mt-2 text-gray-700">
+                  <span className="text-green-800 font-semibold">
+                    {`Correct Answer: ${question.correctAnswer}`}
+                  </span>
+                  <br />
+                  <br />
                   <strong>Explanation:</strong> {question.explanation}
                 </p>
               </div>
