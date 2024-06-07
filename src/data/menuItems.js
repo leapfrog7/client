@@ -13,7 +13,7 @@ import { IoNewspaperOutline } from "react-icons/io5";
 export const navItems = [
   {
     label: "Paper I",
-    path: "",
+    path: null,
     icon: IoNewspaperOutline,
     submenu: [
       {
@@ -36,7 +36,7 @@ export const navItems = [
   },
   {
     label: "Paper II",
-    path: "",
+    path: null,
     icon: IoNewspaperOutline,
     submenu: [
       {
