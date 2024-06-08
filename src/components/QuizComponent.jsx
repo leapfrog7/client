@@ -21,6 +21,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const token = localStorage.getItem("jwtToken");
 
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  // const BASE_URL = "http://localhost:5000/api/v1";
 
   useEffect(() => {
     const fetchUnattemptedQuestions = async () => {
@@ -126,6 +127,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   const handleSubmit = async () => {
     try {
+      console.log("inside handleSubmit");
+
       await axios.post(
         `${BASE_URL}/quiz/submitQuiz`,
         {
@@ -139,6 +142,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
           },
         }
       );
+
       setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to submit quiz:", error);
@@ -204,13 +208,13 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
             className="hidden mr-2"
           />
           <span
-            className={`w-8 h-4 flex items-center flex-shrink-0 p-0 bg-gray-300 rounded-full duration-300 ease-in-out ${
-              showAllQuestions ? "bg-blue-600" : ""
+            className={`w-8 h-4 flex items-center flex-shrink-0 p-0 bg-blue-300 rounded-full duration-300 ease-in-out ${
+              showAllQuestions ? "bg-blue-400" : "bg-gray-600"
             }`}
           >
             <span
               className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-400 ease-in-out ${
-                showAllQuestions ? "translate-x-4 bg-blue-700" : ""
+                showAllQuestions ? "translate-x-4 bg-blue-700" : "bg-white"
               }`}
             ></span>
           </span>

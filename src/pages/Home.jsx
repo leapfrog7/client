@@ -3,7 +3,7 @@ import QuizDetails from "../components/QuizDetails";
 import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
 
-const Home = ({ isLoggedIn, username }) => {
+const Home = ({ isLoggedIn, username, isPaymentMade }) => {
   //This contains the path for various pages of topics.
   const userStats = {
     paperI: [
@@ -52,9 +52,10 @@ const Home = ({ isLoggedIn, username }) => {
 
   return (
     <div className="bg-white flex flex-col w-full xl:w-5/6 mx-auto">
+      {!isPaymentMade && isLoggedIn && <AccountActivationNotice />}
       <div
         className={`flex flex-col lg:flex-row mx-auto items-center justify-center ${
-          isLoggedIn ? "hidden" : ""
+          isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""
         }`}
       >
         {/* Image Background Section */}
@@ -97,12 +98,12 @@ const Home = ({ isLoggedIn, username }) => {
           </div>
         </div>
       </div>
-      <div className={`${isLoggedIn ? "hidden" : ""}`}>
+      <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""}`}>
         <QuizDetails />
       </div>
 
       {/* This is the DashBoard which should appear only when the user is logged In */}
-      {isLoggedIn && (
+      {isLoggedIn && isPaymentMade && (
         <div>
           <Dashboard userStats={userStats} username={username} />
         </div>
@@ -112,10 +113,12 @@ const Home = ({ isLoggedIn, username }) => {
 };
 
 import PropTypes from "prop-types";
+import AccountActivationNotice from "../components/AccountActivationNotice";
 
 Home.propTypes = {
   isLoggedIn: PropTypes.bool,
   username: PropTypes.string,
+  isPaymentMade: PropTypes.bool,
 };
 
 export default Home;

@@ -7,7 +7,7 @@ export default function RegistrationSteps() {
   const upiLink = `upi://pay?pa=8447964162@ptsbi&pn=Yatin&am=999.00&cu=INR&tn=Payment%20for%20Undersigned%20registration`;
 
   return (
-    <div className="bg-yellow-100 p-4 rounded-lg my-8">
+    <div className="bg-gradient-to-r from-emerald-100 to-cyan-100 p-4 rounded-lg my-8">
       <h3 className="text-lg font-semibold mb-2">Instructions:</h3>
       <ol className="list-decimal list-inside text-gray-600">
         <li>Your Mobile Number is going to be your Login Id.</li>
@@ -16,7 +16,7 @@ export default function RegistrationSteps() {
           the provided number on WhatsApp.
           <button
             onClick={() => setIsQrVisible(!isQrVisible)}
-            className="ml-2 text-blue-500 underline"
+            className="ml-2 text-custom underline"
           >
             {isQrVisible ? "Hide QR Code" : "Show QR Code"}
           </button>

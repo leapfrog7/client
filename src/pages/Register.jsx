@@ -155,7 +155,7 @@ export default function Register() {
         {/* {username && <div> Hi, {username}</div>} */}
         {!isRegistered && (
           <>
-            <h2 className="text-2xl font-bold text-center mt-8">
+            <h2 className="text-2xl font-bold text-center mt-8 p-2 bg-gradient-to-r from-emerald-200 to-cyan-200 rounded-lg text-gray-600">
               Create an Account
             </h2>
             <p className="text-center text-gray-600 mt-2 mb-8">

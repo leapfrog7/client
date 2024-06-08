@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { GrCaretNext } from "react-icons/gr";
+import { GrCaretPrevious } from "react-icons/gr";
 
 const BookmarkComponent = ({ userId, topicId }) => {
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedQuestionId, setExpandedQuestionId] = useState(null);
+  //for Pagination of Bookmarks
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10; // Number of items per page
 
   const token = localStorage.getItem("jwtToken");
 
@@ -52,6 +57,15 @@ const BookmarkComponent = ({ userId, topicId }) => {
     }
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+  // Calculate the data to display for the current page
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedQuestions = bookmarkedQuestions.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(bookmarkedQuestions.length / pageSize);
+
   if (loading) {
     return <div>Loading bookmarks...</div>;
   }
@@ -70,16 +84,16 @@ const BookmarkComponent = ({ userId, topicId }) => {
         <h2 className="text-xl md:text-2xl font-bold mb-4 w-full text-center text-gray-800">
           Bookmarked Questions
         </h2>
-        {bookmarkedQuestions.map((question, index) => (
+        {paginatedQuestions.map((question, index) => (
           <div
             key={index}
-            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 bg-white"
+            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 bg-slate-50"
           >
             <p
-              className=" cursor-pointer"
+              className="cursor-pointer whitespace-pre-line"
               onClick={() => toggleExpand(question._id)}
             >
-              {`Question ${index + 1}: ${question.questionText}`}
+              {`Question ${startIndex + index + 1}: ${question.questionText}`}
             </p>
             {expandedQuestionId === question._id && (
               <div className="mt-2">
@@ -100,6 +114,27 @@ const BookmarkComponent = ({ userId, topicId }) => {
             )}
           </div>
         ))}
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4 gap-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+            className="px-4 py-2 mx-1 text-xs md:text-base bg-blue-500 text-white rounded disabled:bg-gray-400"
+          >
+            <GrCaretPrevious />
+          </button>
+          <span className="px-4 py-2 text-xs md:text-base mx-1 bg-gray-200 rounded">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+            className="px-4 text-xs md:text-base py-2 mx-1 bg-blue-500 text-white rounded disabled:bg-gray-400"
+          >
+            <GrCaretNext />
+          </button>
+        </div>
       </div>
     </div>
   );

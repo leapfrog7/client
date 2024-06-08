@@ -27,12 +27,14 @@ import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
+import AdminPage from "./pages/Admin";
 
 const App = () => {
   //States
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [isPaymentMade, setIsPaymentMade] = useState(false);
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
@@ -60,6 +62,9 @@ const App = () => {
         } else {
           setIsLoggedIn(true);
           setUsername(decodedToken.name);
+          setIsPaymentMade(decodedToken.paymentMade);
+          console.log(decodedToken.userType);
+          console.log(decodedToken.paymentMade);
           console.log("logged in - " + isLoggedIn);
         }
       } catch (error) {
@@ -119,13 +124,23 @@ const App = () => {
           <Routes>
             <Route
               path="/"
-              element={<Home isLoggedIn={isLoggedIn} username={username} />}
+              element={
+                <Home
+                  isLoggedIn={isLoggedIn}
+                  username={username}
+                  isPaymentMade={isPaymentMade}
+                />
+              }
             />
             <Route path="/about" element={<h1>About page</h1>} />
             <Route path="/register" element={<Register />} />
             <Route
               path="/login"
               element={<Login verifyToken={verifyClientToken} />}
+            />
+            <Route
+              path="/adminPage"
+              element={<AdminPage verifyToken={verifyClientToken} />}
             />
             <Route path="/pages/quiz/paper-II/Pension" element={<Pension />} />
             <Route
