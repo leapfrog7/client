@@ -28,6 +28,9 @@ import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
 import AdminPage from "./pages/Admin";
+import Unauthorized from "./pages/Unauthorized";
+import NotLoggedIn from "./pages/NotLoggedIn";
+import TokenExpired from "./pages/TokenExpired";
 
 const App = () => {
   //States
@@ -142,6 +145,9 @@ const App = () => {
               path="/adminPage"
               element={<AdminPage verifyToken={verifyClientToken} />}
             />
+            <Route path="/pages/Unauthorized" element={<Unauthorized />} />
+            <Route path="/pages/NotLoggedIn" element={<NotLoggedIn />} />
+            <Route path="/pages/TokenExpired" element={<TokenExpired />} />
             <Route path="/pages/quiz/paper-II/Pension" element={<Pension />} />
             <Route
               path="/pages/quiz/paper-I/Constitution"

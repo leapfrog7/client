@@ -11,6 +11,7 @@ const AddQuestionsForm = () => {
       explanation: "",
     },
   ]);
+  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
 
   const handleQuestionChange = (index, field, value) => {
     const newQuestions = [...questions];
@@ -40,13 +41,10 @@ const AddQuestionsForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/v1/quiz/postQuiz",
-        {
-          topicTitle,
-          questions,
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/quiz/postQuiz`, {
+        topicTitle,
+        questions,
+      });
       console.log(response.data.message);
       setTopicTitle(topics[0]);
       setQuestions([

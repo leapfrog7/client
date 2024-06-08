@@ -1,10 +1,11 @@
 import Tabs from "../../components/Tabs";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 export default function Constitution() {
   const [userId, setUserId] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     getUserId();
   }, []);
@@ -20,6 +21,7 @@ export default function Constitution() {
           // Check if the token is expired
           console.log("Token expired");
           localStorage.removeItem("jwtToken");
+          navigate("/pages/TokenExpired");
         } else {
           console.log(decodedToken.userId);
           setUserId(decodedToken.userId);
@@ -30,6 +32,7 @@ export default function Constitution() {
       }
     } else {
       console.log("User is logged out");
+      navigate("/pages/NotLoggedIn");
     }
   }
 
