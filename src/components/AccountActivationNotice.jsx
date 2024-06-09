@@ -4,7 +4,7 @@ const AccountActivationNotice = () => {
   const [isQrVisible, setIsQrVisible] = useState(false);
 
   // UPI payment link with provided details
-  const upiLink = `upi://pay?pa=8447964162@ptsbi&pn=Yatin&am=999.00&cu=INR&tn=Payment%20for%20Undersigned%20registration`;
+  const upiLink = `upi://pay?pa=7827097711@paytm&pn=Seema%20Bhardwaj&am=999.00&cu=INR&tn=Payment%20for%20Undersigned%20registration`;
 
   // Function to detect mobile device
   const isMobileDevice = () => {
