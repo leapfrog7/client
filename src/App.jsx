@@ -225,7 +225,7 @@ const App = () => {
               element={
                 <Constitution
                   progress={userStats.paperI[0].progress}
-                  quizAttempted={userStats.paperI[0].attemptedQuestions}
+                  quizAttempted={String(userStats.paperI[0].attemptedQuestions)}
                 />
               }
             />
@@ -234,7 +234,9 @@ const App = () => {
               element={
                 <Conduct
                   progress={userStats.paperII[3].progress}
-                  quizAttempted={userStats.paperII[3].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[3].attemptedQuestions
+                  )}
                 />
               }
             />
@@ -243,7 +245,7 @@ const App = () => {
               element={
                 <RTI
                   progress={userStats.paperI[1].progress}
-                  quizAttempted={userStats.paperI[1].attemptedQuestions}
+                  quizAttempted={String(userStats.paperI[1].attemptedQuestions)}
                 />
               }
             />
@@ -252,7 +254,9 @@ const App = () => {
               element={
                 <Pension
                   progress={userStats.paperII[2].progress}
-                  quizAttempted={userStats.paperII[2].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[2].attemptedQuestions
+                  )}
                 />
               }
             />
@@ -261,7 +265,9 @@ const App = () => {
               element={
                 <OfficeProcedure
                   progress={userStats.paperII[5].progress}
-                  quizAttempted={userStats.paperII[5].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[5].attemptedQuestions
+                  )}
                 />
               }
             />
@@ -270,7 +276,7 @@ const App = () => {
               element={
                 <DFPR
                   progress={userStats.paperI[2].progress}
-                  quizAttempted={userStats.paperI[2].attemptedQuestions}
+                  quizAttempted={String(userStats.paperI[2].attemptedQuestions)}
                 />
               }
             />
@@ -279,7 +285,9 @@ const App = () => {
               element={
                 <LeaveRules
                   progress={userStats.paperII[0].progress}
-                  quizAttempted={userStats.paperII[0].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[0].attemptedQuestions
+                  )}
                 />
               }
             />
@@ -288,7 +296,7 @@ const App = () => {
               element={
                 <ParliamentaryProcedure
                   progress={userStats.paperI[3].progress}
-                  quizAttempted={userStats.paperI[3].attemptedQuestions}
+                  quizAttempted={String(userStats.paperI[3].attemptedQuestions)}
                 />
               }
             />
@@ -297,7 +305,9 @@ const App = () => {
               element={
                 <CCA
                   progress={userStats.paperII[1].progress}
-                  quizAttempted={userStats.paperII[1].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[1].attemptedQuestions
+                  )}
                 />
               }
             />
@@ -306,7 +316,9 @@ const App = () => {
               element={
                 <GFR
                   progress={userStats.paperII[4].progress}
-                  quizAttempted={userStats.paperII[4].attemptedQuestions}
+                  quizAttempted={String(
+                    userStats.paperII[4].attemptedQuestions
+                  )}
                 />
               }
             />

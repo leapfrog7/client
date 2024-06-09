@@ -17,7 +17,7 @@ const SignInButton = () => {
   return (
     <button
       onClick={handleSignIn}
-      className="bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2"
+      className={`bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2 `}
     >
       <span> Sign In</span>
       <PiSignInLight className="text-yellow-700 text-xl" />

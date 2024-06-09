@@ -69,7 +69,7 @@ const AdminPage = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Admin Page</h1>
+      <h1 className="text-3xl font-bold mb-6">Admin Page</h1>
       {error && <p className="text-red-600 text-center">{error}</p>}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border rounded-lg shadow-lg">

@@ -6,6 +6,8 @@ import SignInButton from "./SignInButton";
 import { navItems } from "../data/menuItems";
 import Logo from "./Logo";
 import { IoMdCloseCircle } from "react-icons/io";
+import { BiLogoGmail } from "react-icons/bi";
+import { FaWhatsapp } from "react-icons/fa";
 
 SideBar.propTypes = {
   isSidebarOpen: PropTypes.bool,
@@ -117,8 +119,33 @@ export default function SideBar({
               {isLoggedIn ? (
                 <SignOutButton verifyToken={verifyToken} />
               ) : (
-                <SignInButton />
+                <div className="flex justify-center items-center h-full">
+                  <SignInButton />
+                </div>
               )}
+            </div>
+            <div className="shadow-lg bg-slate-800 px-2 py-4 rounded-lg text-center transform transition-transform hover:scale-105">
+              <h2 className="text-slate-100 text-xl font-bold mb-4">
+                Contact Us
+              </h2>
+              <div className="text-gray-100 flex flex-col gap-4 text-center">
+                <a
+                  href="mailto:leapfrog.testseries@gmail.com"
+                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-2 text-sm"
+                >
+                  <BiLogoGmail className="mr-1 text-xl text-red-700" />
+                  leapfrog.testseries@gmail.com
+                </a>
+                <a
+                  href="https://wa.me/918368371597"
+                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaWhatsapp className="mr-2 text-xl text-green-600" />
+                  +91 8368371597
+                </a>
+              </div>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 TopicHeading.propTypes = {
   topicName: PropTypes.string,
-  quizAttempted: PropTypes.number,
+  quizAttempted: PropTypes.string,
   progress: PropTypes.string,
 };
 
