@@ -2,8 +2,15 @@ import Tabs from "../../components/Tabs";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import TopicHeading from "../../components/TopicHeading";
 
-export default function Constitution() {
+Constitution.propTypes = {
+  progress: PropTypes.string,
+  quizAttempted: PropTypes.string,
+};
+
+export default function Constitution({ progress, quizAttempted }) {
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
@@ -38,23 +45,11 @@ export default function Constitution() {
 
   return (
     <div className="w-11/12 md:w-10/12 mx-auto mt-2">
-      <div className="bg-slate-100 p-4 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-2 justify-between items-center">
-        <h1 className="text-xl md:text-2xl font-bold text-blue-800 text-center">
-          Constitution
-        </h1>
-        <div className="flex flex-col md:flex-row gap-2 md:gap-8 justify-between items-center">
-          <div className="flex text-sm md:text-base items-center gap-2">
-            <span className="font-semibold text-gray-700">
-              Questions Attempted:
-            </span>
-            <span className="text-gray-900">123</span>
-          </div>
-          <div className="flex text-sm md:text-base items-center gap-2">
-            <span className="font-semibold text-gray-700">Progress:</span>
-            <span className="text-gray-900">67%</span>
-          </div>
-        </div>
-      </div>
+      <TopicHeading
+        topicName={"Constitution"}
+        progress={progress}
+        quizAttempted={quizAttempted}
+      />
       <Tabs userId={userId} topicName={"Constitution"} />
     </div>
   );

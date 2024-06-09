@@ -2,8 +2,15 @@ import Tabs from "../../components/Tabs";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import TopicHeading from "../../components/TopicHeading";
 
-export default function Pension() {
+Pension.propTypes = {
+  progress: PropTypes.string,
+  quizAttempted: PropTypes.string,
+};
+
+export default function Pension({ progress, quizAttempted }) {
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
@@ -38,7 +45,11 @@ export default function Pension() {
 
   return (
     <div className="w-11/12 md:w-10/12 mx-auto mt-2">
-      <p> This is Pension Page</p>
+      <TopicHeading
+        topicName={"Pension Rules"}
+        progress={progress}
+        quizAttempted={quizAttempted}
+      />
       <Tabs userId={userId} topicName={"Pension_Rules"} />
     </div>
   );

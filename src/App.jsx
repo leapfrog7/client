@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 // Components and Pages
 import Login from "./components/Login";
@@ -38,6 +39,54 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [isPaymentMade, setIsPaymentMade] = useState(false);
+  //This is the state which populates the DashBoard Card. The default is zero
+  const [userStats, setUserStats] = useState({
+    paperI: [
+      {
+        title: "Constitution",
+        progress: "0",
+        path: "/pages/quiz/paper-i/Constitution",
+      },
+      { title: "RTI Act", progress: "0", path: "/pages/quiz/paper-i/rti-act" },
+      { title: "DFPR", progress: "0", path: "/pages/quiz/paper-i/dfpr" },
+      {
+        title: "Parliamentary Procedure",
+        progress: "0",
+        path: "/pages/quiz/paper-i/parliamentary-procedure",
+      },
+    ],
+    paperII: [
+      {
+        title: "Leave Rules",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/leave-rules",
+      },
+      {
+        title: "CCS CCA Rules",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/ccs-cca-rules",
+      },
+      {
+        title: "Pension Rules",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/pension-rules",
+      },
+      {
+        title: "Conduct Rules",
+        progress: "0",
+        path: "/pages/quiz/pages/quiz/paper-ii/conduct-rules",
+      },
+      { title: "GFR", progress: "0", path: "/pages/quiz/paper-ii/gfr" },
+      {
+        title: "Office Procedure",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/csmop",
+      },
+    ],
+  });
+
+  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  // const BASE_URL = "http://localhost:5000/api/v1";
 
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
@@ -69,6 +118,7 @@ const App = () => {
           console.log(decodedToken.userType);
           console.log(decodedToken.paymentMade);
           console.log("logged in - " + isLoggedIn);
+          //fetchUserStats(decodedToken.userId);
         }
       } catch (error) {
         console.error("Invalid token", error);
@@ -79,6 +129,25 @@ const App = () => {
       setIsLoggedIn(false);
     }
   }
+
+  //Fetch user stats from the backend to populate the dashboard progress
+  const fetchUserStats = async () => {
+    const token = localStorage.getItem("jwtToken");
+    try {
+      if (token) {
+        const response = await axios.get(`${BASE_URL}/quiz/getUserStats`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUserStats(response.data);
+        console.log(response.data);
+        console.log(userStats);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user stats", err);
+    }
+  };
 
   return (
     <BrowserRouter>
@@ -132,6 +201,8 @@ const App = () => {
                   isLoggedIn={isLoggedIn}
                   username={username}
                   isPaymentMade={isPaymentMade}
+                  fetchUserStats={fetchUserStats}
+                  userStats={userStats}
                 />
               }
             />
@@ -151,35 +222,94 @@ const App = () => {
             <Route path="/pages/quiz/paper-II/Pension" element={<Pension />} />
             <Route
               path="/pages/quiz/paper-I/Constitution"
-              element={<Constitution />}
+              element={
+                <Constitution
+                  progress={userStats.paperI[0].progress}
+                  quizAttempted={userStats.paperI[0].attemptedQuestions}
+                />
+              }
             />
             <Route
               path="/pages/quiz/paper-ii/conduct-rules"
-              element={<Conduct />}
+              element={
+                <Conduct
+                  progress={userStats.paperII[3].progress}
+                  quizAttempted={userStats.paperII[3].attemptedQuestions}
+                />
+              }
             />
-            <Route path="/pages/quiz/paper-i/rti-act" element={<RTI />} />
+            <Route
+              path="/pages/quiz/paper-i/rti-act"
+              element={
+                <RTI
+                  progress={userStats.paperI[1].progress}
+                  quizAttempted={userStats.paperI[1].attemptedQuestions}
+                />
+              }
+            />
             <Route
               path="/pages/quiz/paper-ii/pension-rules"
-              element={<Pension />}
+              element={
+                <Pension
+                  progress={userStats.paperII[2].progress}
+                  quizAttempted={userStats.paperII[2].attemptedQuestions}
+                />
+              }
             />
             <Route
               path="/pages/quiz/paper-ii/csmop"
-              element={<OfficeProcedure />}
+              element={
+                <OfficeProcedure
+                  progress={userStats.paperII[5].progress}
+                  quizAttempted={userStats.paperII[5].attemptedQuestions}
+                />
+              }
             />
-            <Route path="/pages/quiz/paper-i/dfpr" element={<DFPR />} />
+            <Route
+              path="/pages/quiz/paper-i/dfpr"
+              element={
+                <DFPR
+                  progress={userStats.paperI[2].progress}
+                  quizAttempted={userStats.paperI[2].attemptedQuestions}
+                />
+              }
+            />
             <Route
               path="/pages/quiz/paper-ii/leave-rules"
-              element={<LeaveRules />}
+              element={
+                <LeaveRules
+                  progress={userStats.paperII[0].progress}
+                  quizAttempted={userStats.paperII[0].attemptedQuestions}
+                />
+              }
             />
             <Route
               path="/pages/quiz/paper-i/parliamentary-procedure"
-              element={<ParliamentaryProcedure />}
+              element={
+                <ParliamentaryProcedure
+                  progress={userStats.paperI[3].progress}
+                  quizAttempted={userStats.paperI[3].attemptedQuestions}
+                />
+              }
             />
             <Route
               path="/pages/quiz/paper-ii/ccs-cca-rules"
-              element={<CCA />}
+              element={
+                <CCA
+                  progress={userStats.paperII[1].progress}
+                  quizAttempted={userStats.paperII[1].attemptedQuestions}
+                />
+              }
             />
-            <Route path="/pages/quiz/paper-ii/gfr" element={<GFR />} />
+            <Route
+              path="/pages/quiz/paper-ii/gfr"
+              element={
+                <GFR
+                  progress={userStats.paperII[4].progress}
+                  quizAttempted={userStats.paperII[4].attemptedQuestions}
+                />
+              }
+            />
             <Route
               path="/pages/quiz/addQuestions"
               element={<AddQuestionsForm />}

@@ -2,53 +2,19 @@ import { Link } from "react-router-dom";
 import QuizDetails from "../components/QuizDetails";
 import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
+import { useEffect } from "react";
+// import axios from "axios";
 
-const Home = ({ isLoggedIn, username, isPaymentMade }) => {
-  //This contains the path for various pages of topics.
-  const userStats = {
-    paperI: [
-      {
-        title: "Constitution",
-        progress: "75",
-        path: "/pages/quiz/paper-i/Constitution",
-      },
-      { title: "RTI Act", progress: "50", path: "/pages/quiz/paper-i/rti-act" },
-      { title: "DFPR", progress: "60", path: "/pages/quiz/paper-i/dfpr" },
-      {
-        title: "Parliamentary Procedure",
-        progress: "80",
-        path: "/pages/quiz/paper-i/parliamentary-procedure",
-      },
-    ],
-    paperII: [
-      {
-        title: "Leave Rules",
-        progress: "40",
-        path: "/pages/quiz/paper-ii/leave-rules",
-      },
-      {
-        title: "CCS CCA Rules",
-        progress: "90",
-        path: "/pages/quiz/paper-ii/ccs-cca-rules",
-      },
-      {
-        title: "Pension Rules",
-        progress: "70",
-        path: "/pages/quiz/paper-ii/pension-rules",
-      },
-      {
-        title: "Conduct Rules",
-        progress: "55",
-        path: "/pages/quiz/pages/quiz/paper-ii/conduct-rules",
-      },
-      { title: "GFR", progress: "65", path: "/pages/quiz/paper-ii/gfr" },
-      {
-        title: "Office Procedure",
-        progress: "65",
-        path: "/pages/quiz/paper-ii/csmop",
-      },
-    ],
-  };
+const Home = ({
+  isLoggedIn,
+  username,
+  isPaymentMade,
+  fetchUserStats,
+  userStats,
+}) => {
+  useEffect(() => {
+    fetchUserStats();
+  }, []);
 
   return (
     <div className="bg-white flex flex-col w-full xl:w-5/6 mx-auto">
@@ -119,6 +85,8 @@ Home.propTypes = {
   isLoggedIn: PropTypes.bool,
   username: PropTypes.string,
   isPaymentMade: PropTypes.bool,
+  fetchUserStats: PropTypes.func,
+  userStats: PropTypes.object,
 };
 
 export default Home;

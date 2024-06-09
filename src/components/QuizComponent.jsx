@@ -299,9 +299,12 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
             {showExplanation[currentQuestionIndex] && (
               <div className="mt-2 text-gray-700 text-sm md:text-base">
                 <p style={{ whiteSpace: "pre-line" }}>
-                  <span className="text-green-800 font-semibold ">
+                  <span className="text-green-800 font-semibold p-1">
                     {" "}
-                    Answer -{currentQuestion.correctAnswer}
+                    Answer -{" "}
+                    <span className="bg-green-100 rounded-sm px-2">
+                      {currentQuestion.correctAnswer}
+                    </span>
                   </span>
                   <br /> {currentQuestion.explanation}
                 </p>
