@@ -131,7 +131,7 @@ export default function SideBar({
               <div className="text-gray-100 flex flex-col gap-4 text-center">
                 <a
                   href="mailto:leapfrog.testseries@gmail.com"
-                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-2 text-sm"
+                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-3"
                 >
                   <BiLogoGmail className="mr-1 text-xl text-red-700" />
                   leapfrog.testseries@gmail.com

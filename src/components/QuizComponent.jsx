@@ -22,56 +22,54 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1";
+  const fetchUnattemptedQuestions = async () => {
+    setLoading(true);
+    try {
+      const endpoint = showAllQuestions
+        ? `${BASE_URL}/quiz/getRandomQuiz`
+        : `${BASE_URL}/quiz/getQuiz`;
+      const response = await axios.get(endpoint, {
+        params: { userId, topicName, topicId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setQuizData(response.data);
+    } catch (error) {
+      console.error("Failed to fetch questions:", error);
+      setError("Failed to fetch questions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchBookmarks = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/quiz/fetchAllBookmarks`, {
+        params: { userId, topicId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("fetchBookmarks", response.data.bookmarks);
+      const topicBookmark = response.data.bookmarks.find(
+        (bookmark) => bookmark.topic._id === topicId
+      );
+      if (topicBookmark) {
+        setBookmarkedQuestions(topicBookmark.questions.map((q) => q._id));
+      } else {
+        setBookmarkedQuestions([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch bookmarks:", error);
+    }
+  };
   useEffect(() => {
-    const fetchUnattemptedQuestions = async () => {
-      setLoading(true);
-      try {
-        const endpoint = showAllQuestions
-          ? `${BASE_URL}/quiz/getRandomQuiz`
-          : `${BASE_URL}/quiz/getQuiz`;
-        const response = await axios.get(endpoint, {
-          params: { userId, topicName, topicId },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setQuizData(response.data);
-      } catch (error) {
-        console.error("Failed to fetch questions:", error);
-        setError("Failed to fetch questions");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchBookmarks = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/quiz/fetchAllBookmarks`, {
-          params: { userId, topicId },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log("fetchBookmarks", response.data.bookmarks);
-        const topicBookmark = response.data.bookmarks.find(
-          (bookmark) => bookmark.topic._id === topicId
-        );
-        if (topicBookmark) {
-          setBookmarkedQuestions(topicBookmark.questions.map((q) => q._id));
-        } else {
-          setBookmarkedQuestions([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch bookmarks:", error);
-      }
-    };
-
     if (userId) {
       fetchUnattemptedQuestions();
       fetchBookmarks();
     }
-  }, [userId, topicName, showAllQuestions, topicId]);
+  }, [topicName, showAllQuestions, topicId]);
 
   const handleOptionClick = (option) => {
     setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: option });

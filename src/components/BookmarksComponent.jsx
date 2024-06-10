@@ -80,35 +80,37 @@ const BookmarkComponent = ({ userId, topicId }) => {
 
   return (
     <div className="min-h-screen">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white rounded-lg shadow-md">
         <h2 className="text-xl md:text-2xl font-bold mb-4 w-full text-center text-gray-800">
           Bookmarked Questions
         </h2>
         {paginatedQuestions.map((question, index) => (
           <div
             key={index}
-            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 bg-slate-50"
+            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 "
           >
             <p
-              className="cursor-pointer whitespace-pre-line"
+              className="cursor-pointer whitespace-pre-line font-semibold"
               onClick={() => toggleExpand(question._id)}
             >
               {`Question ${startIndex + index + 1}: ${question.questionText}`}
             </p>
             {expandedQuestionId === question._id && (
-              <div className="mt-2">
+              <div className="mt-2 bg-gradient-to-b from-white to-slate-100 rounded-lg p-2">
                 {question.options.map((option, i) => (
                   <p key={i} className="text-gray-700">
                     {option}
                   </p>
                 ))}
-                <p className="mt-2 text-gray-700">
-                  <span className="text-green-800 font-semibold">
+                <p className="mt-4 text-gray-700">
+                  <span className="text-green-800 font-semibold bg-green-100 p-2 rounded-md">
                     {`Correct Answer: ${question.correctAnswer}`}
                   </span>
                   <br />
                   <br />
-                  <strong>Explanation:</strong> {question.explanation}
+                  <span className="whitespace-pre-line">
+                    <strong>Explanation:</strong> {question.explanation}
+                  </span>
                 </p>
               </div>
             )}
@@ -116,7 +118,7 @@ const BookmarkComponent = ({ userId, topicId }) => {
         ))}
 
         {/* Pagination Controls */}
-        <div className="flex justify-center mt-4 gap-4">
+        <div className="flex justify-center my-4 pb-4 gap-4">
           <button
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}

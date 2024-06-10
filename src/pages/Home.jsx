@@ -3,6 +3,7 @@ import QuizDetails from "../components/QuizDetails";
 import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
 import { useEffect } from "react";
+// import FeatureCarousel from "../components/FeatureCarousel";
 // import axios from "axios";
 
 const Home = ({
@@ -64,6 +65,7 @@ const Home = ({
           </div>
         </div>
       </div>
+      {/* <FeatureCarousel /> */}
       <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""}`}>
         <QuizDetails />
       </div>

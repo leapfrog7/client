@@ -41,7 +41,7 @@ const AddQuestionsForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(`${BASE_URL}/quiz/postQuiz`, {
+      const response = await axios.post(`${BASE_URL}/checkAdmin/postQuiz`, {
         topicTitle,
         questions,
       });
