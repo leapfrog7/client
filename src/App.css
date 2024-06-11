@@ -1,0 +1,8 @@
+/* Add this CSS to your global stylesheet or as inline styles if necessary */
+.carousel .slide {
+  touch-action: pan-y; /* Ensure that vertical panning is allowed */
+}
+
+.carousel img {
+  pointer-events: none; /* Allow touches to pass through images */
+}

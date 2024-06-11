@@ -4,6 +4,9 @@ import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
 import { useEffect } from "react";
 import FeatureCarousel from "../components/FeatureCarousel";
+import AccountActivationNotice from "../components/AccountActivationNotice";
+// import Carousel_N from "../components/Carousel_N";
+
 // import axios from "axios";
 
 const Home = ({
@@ -65,7 +68,17 @@ const Home = ({
           </div>
         </div>
       </div>
-      {!isLoggedIn && <FeatureCarousel />}
+      <div className="max-w-screen-lg mx-auto overflow-y-auto">
+        {!isLoggedIn && (
+          <div>
+            <h2 className="max-w-80 mx-auto rounded-lg text-2xl font-bold text-center text-gray-700 mb-2 ">
+              Features
+            </h2>
+            <FeatureCarousel />
+          </div>
+        )}
+      </div>
+
       <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""}`}>
         <QuizDetails />
       </div>
@@ -81,7 +94,8 @@ const Home = ({
 };
 
 import PropTypes from "prop-types";
-import AccountActivationNotice from "../components/AccountActivationNotice";
+
+// import { Carousel } from "react-responsive-carousel";
 
 Home.propTypes = {
   isLoggedIn: PropTypes.bool,

@@ -3,20 +3,22 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 
 const FeatureCarousel = () => {
   return (
-    <div className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8 overflow-y-auto">
+    <div className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
       <Carousel
         showArrows={true}
         showThumbs={false}
         showStatus={false}
         infiniteLoop={true}
         autoPlay={true}
-        interval={5000}
+        interval={7000}
         emulateTouch={true}
         swipeable={true} // Ensure touch swipe is enabled
         useKeyboardArrows={true} // Allow keyboard arrows for navigation
+        preventMovementUntilSwipeScrollTolerance={true} // Add this line
+        swipeScrollTolerance={50} // Add this line
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gray-100 rounded-lg shadow-lg">
-          <div className="flex flex-col items-center max-w-md mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-50 to-pink-50 rounded-lg shadow-lg">
+          <div className="flex flex-col items-center max-w-md mx-auto overflow-hidden z-10">
             <img
               src="/progress.png"
               srcSet="/progress.png 600w, progress.png 300w"
@@ -51,7 +53,7 @@ const FeatureCarousel = () => {
             <p className="text-sm sm:text-base">Available to you anytime</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gray-100 rounded-lg shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-100 to-pink-50 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
               src="/quiz.png"
@@ -60,9 +62,11 @@ const FeatureCarousel = () => {
               alt="Customizable quizzes"
               className="mb-4 rounded-lg lg:object-cover"
             />
+
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Customizable Quizzes
             </h2>
+
             <p className="text-sm sm:text-base">
               Create quizzes tailored to your needs
             </p>
@@ -84,7 +88,7 @@ const FeatureCarousel = () => {
             <p className="text-sm sm:text-base">
               Get insights on your performance
             </p>
-            <p className="text-sm sm:text-base">
+            <p className="text-sm sm:text-base pb-4">
               Analyze your strengths and weaknesses
             </p>
           </div>
