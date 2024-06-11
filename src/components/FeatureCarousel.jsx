@@ -3,7 +3,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 
 const FeatureCarousel = () => {
   return (
-    <div className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-screen-lg mx-auto px-4 sm:px-6 lg:px-8 overflow-y-auto">
       <Carousel
         showArrows={true}
         showThumbs={false}
@@ -12,6 +12,8 @@ const FeatureCarousel = () => {
         autoPlay={true}
         interval={5000}
         emulateTouch={true}
+        swipeable={true} // Ensure touch swipe is enabled
+        useKeyboardArrows={true} // Allow keyboard arrows for navigation
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gray-100 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto">
