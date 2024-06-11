@@ -16,11 +16,11 @@ const FeatureCarousel = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gray-100 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
-              src="https://via.placeholder.com/300x200"
-              srcSet="https://via.placeholder.com/600x400 600w, https://via.placeholder.com/300x200 300w"
+              src="/progress.png"
+              srcSet="/progress.png 600w, progress.png 300w"
               sizes="(max-width: 640px) 300px, 600px"
               alt="Track your progress"
-              className="mb-4 rounded-lg"
+              className="mb-4 rounded-lg object-cover lg:max-h-96"
             />
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Track Your Progress
@@ -34,11 +34,11 @@ const FeatureCarousel = () => {
           </div>
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
-              src="https://via.placeholder.com/300x200"
-              srcSet="https://via.placeholder.com/600x400 600w, https://via.placeholder.com/300x200 300w"
+              src="/Bookmarks.png" // Replace with your image path
+              srcSet="/Bookmarks.png 600w"
               sizes="(max-width: 640px) 300px, 600px"
               alt="Bookmark important questions"
-              className="mb-4 rounded-lg"
+              className="mb-4 rounded-lg object-cover lg:max-h-96"
             />
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Bookmark Important Questions
@@ -52,11 +52,11 @@ const FeatureCarousel = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gray-100 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
-              src="https://via.placeholder.com/300x200"
-              srcSet="https://via.placeholder.com/600x400 600w, https://via.placeholder.com/300x200 300w"
+              src="/quiz.png"
+              srcSet="/quiz.png 600w, /quiz.png 300w"
               sizes="(max-width: 640px) 300px, 600px"
               alt="Customizable quizzes"
-              className="mb-4 rounded-lg"
+              className="mb-4 rounded-lg lg:object-cover"
             />
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Customizable Quizzes
@@ -70,11 +70,11 @@ const FeatureCarousel = () => {
           </div>
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
-              src="https://via.placeholder.com/300x200"
-              srcSet="https://via.placeholder.com/600x400 600w, https://via.placeholder.com/300x200 300w"
+              src="/track.png"
+              srcSet="/track.png 600w, /track.png 300w"
               sizes="(max-width: 640px) 300px, 600px"
               alt="Detailed analytics"
-              className="mb-4 rounded-lg"
+              className="mb-4 rounded-lg lg:object-cover"
             />
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Detailed Analytics
