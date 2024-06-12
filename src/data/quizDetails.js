@@ -12,22 +12,22 @@ export const paperI_Items = [
   {
     icon: FaGavel,
     title: "Constitution",
-    description: "Understanding the framework of the Constitution.",
+    description: "The principles of the Constitution of India.",
   },
   {
     icon: LuFileSearch,
     title: "RTI Act",
-    description: "Right to Information Act explained.",
+    description: "Right to Information Act, 2005.",
   },
   {
     icon: GiReceiveMoney,
     title: "DFPR",
-    description: "Detailed Financial and Procedural Rules.",
+    description: "Delegtion of Financial Power Rules, 1978.",
   },
   {
     icon: GrGroup,
     title: "Parliamentary Procedure",
-    description: "Procedures followed in the parliament.",
+    description: "Rules of Procedure and Conduct of Business in Lok Sabha.",
   },
 ];
 
@@ -35,28 +35,33 @@ export const paperII_Items = [
   {
     icon: SlCalender,
     title: "Leave Rules",
-    description: "Comprehensive guide on leave rules.",
+    description: "Central Civil Service (Leave) Rules, 1972",
   },
   {
     icon: TbReportSearch,
     title: "CCS CCA Rules",
     description:
-      "Central Civil Services (Classification, Control, and Appeal) Rules.",
+      "Central Civil Services (Classification, Control, and Appeal) Rules, 1965.",
   },
   {
     icon: FaPersonCane,
     title: "Pension Rules",
-    description: "Understanding the rules of pension.",
+    description: "Central Civil Services (Pension) Rules, 2021.",
   },
   {
     icon: MdOutlineHandshake,
     title: "Conduct Rules",
-    description: "Rules of conduct for civil servants.",
+    description: "Central Civil Services (Conduct) Rules, 1964.",
   },
   {
     icon: GiPayMoney,
     title: "GFR",
-    description: "General Financial Rules explained.",
+    description: "General Financial Rules, 2017.",
+  },
+  {
+    icon: GiPayMoney,
+    title: "CSMOP 2022",
+    description: "Manual of Office Procedure (CSMOP).",
   },
 ];
 

@@ -16,6 +16,7 @@ import Footer from "./components/Footer";
 import Logo from "./components/Logo";
 import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
+import Subscribe from "./pages/Subscribe";
 import Constitution from "./pages/quiz/Constitution";
 import Conduct from "./pages/quiz/Conduct";
 import RTI from "./pages/quiz/RTI";
@@ -208,6 +209,7 @@ const App = () => {
             />
             <Route path="/about" element={<h1>About page</h1>} />
             <Route path="/register" element={<Register />} />
+            <Route path="/subscribe" element={<Subscribe />} />
             <Route
               path="/login"
               element={<Login verifyToken={verifyClientToken} />}

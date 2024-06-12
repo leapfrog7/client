@@ -2,10 +2,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaRegHandPointUp } from "react-icons/fa";
 import { PiCurrencyInr } from "react-icons/pi";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const PricingSection = () => {
   const originalPrice = 1200;
   const discountedPrice = 999;
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white shadow-md rounded-lg max-w-md mx-auto p-4 text-center">
@@ -23,7 +25,10 @@ const PricingSection = () => {
         </div>
         <p className="text-gray-600 text-sm">Limited time offer!</p>
       </div>
-      <button className="bg-white text-customBlue border-blue-800 border px-8 py-2 rounded-lg hover:bg-customBlue hover:text-white transition duration-300 flex items-center justify-center mx-auto">
+      <button
+        className="bg-white text-customBlue border-blue-800 border px-8 py-2 rounded-lg hover:bg-customBlue hover:text-white transition duration-300 flex items-center justify-center mx-auto"
+        onClick={() => navigate("/subscribe")}
+      >
         Subscribe <FaRegHandPointUp className="ml-2 hover:text-white" />
       </button>
       <div className="flex justify-center mt-6 space-x-2 min-w-56 gap-2 text-sm">

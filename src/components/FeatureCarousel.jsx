@@ -17,7 +17,7 @@ const FeatureCarousel = () => {
         preventMovementUntilSwipeScrollTolerance={true} // Add this line
         swipeScrollTolerance={50} // Add this line
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-50 to-pink-50 rounded-lg shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-100 to-pink-100 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto overflow-hidden z-10">
             <img
               src="/progress.png"
@@ -29,11 +29,9 @@ const FeatureCarousel = () => {
             <h2 className="text-lg sm:text-xl font-bold mb-2">
               Track Your Progress
             </h2>
+
             <p className="text-sm sm:text-base">
-              Option to get unattempted quiz
-            </p>
-            <p className="text-sm sm:text-base">
-              See your progress in real-time
+              See your progress in real-time as you submit your quiz
             </p>
           </div>
           <div className="flex flex-col items-center max-w-md mx-auto">
@@ -53,7 +51,7 @@ const FeatureCarousel = () => {
             <p className="text-sm sm:text-base">Available to you anytime</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-100 to-pink-50 rounded-lg shadow-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 sm:p-8 bg-gradient-to-r from-yellow-100 to-pink-100 rounded-lg shadow-lg">
           <div className="flex flex-col items-center max-w-md mx-auto">
             <img
               src="/quiz.png"
@@ -64,14 +62,12 @@ const FeatureCarousel = () => {
             />
 
             <h2 className="text-lg sm:text-xl font-bold mb-2">
-              Customizable Quizzes
+              Customized Quiz Experience
             </h2>
 
             <p className="text-sm sm:text-base">
-              Create quizzes tailored to your needs
-            </p>
-            <p className="text-sm sm:text-base">
-              Choose topics and difficulty levels
+              Choose between random questions from any topic or focus
+              exclusively on unattempted quizzes!
             </p>
           </div>
           <div className="flex flex-col items-center max-w-md mx-auto">
@@ -83,13 +79,11 @@ const FeatureCarousel = () => {
               className="mb-4 rounded-lg lg:object-cover"
             />
             <h2 className="text-lg sm:text-xl font-bold mb-2">
-              Detailed Analytics
+              Progress Dashboard
             </h2>
             <p className="text-sm sm:text-base">
-              Get insights on your performance
-            </p>
-            <p className="text-sm sm:text-base pb-4">
-              Analyze your strengths and weaknesses
+              helping you to focus your efforts and achieve your learning goals
+              efficiently
             </p>
           </div>
         </div>

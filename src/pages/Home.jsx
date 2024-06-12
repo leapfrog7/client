@@ -47,15 +47,22 @@ const Home = ({
             <div className="w-full md:w-3/5 flex items-center justify-center p-4 lg:p-8 bg-white">
               <div className="max-w-lg text-center md:text-left">
                 <h1 className="text-2xl md:text-4xl font-bold mb-4">
-                  Welcome to Our Website
+                  Welcome to{" "}
+                  <span className="text-customBlue">UnderSigned</span>
                 </h1>
-                <p className="text-base md:text-lg mb-4">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Phasellus imperdiet, nulla et dictum interdum, nisi lorem
-                  egestas odio, vitae scelerisque enim ligula venenatis dolor.
+                <p className="text-base md:text-lg mb-4 text-gray-700">
+                  Our platform is designed to help you excel in your exams with
+                  a wide range of quizzes tailored specifically for LDCE
+                  aspirants.
+                </p>
+                <p className="text-base md:text-lg mb-4 text-gray-700">
+                  We equip you with all the essential tools for success,
+                  including progress tracking, bookmarking of important
+                  questions, topic-wise quizzes, and the option to focus
+                  exclusively on unattempted questions.
                 </p>
                 <Link
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white my-4 px-6 py-2 rounded hover:bg-blue-600"
                   to="/register"
                 >
                   Register
