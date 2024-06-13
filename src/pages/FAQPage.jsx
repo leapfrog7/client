@@ -72,7 +72,7 @@ const FAQPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 ">
-      <h1 className="bg-slate-50 rounded-md text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-700 flex gap-2 items-center justify-center">
+      <h1 className="bg-white rounded-md text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-700 flex gap-2 items-center justify-center">
         <span>Frequently Asked Questions</span>{" "}
         <img src="/faq.png" width={60} height={60} />
       </h1>
@@ -80,14 +80,14 @@ const FAQPage = () => {
         <div key={index} className="mb-4">
           <div
             onClick={() => toggleQuestion(index)}
-            className="cursor-pointer bg-gradient-to-r from-rose-600 to-pink-600 p-4 rounded-lg shadow-md hover:bg-pink-300 transition duration-300 text-white"
+            className="cursor-pointer bg-gradient-to-r from-rose-500 to-pink-500 p-4 rounded-lg shadow-md hover:bg-pink-300 transition duration-300 text-white"
           >
             <h2 className="text-sm md:text-base xl:text-lg font-semibold">
               {faq.question}
             </h2>
           </div>
           {openQuestionIndex === index && (
-            <div className="bg-white p-4 border-l-4 border-pink-700 text-gray-600 rounded-r-lg shadow-inner">
+            <div className="bg-white p-4 border-l-4 border-pink-700 text-gray-600 rounded-r-lg shadow-inner text-sm md:text-base xl:text-lg">
               <p>{faq.answer}</p>
             </div>
           )}
