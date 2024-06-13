@@ -31,8 +31,8 @@ const Footer = () => {
               </li>
               <li className="flex items-center justify-center">
                 <MdOutlineFeaturedPlayList className="mr-2" />
-                <a href="/" className="hover:text-yellow-500">
-                  Features
+                <a href="/FAQs" className="hover:text-yellow-500">
+                  FAQs
                 </a>
               </li>
             </ul>

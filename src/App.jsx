@@ -33,6 +33,7 @@ import AdminPage from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
 import NotLoggedIn from "./pages/NotLoggedIn";
 import TokenExpired from "./pages/TokenExpired";
+import FAQPage from "./pages/FAQPage";
 
 const App = () => {
   //States
@@ -210,6 +211,7 @@ const App = () => {
             <Route path="/about" element={<h1>About page</h1>} />
             <Route path="/register" element={<Register />} />
             <Route path="/subscribe" element={<Subscribe />} />
+            <Route path="/FAQs" element={<FAQPage />} />
             <Route
               path="/login"
               element={<Login verifyToken={verifyClientToken} />}

@@ -59,7 +59,7 @@ export default function SideBar({
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } transition-transform lg:hidden md:hidden`}
       >
-        <div className="p-4 w-4/5 bg-gray-800 h-full">
+        <div className="p-4 w-4/5 bg-gray-800 h-full overflow-y-auto">
           {/* Logo in Sidebar with close button */}
           <div className="flex items-center justify-between mb-8 mt-1">
             <div className="flex items-center space-x-2">
@@ -124,21 +124,21 @@ export default function SideBar({
                 </div>
               )}
             </div>
-            <div className="shadow-lg bg-slate-800 px-2 py-4 rounded-lg text-center transform transition-transform hover:scale-105">
+            <div className="shadow-lg bg-slate-600 px-2 py-4 rounded-lg text-center transform transition-transform hover:scale-105">
               <h2 className="text-slate-100 text-xl font-bold mb-4">
                 Contact Us
               </h2>
               <div className="text-gray-100 flex flex-col gap-4 text-center">
                 <a
                   href="mailto:leapfrog.testseries@gmail.com"
-                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-3"
+                  className="hover:text-yellow-500 flex items-center justify-center text-sm bg-slate-200 text-gray-700 rounded-xl py-2"
                 >
                   <BiLogoGmail className="mr-1 text-xl text-red-700" />
                   leapfrog.testseries@gmail.com
                 </a>
                 <a
                   href="https://wa.me/918368371597"
-                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-2"
+                  className="hover:text-yellow-500 flex items-center justify-center text-base bg-slate-200 text-gray-700 rounded-xl py-1"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
