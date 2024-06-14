@@ -27,6 +27,7 @@ import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
+import About from "./pages/About";
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
 import AdminPage from "./pages/Admin";
@@ -208,10 +209,11 @@ const App = () => {
                 />
               }
             />
-            <Route path="/about" element={<h1>About page</h1>} />
+
             <Route path="/register" element={<Register />} />
             <Route path="/subscribe" element={<Subscribe />} />
             <Route path="/FAQs" element={<FAQPage />} />
+            <Route path="/about" element={<About />} />
             <Route
               path="/login"
               element={<Login verifyToken={verifyClientToken} />}

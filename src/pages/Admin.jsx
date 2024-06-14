@@ -12,7 +12,7 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/checkAdmin`, {
+        const response = await axios.get(`${BASE_URL}/updatePaymentStatus`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
