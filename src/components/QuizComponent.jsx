@@ -12,6 +12,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); //for loader spinner
   const [showExplanation, setShowExplanation] = useState({});
   const [loading, setLoading] = useState(true);
   const [loadingBM, setLoadingBM] = useState(false);
@@ -124,6 +125,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     try {
       console.log("inside handleSubmit");
 
@@ -145,6 +147,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     } catch (error) {
       console.error("Failed to submit quiz:", error);
       setError("Failed to submit quiz");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -315,8 +319,13 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               <button
                 onClick={handleSubmit}
                 className="px-12 py-2 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white rounded items-center"
+                disabled={isSubmitting} // Disable button when submitting
               >
-                Submit
+                {isSubmitting ? (
+                  <TailSpin color="#fff" height={20} width={20} />
+                ) : (
+                  "Submit"
+                )}
               </button>
             </div>
           )}

@@ -304,7 +304,7 @@ export default function Register() {
         {error && !isRegistered && (
           <div className="mt-6 text-center p-4 bg-red-100 text-red-800 rounded-lg">
             <p className="text-lg font-semibold">
-              The Mobile Number already exists
+              The Mobile Number or Email already exist!
             </p>
           </div>
         )}
