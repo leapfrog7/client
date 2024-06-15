@@ -5,6 +5,7 @@ import Dashboard from "../components/Dashboard";
 import { useEffect } from "react";
 import FeatureCarousel from "../components/FeatureCarousel";
 import AccountActivationNotice from "../components/AccountActivationNotice";
+import { Helmet } from "react-helmet";
 // import Carousel_N from "../components/Carousel_N";
 
 // import axios from "axios";
@@ -22,6 +23,24 @@ const Home = ({
 
   return (
     <div className="bg-white flex flex-col w-full xl:w-5/6 mx-auto">
+      <Helmet>
+        <title>Home Page - UnderSigned</title>
+        <meta
+          name="description"
+          content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC) for promotion to SO or PS grade"
+        />
+        <meta
+          name="keywords"
+          content="UnderSigned, LDCE, Limited Departmental, Section Officer, Test Series, CCS CCA, Pension, Conduct, Leave Rules"
+        />
+        <meta property="og:title" content="Home Page - Your React App" />
+        <meta
+          property="og:description"
+          content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC)"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
       {!isPaymentMade && isLoggedIn && <AccountActivationNotice />}
       <div
         className={`flex flex-col lg:flex-row mx-auto items-center justify-center ${
