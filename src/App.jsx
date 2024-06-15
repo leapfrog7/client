@@ -26,6 +26,7 @@ import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
+import AoBR from "./pages/quiz/AoBR";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
 import About from "./pages/About";
 //Icons
@@ -56,6 +57,11 @@ const App = () => {
         title: "Parliamentary Procedure",
         progress: "0",
         path: "/pages/quiz/paper-i/parliamentary-procedure",
+      },
+      {
+        title: "AoBR",
+        progress: "0",
+        path: "/pages/quiz/paper-i/AoBR",
       },
     ],
     paperII: [
@@ -303,6 +309,15 @@ const App = () => {
                 <ParliamentaryProcedure
                   progress={userStats.paperI[3].progress}
                   quizAttempted={String(userStats.paperI[3].attemptedQuestions)}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-i/AoBR"
+              element={
+                <AoBR
+                  progress={userStats.paperI[4].progress}
+                  quizAttempted={String(userStats.paperI[4].attemptedQuestions)}
                 />
               }
             />
