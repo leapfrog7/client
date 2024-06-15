@@ -12,7 +12,7 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/updatePaymentStatus`, {
+        const response = await axios.get(`${BASE_URL}/checkAdmin`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
@@ -29,7 +29,7 @@ const AdminPage = () => {
   const updatePaymentStatus = async (userId, paymentMade) => {
     try {
       const response = await axios.patch(
-        `${BASE_URL}/checkAdmin`,
+        `${BASE_URL}/updatePaymentStatus`,
         { userId, paymentMade },
         {
           headers: {
