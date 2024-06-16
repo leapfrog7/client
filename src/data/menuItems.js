@@ -1,5 +1,5 @@
 import { FiUserPlus, FiBriefcase } from "react-icons/fi";
-import { FaGavel } from "react-icons/fa";
+import { FaGavel, FaQuestionCircle, FaBook, FaSearch } from "react-icons/fa";
 import { LuFileSearch } from "react-icons/lu";
 import { GiReceiveMoney } from "react-icons/gi";
 import { GrGroup } from "react-icons/gr";
@@ -8,7 +8,7 @@ import { MdOutlineHandshake } from "react-icons/md";
 import { FaPersonCane } from "react-icons/fa6";
 import { GiPayMoney } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
-import { IoNewspaperOutline } from "react-icons/io5";
+import { IoNewspaperOutline, IoFolderOpenOutline } from "react-icons/io5";
 
 export const navItems = [
   {
@@ -31,6 +31,28 @@ export const navItems = [
         label: "Parliamentary Procedure",
         path: "/pages/quiz/paper-i/parliamentary-procedure",
         icon: GrGroup,
+      },
+      {
+        label: "AoBR",
+        path: null,
+        icon: IoFolderOpenOutline, // You can choose an appropriate icon
+        submenu: [
+          {
+            label: "AoBR Quiz",
+            path: "/pages/quiz/paper-i/AoBR",
+            icon: FaQuestionCircle,
+          },
+          {
+            label: "AoBR Full",
+            path: "/pages/aobr/complete",
+            icon: FaBook,
+          },
+          {
+            label: "AoBR Lookup",
+            path: "/pages/aobr/lookup",
+            icon: FaSearch,
+          },
+        ],
       },
     ],
   },

@@ -5,7 +5,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 const PricingSection = () => {
-  const originalPrice = 1200;
+  const originalPrice = 1499;
   const discountedPrice = 999;
   const navigate = useNavigate();
 

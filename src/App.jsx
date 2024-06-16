@@ -29,6 +29,9 @@ import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
 import About from "./pages/About";
+import AddMDO from "./pages/quiz/AddMDO";
+import AoBR_Full from "./pages/AoBR_Full";
+import AoBR_Lookup from "./pages/AoBR_Lookup";
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
 import AdminPage from "./pages/Admin";
@@ -203,6 +206,9 @@ const App = () => {
 
         <div className="flex-grow min-h-screen">
           <Routes>
+            {/* Admin Routes */}
+            <Route path="/admin/addMDO" element={<AddMDO />} />
+
             <Route
               path="/"
               element={
@@ -231,7 +237,8 @@ const App = () => {
             <Route path="/pages/Unauthorized" element={<Unauthorized />} />
             <Route path="/pages/NotLoggedIn" element={<NotLoggedIn />} />
             <Route path="/pages/TokenExpired" element={<TokenExpired />} />
-            <Route path="/pages/quiz/paper-II/Pension" element={<Pension />} />
+            <Route path="/pages/aobr/complete" element={<AoBR_Full />} />
+            <Route path="/pages/aobr/lookup" element={<AoBR_Lookup />} />
             <Route
               path="/pages/quiz/paper-I/Constitution"
               element={

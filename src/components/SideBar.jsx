@@ -5,7 +5,11 @@ import SignOutButton from "./SignOutButton";
 import SignInButton from "./SignInButton";
 import { navItems } from "../data/menuItems";
 import Logo from "./Logo";
-import { IoMdCloseCircle } from "react-icons/io";
+import {
+  IoMdCloseCircle,
+  IoMdArrowDropdown,
+  IoMdArrowDropright,
+} from "react-icons/io";
 import { BiLogoGmail } from "react-icons/bi";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -24,11 +28,17 @@ export default function SideBar({
 }) {
   const [expanded, setExpanded] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [subExpanded, setSubExpanded] = useState(null);
 
   const navigate = useNavigate();
 
   const handleToggle = (index) => {
     setExpanded(expanded === index ? null : index);
+    setSubExpanded(null); // Reset sub-menu expansion when a new main item is expanded
+  };
+
+  const handleSubToggle = (subIndex) => {
+    setSubExpanded(subExpanded === subIndex ? null : subIndex);
   };
 
   const handleItemClick = (index, path) => {
@@ -84,32 +94,87 @@ export default function SideBar({
                 >
                   <item.icon />
                   <span>{item.label}</span>
+                  {item.submenu && (
+                    <span className="ml-auto">
+                      {expanded === index ? (
+                        <IoMdArrowDropdown />
+                      ) : (
+                        <IoMdArrowDropright />
+                      )}
+                    </span>
+                  )}
                 </button>
                 {item.submenu && (
                   <div
-                    className={`pl-4 flex flex-col space-y-2 text-sm ${
+                    className={`pl-4 flex flex-col text-base ${
                       expanded === index
                         ? "max-h-full opacity-100"
                         : "max-h-0 opacity-0"
                     } overflow-hidden`}
                   >
                     {item.submenu.map((subItem, subIndex) => (
-                      <Link
-                        key={subIndex}
-                        to={subItem.path}
-                        className={`text-gray-300 py-2 px-4 rounded-md mt-3 flex items-center space-x-2 hover:text-yellow-400 ${
-                          selectedItem === `${index}-${subIndex}`
-                            ? "bg-gray-700 text-yellow-400"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          handleItemClick(`${index}-${subIndex}`, subItem.path)
-                        }
-                        // When the element is clicked, the onClick event handler calls handleItemClick with the unique identifier of the current item, updating the component state to mark this item as selected.
-                      >
-                        <subItem.icon className="mr-2" />
-                        <span>{subItem.label}</span>
-                      </Link>
+                      <div key={subIndex} className="relative">
+                        <button
+                          className={`text-gray-300 py-2 px-4 rounded-md mt-3 flex items-center space-x-2 hover:text-yellow-400 w-full text-left ${
+                            selectedItem === `${index}-${subIndex}`
+                              ? "bg-gray-700 text-yellow-400"
+                              : ""
+                          }`}
+                          onClick={() => {
+                            if (subItem.submenu) {
+                              handleSubToggle(subIndex);
+                            } else {
+                              handleItemClick(
+                                `${index}-${subIndex}`,
+                                subItem.path
+                              );
+                            }
+                          }}
+                        >
+                          <subItem.icon className="mr-2" />
+                          <span>{subItem.label}</span>
+                          {subItem.submenu && (
+                            <span className="ml-auto">
+                              {subExpanded === subIndex ? (
+                                <IoMdArrowDropdown />
+                              ) : (
+                                <IoMdArrowDropright />
+                              )}
+                            </span>
+                          )}
+                        </button>
+                        {subItem.submenu && (
+                          <div
+                            className={`pl-4 flex flex-col space-y-2 text-sm ${
+                              subExpanded === subIndex
+                                ? "max-h-full opacity-100"
+                                : "max-h-0 opacity-0"
+                            } overflow-hidden`}
+                          >
+                            {subItem.submenu.map((nestedItem, nestedIndex) => (
+                              <Link
+                                key={nestedIndex}
+                                to={nestedItem.path}
+                                className={`text-gray-300 py-2 px-4 rounded-md mt-3 flex items-center space-x-2 hover:text-yellow-400 ${
+                                  selectedItem ===
+                                  `${index}-${subIndex}-${nestedIndex}`
+                                    ? "bg-gray-700 text-yellow-400"
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  handleItemClick(
+                                    `${index}-${subIndex}-${nestedIndex}`,
+                                    nestedItem.path
+                                  )
+                                }
+                              >
+                                <nestedItem.icon className="mr-2" />
+                                <span>{nestedItem.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
