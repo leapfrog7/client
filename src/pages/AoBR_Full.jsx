@@ -103,14 +103,17 @@ const ShowWorkAllocation = () => {
       {loading && <div className="text-center text-gray-500">Loading...</div>}
       {error && <div className="text-center text-red-500">{error}</div>}
       {allocation && (
-        <div className="mt-8">
+        <div className="my-8">
           <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-customCyan mb-4 text-center bg-cyan-50 rounded-md">
             {allocation.name}
           </h3>
           {allocation.allocatedWork.length > 0 ? (
             <ul className="list-disc list-inside space-y-2 text-sm md:text-base">
               {allocation.allocatedWork.map((work, index) => (
-                <li key={index} className="text-gray-700">
+                <li
+                  key={index}
+                  className="text-gray-700 py-2 px-4 bg-white shadow-sm list-decimal"
+                >
                   {work.description}
                 </li>
               ))}

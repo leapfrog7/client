@@ -103,7 +103,7 @@ const BookmarkComponent = ({ userId, topicId }) => {
                   </p>
                 ))}
                 <p className="mt-4 text-gray-700">
-                  <span className="text-green-800 font-semibold bg-green-100 p-2 rounded-md">
+                  <span className="text-green-800 font-semibold bg-green-100 rounded-md">
                     {`Correct Answer: ${question.correctAnswer}`}
                   </span>
                   <br />

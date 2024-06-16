@@ -4,6 +4,8 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { MdOutlineBookmarkAdded } from "react-icons/md";
 import { MdOutlineBookmarkRemove } from "react-icons/md";
+import { IoReload } from "react-icons/io5";
+import { MdPreview } from "react-icons/md";
 import { TailSpin } from "react-loader-spinner"; // Importing the loading spinner
 
 const QuizComponent = ({ userId, topicName, topicId }) => {
@@ -381,12 +383,22 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               )}
             </div>
           ))}
-          <div className="mt-4">
+          <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 gap-4 mx-auto">
             <button
               onClick={() => setIsSubmitted(false)}
-              className="px-4 py-2 bg-blue-500 text-white rounded"
+              className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 sm:mb-4 flex items-center justify-center"
             >
-              Review Again
+              <span>Review Again</span> <MdPreview className="ml-2 text-lg" />
+            </button>
+
+            <button
+              onClick={() => {
+                window.location.reload();
+              }}
+              className="px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-md hover:bg-pink-800 flex items-center justify-center"
+            >
+              <span>Take Another Quiz</span>{" "}
+              <IoReload className="ml-2 text-lg" />
             </button>
           </div>
         </div>
