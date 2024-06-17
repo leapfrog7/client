@@ -155,22 +155,24 @@ const RevenueManagement = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Revenue Management</h2>
+      <h2 className="text-xl md:text-2xl font-bold mb-4">Revenue Management</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border text-sm md:text-base text-center">
           <thead>
             <tr>
-              <th className="py-2 px-4 border">User ID</th>
-              <th className="py-2 px-4 border">Amount</th>
-              <th className="py-2 px-4 border">Confirmed</th>
-              <th className="py-2 px-4 border">Actions</th>
+              <th className="py-2 px-2 md:px-4 border">Name</th>
+              <th className="py-2 px-2 md:px-4 border">Amount</th>
+              <th className="py-2 px-2 md:px-4 border">Confirmed</th>
+              <th className="py-2 px-2 md:px-4 border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentEntries.map((entry) => (
               <tr key={entry._id} className="hover:bg-sky-50">
-                <td className="py-2 px-4 border">{entry.userId.name}</td>
-                <td className="py-2 px-4 border">
+                <td className="py-2 px-2 md:px-4 border">
+                  {entry.userId.name}
+                </td>
+                <td className="py-2 px-2 md:px-4 border">
                   {editingEntry && editingEntry._id === entry._id ? (
                     <input
                       type="number"
@@ -182,14 +184,14 @@ const RevenueManagement = () => {
                     `₹${entry.amount}`
                   )}
                 </td>
-                <td className="py-2 px-4 border">
+                <td className="py-2 px-2 md:px-4 border">
                   {entry.confirmed ? "Yes" : "No"}
                 </td>
-                <td className="py-2 px-4 border">
+                <td className="py-2 px-2 md:px-4 border text-xs">
                   {editingEntry && editingEntry._id === entry._id ? (
                     <button
                       onClick={handleEditSave}
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
+                      className="bg-blue-500 text-white px-2 md:px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
                     >
                       Save
                     </button>
@@ -198,7 +200,7 @@ const RevenueManagement = () => {
                       {!entry.confirmed && (
                         <button
                           onClick={() => handleConfirm(entry._id)}
-                          className="bg-green-200 text-green-700 px-2 py-2 rounded hover:bg-green-300 transition duration-200"
+                          className="bg-green-200 text-green-700 px-2 md:px-4 py-2 rounded hover:bg-green-300 transition duration-200"
                         >
                           Add to Revenue
                         </button>
@@ -206,14 +208,14 @@ const RevenueManagement = () => {
                       {entry.confirmed && (
                         <button
                           onClick={() => handleRefund(entry._id)}
-                          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition duration-200"
+                          className="bg-red-500 text-white px-2 md:px-4 py-2 rounded hover:bg-red-700 transition duration-200"
                         >
                           Remove Revenue
                         </button>
                       )}
                       <button
                         onClick={() => handleEditClick(entry)}
-                        className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded ml-2 hover:bg-yellow-300 transition duration-200 mt-2 md:mt-0"
+                        className="bg-yellow-100 text-yellow-700 px-2 md:px-4 py-2 rounded ml-2 hover:bg-yellow-300 transition duration-200 mt-2 md:mt-0"
                       >
                         Edit Amount
                       </button>

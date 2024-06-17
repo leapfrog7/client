@@ -161,22 +161,22 @@ const UserManagement = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
-      <div className="mb-4 flex items-center gap-4">
-        <label className="mr-1">Filter users: </label>
+      <h2 className="text-lg md:text-xl font-bold mb-4">User Management</h2>
+      <div className="mb-4 flex items-center gap-2 text-sm">
+        <label className="mr-0 font-semibold">Filter : </label>
         <select
           value={filter}
           onChange={handleFilterChange}
-          className="p-2 border rounded"
+          className="p-1 border rounded"
         >
           <option value="all">All</option>
           <option value="paid">Paid</option>
           <option value="unpaid">Unpaid</option>
         </select>
-        <div className="mb-4 text-center flex flex-col md:flex-row">
-          <label className="mr-4">Show Columns: </label>
+        <div className="mb-4 ml-3 gap-2 text-center flex flex-col md:flex-row">
+          <label className="mr-2 font-semibold">Show Columns: </label>
           <div>
-            <label className="mr-4">
+            <label className="mr-2 text-xs md:text-sm lg:text-base">
               <input
                 type="checkbox"
                 checked={showEmail}
@@ -184,7 +184,7 @@ const UserManagement = () => {
               />{" "}
               Email
             </label>
-            <label className="mr-4">
+            <label className="mr-2 text-xs md:text-sm lg:text-base">
               <input
                 type="checkbox"
                 checked={showMobile}
@@ -192,7 +192,7 @@ const UserManagement = () => {
               />{" "}
               Mobile
             </label>
-            <label className="mr-4">
+            <label className="mr-2 text-xs md:text-sm lg:text-base">
               <input
                 type="checkbox"
                 checked={showBatch}
@@ -211,31 +211,31 @@ const UserManagement = () => {
               {showEmail && <th className="py-2 px-4 border">Email</th>}
               {showMobile && <th className="py-2 px-4 border">Mobile</th>}
               {showBatch && <th className="py-2 px-4 border">Batch</th>}
-              <th className="py-2 px-4 border">Payment Status</th>
+              <th className="py-2 px-4 border">Status</th>
               <th className="py-2 px-4 border">Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentUsers.map((user) => (
               <tr key={user._id}>
-                <td className="py-2 px-4 border">{user.name}</td>
+                <td className="py-2 px-2 md:px-4 border">{user.name}</td>
                 {showEmail && (
-                  <td className="py-2 px-4 border">{user.email}</td>
+                  <td className="py-2 px-2 md:px-4 border">{user.email}</td>
                 )}
                 {showMobile && (
-                  <td className="py-2 px-4 border">{user.mobile}</td>
+                  <td className="py-2 px-2 md:px-4 border">{user.mobile}</td>
                 )}
                 {showBatch && (
-                  <td className="py-2 px-4 border">{user.batch}</td>
+                  <td className="py-2 px-2 md:px-4 border">{user.batch}</td>
                 )}
-                <td className="py-2 px-4 border">
+                <td className="py-2 px-2 md:px-4 border">
                   {user.paymentMade ? "Paid" : "Unpaid"}
                 </td>
-                <td className="py-2 px-4 border text-center flex gap-2 flex-col md:flex-row">
+                <td className="py-2 px-2 md:px-4 border text-center flex gap-2 flex-col md:flex-row">
                   <div>
                     <button
                       onClick={() => handleChangePaymentStatus(user)}
-                      className={`px-4 py-2 rounded ml-2 transition duration-200 ${
+                      className={`px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
                         user.paymentMade
                           ? "bg-green-200 hover:bg-green-300 text-green-800"
                           : "bg-red-200 hover:bg-red-300 text-red-800"
@@ -244,7 +244,7 @@ const UserManagement = () => {
                       {user.paymentMade ? `Mark as Unpaid ` : `Mark as Paid `}
                     </button>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 text-center">
                     <button
                       onClick={() => handleEditUser(user)}
                       className="bg-yellow-200 text-slate-500 px-4 py-2 rounded hover:bg-yellow-300 transition duration-200"

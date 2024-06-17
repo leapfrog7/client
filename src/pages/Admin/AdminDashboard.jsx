@@ -44,14 +44,14 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <h1 className="text-2xl lg:text-3xl font-bold mb-6">Admin Dashboard</h1>
       <div className="mb-6 border-b border-gray-300">
-        <nav className="flex space-x-4 items-center justify-center text-center">
+        <nav className="flex space-x-2 text-sm md:text-base items-center justify-center text-center">
           <Link
             to="users"
-            className={`px-4 py-2 ${
+            className={`text-sm md:text-base px-4 py-2 ${
               activeTab.includes("users")
-                ? "border-b-2 border-blue-500 text-blue-500"
+                ? "border-b-2 border-blue-500 text-blue-500 font-semibold"
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab("users")}
@@ -60,9 +60,9 @@ const AdminDashboard = () => {
           </Link>
           <Link
             to="mcqs"
-            className={`px-4 py-2 ${
+            className={`text-sm md:text-base px-4 py-2 ${
               activeTab.includes("mcqs")
-                ? "border-b-2 border-blue-500 text-blue-500"
+                ? "border-b-2 border-blue-500 text-blue-500 font-semibold"
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab("mcqs")}
@@ -71,9 +71,9 @@ const AdminDashboard = () => {
           </Link>
           <Link
             to="revenue"
-            className={`px-4 py-2 ${
+            className={`text-sm md:text-base px-4 py-2 ${
               activeTab.includes("revenue")
-                ? "border-b-2 border-blue-500 text-blue-500"
+                ? "border-b-2 border-blue-500 text-blue-500 font-semibold"
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab("revenue")}
