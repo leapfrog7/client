@@ -155,9 +155,11 @@ const RevenueManagement = () => {
 
   return (
     <div>
-      <h2 className="text-xl md:text-2xl font-bold mb-4">Revenue Management</h2>
+      <h2 className="text-xl md:text-2xl font-bold mb-4 ml-4">
+        Revenue Management
+      </h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border text-sm md:text-base text-center">
+        <table className="min-w-full bg-white border text-sm md:text-base text-center px-1">
           <thead>
             <tr>
               <th className="py-2 px-2 md:px-4 border">Name</th>

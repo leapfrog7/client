@@ -161,21 +161,25 @@ const UserManagement = () => {
 
   return (
     <div>
-      <h2 className="text-lg md:text-xl font-bold mb-4">User Management</h2>
-      <div className="mb-4 flex items-center gap-2 text-sm">
-        <label className="mr-0 font-semibold">Filter : </label>
-        <select
-          value={filter}
-          onChange={handleFilterChange}
-          className="p-1 border rounded"
-        >
-          <option value="all">All</option>
-          <option value="paid">Paid</option>
-          <option value="unpaid">Unpaid</option>
-        </select>
+      <h2 className="text-lg md:text-xl font-bold mb-4 pl-4">
+        User Management
+      </h2>
+      <div className="mb-4 flex items-center justify-center gap-3 text-sm">
+        <div className="mb-2 flex flex-col items-center justify-center gap-2">
+          <label className="mr-0 font-semibold">Filter : </label>
+          <select
+            value={filter}
+            onChange={handleFilterChange}
+            className="p-1 border rounded"
+          >
+            <option value="all">All</option>
+            <option value="paid">Paid</option>
+            <option value="unpaid">Unpaid</option>
+          </select>
+        </div>
         <div className="mb-4 ml-3 gap-2 text-center flex flex-col md:flex-row">
           <label className="mr-2 font-semibold">Show Columns: </label>
-          <div>
+          <div className="flex gap-2 items-center justify-center">
             <label className="mr-2 text-xs md:text-sm lg:text-base">
               <input
                 type="checkbox"
@@ -204,15 +208,17 @@ const UserManagement = () => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border text-center text-sm md:text-base">
+        <table className="min-w-full bg-white border text-center text-sm md:text-base px-1">
           <thead>
             <tr>
-              <th className="py-2 px-4 border">Name</th>
-              {showEmail && <th className="py-2 px-4 border">Email</th>}
-              {showMobile && <th className="py-2 px-4 border">Mobile</th>}
-              {showBatch && <th className="py-2 px-4 border">Batch</th>}
-              <th className="py-2 px-4 border">Status</th>
-              <th className="py-2 px-4 border">Actions</th>
+              <th className="py-2 px-2 md:px-4 border">Name</th>
+              {showEmail && <th className="py-2 px-2 md:px-4 border">Email</th>}
+              {showMobile && (
+                <th className="py-2 px-2 md:px-4 border">Mobile</th>
+              )}
+              {showBatch && <th className="py-2 px-2 md:px-4 border">Batch</th>}
+              <th className="py-2 px-2 md:px-4 border">Status</th>
+              <th className="py-2 px-2 md:px-4 *:border">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -235,7 +241,7 @@ const UserManagement = () => {
                   <div>
                     <button
                       onClick={() => handleChangePaymentStatus(user)}
-                      className={`px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
+                      className={` text-xs md:text-sm lg:text-base px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
                         user.paymentMade
                           ? "bg-green-200 hover:bg-green-300 text-green-800"
                           : "bg-red-200 hover:bg-red-300 text-red-800"
@@ -244,7 +250,7 @@ const UserManagement = () => {
                       {user.paymentMade ? `Mark as Unpaid ` : `Mark as Paid `}
                     </button>
                   </div>
-                  <div className="flex gap-1 text-center">
+                  <div className="flex gap-1 text-center items-center justify-center text-xs md:text-sm lg:text-base">
                     <button
                       onClick={() => handleEditUser(user)}
                       className="bg-yellow-200 text-slate-500 px-4 py-2 rounded hover:bg-yellow-300 transition duration-200"
