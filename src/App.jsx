@@ -32,6 +32,9 @@ import About from "./pages/About";
 import AddMDO from "./pages/quiz/AddMDO";
 import AoBR_Full from "./pages/AoBR_Full";
 import AoBR_Lookup from "./pages/AoBR_Lookup";
+
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
 import AdminPage from "./pages/Admin";
@@ -354,6 +357,17 @@ const App = () => {
               path="/pages/quiz/addQuestions"
               element={<AddQuestionsForm />}
             />
+
+            {/* Admin Routes */}
+            <Route path="/AdminDashboard/*" element={<AdminDashboard />} />
+            {/* <Route
+              path="/AdminDashboard/userManagement"
+              element={<UserManagement />}
+            />
+            <Route
+              path="/AdminDashboard/mcqManagement"
+              element={<MCQ_Management />}
+            /> */}
           </Routes>
         </div>
         <Footer />
