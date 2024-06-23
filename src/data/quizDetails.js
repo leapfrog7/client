@@ -7,6 +7,7 @@ import { MdOutlineHandshake } from "react-icons/md";
 import { FaPersonCane } from "react-icons/fa6";
 import { GiPayMoney } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
+import { LiaNetworkWiredSolid } from "react-icons/lia";
 
 export const paperI_Items = [
   {
@@ -28,6 +29,11 @@ export const paperI_Items = [
     icon: GrGroup,
     title: "Parliamentary Procedure",
     description: "Rules of Procedure and Conduct of Business in Lok Sabha.",
+  },
+  {
+    icon: LiaNetworkWiredSolid,
+    title: "AoBR",
+    description: "Allocation of Business Rule, 1961 (fully updated).",
   },
 ];
 
