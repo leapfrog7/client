@@ -52,13 +52,13 @@ export default function Login({ verifyToken }) {
 
   // Function to set the User Input Field
   function handleUserInput(event) {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setUserInput(event.target.value);
   }
 
   // Function to set the User Password Field
   function handlePasswordInput(event) {
-    console.log(event.target.value);
+    //console.log(event.target.value);
     setPasswordInput(event.target.value);
   }
 

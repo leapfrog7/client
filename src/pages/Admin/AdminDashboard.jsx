@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import UserManagement from "./UserManagement";
 import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
+import AobrManagement from "./AobrManagement";
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -50,7 +51,7 @@ const AdminDashboard = () => {
       <div className="mb-6 border-b border-gray-300">
         <nav className="bg-white shadow-md py-2 px-1">
           <div className="max-w-full mx-auto px-0 lg:px-8">
-            <div className="flex justify-center items-center h-16 text-center">
+            <div className="flex justify-center items-center h-16 text-center overflow-auto pb-4">
               <Link
                 to="users"
                 className={`text-sm md:text-base px-2 py-2 transition duration-300 ease-in-out ${
@@ -84,6 +85,17 @@ const AdminDashboard = () => {
               >
                 Revenue Management
               </Link>
+              <Link
+                to="aobr"
+                className={`text-sm md:text-base px-4 py-2 ${
+                  activeTab.includes("ministry-work-allocation")
+                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+                onClick={() => setActiveTab("ministry-work-allocation")}
+              >
+                AoBR Management
+              </Link>
             </div>
           </div>
         </nav>
@@ -93,6 +105,7 @@ const AdminDashboard = () => {
           <Route path="users" element={<UserManagement />} />
           <Route path="mcqs" element={<MCQManagement />} />
           <Route path="revenue" element={<RevenueManagement />} />
+          <Route path="aobr" element={<AobrManagement />} />
         </Routes>
       </div>
     </div>
