@@ -50,8 +50,8 @@ const AdminDashboard = () => {
       </h1>
       <div className="mb-6 border-b border-gray-300">
         <nav className="bg-white shadow-md py-2 px-1">
-          <div className="max-w-full mx-auto px-0 lg:px-8">
-            <div className="flex justify-center items-center h-16 text-center overflow-auto pb-4">
+          <div className="max-w-full mx-auto px-0 lg:px-8 overflow-x-auto">
+            <div className="flex justify-center items-center h-16 text-center pb-4 space-x-2 min-w-max">
               <Link
                 to="users"
                 className={`text-sm md:text-base px-2 py-2 transition duration-300 ease-in-out ${
