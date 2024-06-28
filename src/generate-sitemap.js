@@ -1,5 +1,5 @@
-import { writeFileSync } from "fs";
-import { SitemapStream, streamToPromise } from "sitemap";
+import { createWriteStream } from "fs";
+import { SitemapStream } from "sitemap";
 
 // List your routes here
 const links = [
@@ -50,13 +50,23 @@ const links = [
 const sitemapStream = new SitemapStream({
   hostname: "https://undersigned.netlify.app/",
 });
+const writeStream = createWriteStream("./public/sitemap.xml");
+// Pipe the sitemapStream to writeStream
+sitemapStream.pipe(writeStream);
 
-streamToPromise(sitemapStream.pipe(writeFileSync("./public/sitemap.xml")))
-  .then(() => console.log("Sitemap generated successfully!"))
-  .catch((error) => console.error("Error generating sitemap", error));
-
+// Write each link to the sitemap
 links.forEach((link) => {
   sitemapStream.write(link);
 });
 
+// End the stream
 sitemapStream.end();
+
+// Log success or handle errors
+sitemapStream.on("end", () => {
+  console.log("Sitemap generated successfully!");
+});
+
+sitemapStream.on("error", (error) => {
+  console.error("Error generating sitemap", error);
+});

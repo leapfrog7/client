@@ -114,13 +114,13 @@ const App = () => {
 
   //verify jwtToken if already present
   function verifyClientToken() {
-    console.log("inside verify token");
+    //console.log("inside verify token");
     const token = localStorage.getItem("jwtToken");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         const currentTime = Date.now() / 1000;
-        console.log(decodedToken, currentTime);
+        // console.log(decodedToken, currentTime);
         if (decodedToken.exp < currentTime) {
           // Token is expired
           console.log("Token expired");
