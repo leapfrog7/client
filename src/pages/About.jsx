@@ -1,9 +1,30 @@
-import { FaRegLightbulb, FaRegChartBar, FaRegGrinStars } from "react-icons/fa";
+import { FaRegLightbulb, FaRegGrinStars } from "react-icons/fa";
+import { SiTarget } from "react-icons/si";
 import { GiPathDistance } from "react-icons/gi";
+import { Helmet } from "react-helmet";
 
 const About = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-100 to-yellow-100 py-10">
+      <Helmet>
+        <title>About Us - UnderSigned</title>
+        <meta
+          name="description"
+          content="Learn more about Your Website Name, our vision, and how we strive to provide the best quizzes on various topics for SO LDCE."
+        />
+        <link rel="canonical" href="https://undersigned.netlify.app/about" />
+        <meta property="og:title" content="About Us - UnderSigned" />
+        <meta
+          property="og:description"
+          content="Learn more about Your Website Name, our vision, and how we strive to provide the best quizzes on various topics for SO LDCE."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.netlify.app/about"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
+
       <div className="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg">
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 text-center mb-8">
           About Us
@@ -33,19 +54,22 @@ const About = () => {
               year. While it met some of our initial goals, we realized that
               there was room for improvement. The feedback from our users
               highlighted the need for more options and enhanced features.
-            </p>
-          </div>
-          <div className="text-center">
-            <FaRegChartBar className="text-4xl md:text-5xl lg:text-6xl text-green-500 mx-auto mb-4" />
-            <h2 className="text-lg lg:text-xl font-semibold text-gray-800 mb-2">
-              Our Vision
-            </h2>
-            <p className="text-sm md:text-base text-gray-700">
               Determined to provide a better preparation platform for LDCE
               aspirants, we went back to the drawing board. We started from
               scratch, redesigning our entire system to deliver an enriched user
               experience. Significant improvements were made at the database
               schema level to ensure better performance and reliability.
+            </p>
+          </div>
+          <div className="text-center">
+            <SiTarget className="text-4xl md:text-5xl lg:text-6xl text-green-500 mx-auto mb-4" />
+            <h2 className="text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+              Our Vision
+            </h2>
+            <p className="text-sm md:text-base text-gray-700">
+              To create a platform for the officers belonging to Central
+              Secretariat Service (CSS) to foster a more efficient, a more
+              competent and a better informed work environment.
             </p>
           </div>
           <div className="text-center">
@@ -55,9 +79,9 @@ const About = () => {
             </h2>
             <p className="text-sm md:text-base text-gray-700">
               We are continuously working on enhancing our platform to meet and
-              exceed our user&apos;s expectations. We hope that our subscribers
-              will appreciate the changes and improvements we have made and will
-              continue to support us in our journey.
+              exceed our user&apos;s expectations. We have started with a test
+              series for LDCE and with time we aim to add many more general
+              features to realize our vision.
             </p>
           </div>
         </div>
