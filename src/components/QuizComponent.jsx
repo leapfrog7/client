@@ -54,7 +54,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("fetchBookmarks", response.data.bookmarks);
+      //console.log("fetchBookmarks", response.data.bookmarks);
       const topicBookmark = response.data.bookmarks.find(
         (bookmark) => bookmark.topic._id === topicId
       );
@@ -129,7 +129,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      console.log("inside handleSubmit");
+      //console.log("inside handleSubmit");
 
       await axios.post(
         `${BASE_URL}/quiz/submitQuiz`,

@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaRegHandPointUp } from "react-icons/fa";
 import { PiCurrencyInr } from "react-icons/pi";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { SiTestrail } from "react-icons/si";
 import { useNavigate } from "react-router-dom";
 
 const PricingSection = () => {
@@ -40,6 +41,18 @@ const PricingSection = () => {
           <FontAwesomeIcon icon={faCheck} className="mr-2" />
           <span>Paper 2</span>
         </div>
+      </div>
+      <div className="mb-3">
+        <p className="text-gray-600 my-6">
+          Try our sample quiz and see how you fare!
+        </p>
+        <a
+          className="bg-customFuchsia text-white py-2 rounded-lg shadow hover:bg-fuchsia-700 transition duration-300 flex items-center 
+          justify-center gap-2"
+          href="/pages/quiz/SampleQuiz"
+        >
+          <span>Take Sample Quiz</span> <SiTestrail />
+        </a>
       </div>
     </div>
   );

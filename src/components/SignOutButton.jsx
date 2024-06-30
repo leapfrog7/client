@@ -3,14 +3,14 @@ import { PiSignOutLight } from "react-icons/pi";
 import PropTypes from "prop-types";
 
 const SignOutButton = ({ isLoggedIn, verifyToken }) => {
-  console.log("inside Signout");
+  //console.log("inside Signout");
   const navigate = useNavigate();
   //When User Clicks on Sign Out button
   const handleSignOut = () => {
     // Remove the JWT from local storage
-    console.log(localStorage.getItem("jwtToken") + 4);
-    console.log("inside handlesignout");
-    console.log(localStorage.getItem("jwtToken"));
+    // console.log(localStorage.getItem("jwtToken") + 4);
+    //console.log("inside handlesignout");
+    //console.log(localStorage.getItem("jwtToken"));
 
     localStorage.removeItem("jwtToken");
     console.log(isLoggedIn);

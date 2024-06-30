@@ -17,6 +17,7 @@ import Logo from "./components/Logo";
 import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
 import Subscribe from "./pages/Subscribe";
+import SampleQuiz from "./pages/quiz/SampleQuiz";
 import Constitution from "./pages/quiz/Constitution";
 import Conduct from "./pages/quiz/Conduct";
 import RTI from "./pages/quiz/RTI";
@@ -242,6 +243,9 @@ const App = () => {
             <Route path="/pages/TokenExpired" element={<TokenExpired />} />
             <Route path="/pages/aobr/complete" element={<AoBR_Full />} />
             <Route path="/pages/aobr/lookup" element={<AoBR_Lookup />} />
+
+            <Route path="/pages/quiz/SampleQuiz" element={<SampleQuiz />} />
+
             <Route
               path="/pages/quiz/paper-I/Constitution"
               element={

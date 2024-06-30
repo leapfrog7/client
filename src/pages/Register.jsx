@@ -5,6 +5,7 @@ import axios from "axios";
 ///import { jwtDecode } from "jwt-decode";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import {
   FaUser,
   FaMobileAlt,
@@ -152,6 +153,27 @@ export default function Register() {
         />
       )}
       <div className="container mx-auto md:w-2/3 lg:w-1/2 shadow-xl p-4 rounded-lg">
+        <Helmet>
+          <title>Register - UnderSigned</title>
+          <meta
+            name="description"
+            content="Create an account on UnderSigned to start taking quizzes and tracking your progress. Registration is quick and easy."
+          />
+          <link
+            rel="canonical"
+            href="https://undersigned.netlify.app/register"
+          />
+          <meta property="og:title" content="Register - UnderSigned" />
+          <meta
+            property="og:description"
+            content="Create an account on UnderSigned to start taking quizzes and tracking your progress. Registration is quick and easy."
+          />
+          <meta
+            property="og:url"
+            content="https://undersigned.netlify.app/register"
+          />
+          <meta property="og:type" content="website" />
+        </Helmet>
         {/* {username && <div> Hi, {username}</div>} */}
         {!isRegistered && (
           <>

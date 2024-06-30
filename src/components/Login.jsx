@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PropTypes } from "prop-types";
 import Loading from "./Loading";
+import { Helmet } from "react-helmet";
 
 Login.propTypes = {
   verifyToken: PropTypes.func,
@@ -35,8 +36,8 @@ export default function Login({ verifyToken }) {
       // Store the token in local storage
       localStorage.setItem("jwtToken", response.data.token);
       verifyToken();
-      console.log(response.data);
-      console.log(data);
+      //console.log(response.data);
+      if (data) console.log("");
       navigate("/");
     } catch (error) {
       console.log(error);
@@ -67,6 +68,24 @@ export default function Login({ verifyToken }) {
       className="bg-cover bg-center min-h-screen"
       style={{ backgroundImage: "url('/loginBackground.png')" }}
     >
+      <Helmet>
+        <title>Login - UnderSigned</title>
+        <meta
+          name="description"
+          content="Log in to UnderSigned to continue taking quizzes and tracking your progress. Enter your registered email and password to access your account."
+        />
+        <link rel="canonical" href="https://undersigned.netlify.app/login" />
+        <meta property="og:title" content="Login - UnderSigned" />
+        <meta
+          property="og:description"
+          content="Log in to UnderSigned to continue taking quizzes and tracking your progress. Enter your registered email and password to access your account."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.netlify.app/login"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
       {loading && <Loading />} {/* Render the loading spinner if loading */}
       {/* Render this component if not loading */}
       <div className="flex flex-col items-center justify-center p-4">

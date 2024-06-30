@@ -43,6 +43,10 @@ const links = [
   },
   { url: "/pages/quiz/paper-ii/gfr", changefreq: "weekly", priority: 0.8 },
   { url: "/pages/quiz/paper-ii/csmop", changefreq: "weekly", priority: 0.8 },
+  { url: "/pages/quiz/SampleQuiz", changefreq: "weekly", priority: 0.8 },
+  { url: "/about", changefreq: "weekly", priority: 0.8 },
+  { url: "/FAQs", changefreq: "weekly", priority: 0.8 },
+  { url: "/subscribe", changefreq: "weekly", priority: 0.8 },
 
   // Add other routes here
 ];

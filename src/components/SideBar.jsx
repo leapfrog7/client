@@ -180,6 +180,25 @@ export default function SideBar({
                 )}
               </div>
             ))}
+            {!isLoggedIn ? (
+              <div className="p-4 bg-gray-200 rounded-lg shadow-lg text-center">
+                <h2 className="text-lg font-bold mb-1 text-gray-800">
+                  Ready to Challenge Yourself?
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Take our sample quiz and test your knowledge now!
+                </p>
+                <a
+                  className="bg-pink-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition duration-300"
+                  href="/pages/quiz/SampleQuiz"
+                >
+                  Sample Quiz
+                </a>
+              </div>
+            ) : (
+              <div></div>
+            )}
+
             <div onClick={toggleSidebar}>
               {isLoggedIn ? (
                 <SignOutButton verifyToken={verifyToken} />

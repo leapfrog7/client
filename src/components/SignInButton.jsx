@@ -4,11 +4,11 @@ import { PiSignInLight } from "react-icons/pi";
 import PropTypes from "prop-types";
 
 const SignInButton = () => {
-  console.log("inside SignIn");
+  //console.log("inside SignIn");
   const navigate = useNavigate();
   //When User Clicks on Sign Out button
   const handleSignIn = () => {
-    console.log("inside SignIn");
+    //console.log("inside SignIn");
     navigate("/login");
 
     //verifyToken();
