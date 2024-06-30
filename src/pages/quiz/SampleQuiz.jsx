@@ -87,14 +87,14 @@ const SampleQuizComponent = () => {
   return (
     <div className="min-h-screen max-w-4xl mx-auto">
       <div className="flex items-center justify-between bg-cyan-100 mt-2 p-2 gap-4 md:gap-8">
-        <h1 className="ml-2 text-xl md:text-2xl text-gray-700 ">
+        <h1 className="ml-2 text-lg md:text-xl lg:text-2xl text-gray-700 ">
           Sample Quiz*
         </h1>
         <a
-          className="text-customPink bg-pink-100 py-2 px-4 rounded-md font-semibold mr-2"
+          className="text-white bg-pink-600 py-2 px-4 rounded-md font-semibold mr-2 text-sm md:text-base"
           href="/subscribe"
         >
-          Subscribe for Full Access
+          Click to Subscribe
         </a>
       </div>
       {!isSubmitted ? (
@@ -258,9 +258,10 @@ const SampleQuizComponent = () => {
         </div>
       )}
 
-      <p className="text-center text-yellow-700 my-4 text-sm">
-        *This database for this sample quiz represents just under 1% of our
-        comprehensive MCQ collection.
+      <p className="text-center text-yellow-700 my-4 text-sm w-11/12 text-center">
+        *The database for this sample quiz represents just under 1% of our
+        comprehensive MCQ collection. <br />
+        <span className="text-yellow-700">Subscribe to get full access.</span>
       </p>
     </div>
   );
@@ -269,12 +270,12 @@ const SampleQuizComponent = () => {
 SampleQuizComponent.propTypes = {
   questions: PropTypes.arrayOf(
     PropTypes.shape({
-      questionText: PropTypes.string.isRequired,
-      options: PropTypes.arrayOf(PropTypes.string).isRequired,
-      correctAnswer: PropTypes.string.isRequired,
-      explanation: PropTypes.string.isRequired,
+      questionText: PropTypes.string,
+      options: PropTypes.arrayOf(PropTypes.string),
+      correctAnswer: PropTypes.string,
+      explanation: PropTypes.string,
     })
-  ).isRequired,
+  ),
 };
 
 export default SampleQuizComponent;
