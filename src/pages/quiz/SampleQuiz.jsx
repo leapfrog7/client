@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { TailSpin } from "react-loader-spinner"; // Importing the loading spinner
 import { IoReload } from "react-icons/io5";
 import { MdPreview } from "react-icons/md";
+import { Helmet } from "react-helmet";
 
 const SampleQuizComponent = () => {
   const [quizData, setQuizData] = useState([]);
@@ -86,6 +87,33 @@ const SampleQuizComponent = () => {
 
   return (
     <div className="min-h-screen max-w-4xl mx-auto">
+      <Helmet>
+        <title>Sample Quiz | UnderSigned</title>
+        <meta
+          name="description"
+          content="Take our Sample Quiz to experience our platform's powerful quiz features. Perfect for LDCE aspirants, our quizzes help you track progress, bookmark important questions, and focus on unattempted questions."
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.netlify.app/pages/quiz/SampleQuiz"
+        />
+        <meta property="og:title" content="Sample Quiz | UnderSigned" />
+        <meta
+          property="og:description"
+          content="Experience our Sample Quiz and discover our comprehensive tools designed to help you excel in your LDCE exams."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.netlify.app/pages/quiz/SampleQuiz"
+        />
+        <meta property="og:type" content="website" />
+
+        <meta name="twitter:title" content="Sample Quiz | UnderSigned" />
+        <meta
+          name="twitter:description"
+          content="Try our Sample Quiz to get a taste of our platform's features. Ideal for LDCE aspirants, our quizzes are designed to help you succeed."
+        />
+      </Helmet>
       <div className="flex items-center justify-between bg-cyan-100 mt-2 p-2 gap-4 md:gap-8">
         <h1 className="ml-2 text-lg md:text-xl lg:text-2xl text-gray-700 ">
           Sample Quiz*
