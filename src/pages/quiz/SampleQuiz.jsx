@@ -26,7 +26,7 @@ const SampleQuizComponent = () => {
     } finally {
       setLoading(false);
     }
-  }, [questions]);
+  }, []);
 
   const handleOptionClick = (option) => {
     setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: option });
@@ -286,7 +286,7 @@ const SampleQuizComponent = () => {
         </div>
       )}
 
-      <p className="text-center text-yellow-700 my-4 text-sm w-11/12 text-center">
+      <p className="text-center text-yellow-700 my-4 text-sm w-11/12">
         *The database for this sample quiz represents just under 1% of our
         comprehensive MCQ collection. <br />
         <span className="text-yellow-700">Subscribe to get full access.</span>

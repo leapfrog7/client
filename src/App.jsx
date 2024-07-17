@@ -22,7 +22,7 @@ import Constitution from "./pages/quiz/Constitution";
 import Conduct from "./pages/quiz/Conduct";
 import RTI from "./pages/quiz/RTI";
 import OfficeProcedure from "./pages/quiz/OfficeProcedure";
-import DFPR from "./pages/quiz/DFPR";
+import DFPR_2024 from "./pages/quiz/DFPR_2024";
 import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
@@ -33,6 +33,7 @@ import About from "./pages/About";
 import AddMDO from "./pages/quiz/AddMDO";
 import AoBR_Full from "./pages/AoBR_Full";
 import AoBR_Lookup from "./pages/AoBR_Lookup";
+import PreviousYearQuiz from "./pages/quiz/previousYear/Exam";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
@@ -59,7 +60,8 @@ const App = () => {
         path: "/pages/quiz/paper-i/Constitution",
       },
       { title: "RTI Act", progress: "0", path: "/pages/quiz/paper-i/rti-act" },
-      { title: "DFPR", progress: "0", path: "/pages/quiz/paper-i/dfpr" },
+      // { title: "DFPR", progress: "0", path: "/pages/quiz/paper-i/dfpr" },
+
       {
         title: "Parliamentary Procedure",
         progress: "0",
@@ -69,6 +71,11 @@ const App = () => {
         title: "AoBR",
         progress: "0",
         path: "/pages/quiz/paper-i/AoBR",
+      },
+      {
+        title: "DFPR_2024",
+        progress: "0",
+        path: "/pages/quiz/paper-i/dfpr-2024",
       },
     ],
     paperII: [
@@ -101,6 +108,8 @@ const App = () => {
     ],
   });
 
+  console.log("Make sure to change the Base URL");
+
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1";
 
@@ -131,9 +140,9 @@ const App = () => {
           setIsLoggedIn(true);
           setUsername(decodedToken.name);
           setIsPaymentMade(decodedToken.paymentMade);
-          console.log(decodedToken.userType);
-          console.log(decodedToken.paymentMade);
-          console.log("logged in - " + isLoggedIn);
+          //console.log(decodedToken.userType);
+          // console.log(decodedToken.paymentMade);
+          // console.log("logged in - " + isLoggedIn);
           //fetchUserStats(decodedToken.userId);
         }
       } catch (error) {
@@ -157,8 +166,8 @@ const App = () => {
           },
         });
         setUserStats(response.data);
-        console.log(response.data);
-        console.log(userStats);
+        //console.log(response.data);
+        // console.log(userStats);
       }
     } catch (err) {
       console.error("Failed to fetch user stats", err);
@@ -297,7 +306,7 @@ const App = () => {
                 />
               }
             />
-            <Route
+            {/* <Route
               path="/pages/quiz/paper-i/dfpr"
               element={
                 <DFPR
@@ -305,7 +314,18 @@ const App = () => {
                   quizAttempted={String(userStats.paperI[2].attemptedQuestions)}
                 />
               }
+            /> */}
+
+            <Route
+              path="/pages/quiz/paper-i/dfpr-2024"
+              element={
+                <DFPR_2024
+                  progress={userStats.paperI[4].progress}
+                  quizAttempted={String(userStats.paperI[4].attemptedQuestions)}
+                />
+              }
             />
+
             <Route
               path="/pages/quiz/paper-ii/leave-rules"
               element={
@@ -321,8 +341,8 @@ const App = () => {
               path="/pages/quiz/paper-i/parliamentary-procedure"
               element={
                 <ParliamentaryProcedure
-                  progress={userStats.paperI[3].progress}
-                  quizAttempted={String(userStats.paperI[3].attemptedQuestions)}
+                  progress={userStats.paperI[2].progress}
+                  quizAttempted={String(userStats.paperI[2].attemptedQuestions)}
                 />
               }
             />
@@ -330,8 +350,8 @@ const App = () => {
               path="/pages/quiz/paper-i/AoBR"
               element={
                 <AoBR
-                  progress={userStats.paperI[4].progress}
-                  quizAttempted={String(userStats.paperI[4].attemptedQuestions)}
+                  progress={userStats.paperI[3].progress}
+                  quizAttempted={String(userStats.paperI[3].attemptedQuestions)}
                 />
               }
             />
@@ -360,6 +380,11 @@ const App = () => {
             <Route
               path="/pages/quiz/addQuestions"
               element={<AddQuestionsForm />}
+            />
+
+            <Route
+              path="/pages/quiz/previousYear/Exam"
+              element={<PreviousYearQuiz />}
             />
 
             {/* Admin Routes */}

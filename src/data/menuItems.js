@@ -26,7 +26,11 @@ export const navItems = [
         path: "/pages/quiz/paper-i/rti-act",
         icon: LuFileSearch,
       },
-      { label: "DFPR", path: "/pages/quiz/paper-i/dfpr", icon: GiReceiveMoney },
+      {
+        label: "DFPR",
+        path: "/pages/quiz/paper-i/dfpr-2024",
+        icon: GiReceiveMoney,
+      },
       {
         label: "Parliamentary Procedure",
         path: "/pages/quiz/paper-i/parliamentary-procedure",

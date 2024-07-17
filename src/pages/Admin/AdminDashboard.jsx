@@ -5,6 +5,7 @@ import UserManagement from "./UserManagement";
 import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
+import PrevYear from "./PrevYear";
 
 const AdminDashboard = () => {
   const location = useLocation();
@@ -96,6 +97,17 @@ const AdminDashboard = () => {
               >
                 AoBR Management
               </Link>
+              <Link
+                to="prevYear"
+                className={`text-sm md:text-base px-4 py-2 ${
+                  activeTab.includes("prevYear")
+                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+                onClick={() => setActiveTab("prevYear")}
+              >
+                Previous Years
+              </Link>
             </div>
           </div>
         </nav>
@@ -106,6 +118,7 @@ const AdminDashboard = () => {
           <Route path="mcqs" element={<MCQManagement />} />
           <Route path="revenue" element={<RevenueManagement />} />
           <Route path="aobr" element={<AobrManagement />} />
+          <Route path="prevYear" element={<PrevYear />} />
         </Routes>
       </div>
     </div>

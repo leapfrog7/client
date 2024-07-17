@@ -22,8 +22,8 @@ export const paperI_Items = [
   },
   {
     icon: GiReceiveMoney,
-    title: "DFPR",
-    description: "Delegtion of Financial Power Rules, 1978.",
+    title: "DFPR, 2024",
+    description: "Delegtion of Financial Power Rules, 2024.",
   },
   {
     icon: GrGroup,
