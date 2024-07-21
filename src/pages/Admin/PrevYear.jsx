@@ -206,8 +206,7 @@ const AddQuestionForm = () => {
             className="w-full p-2 border"
           >
             <option value="2015">2015</option>
-            <option value="2016">2016</option>
-            <option value="2017">2017</option>
+            <option value="2016-17">2016-17</option>
             <option value="2018">2018</option>
             <option value="2019-20">2019-20</option>
             <option value="2021-22">2021-22</option>

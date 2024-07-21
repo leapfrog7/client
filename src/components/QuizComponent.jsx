@@ -168,9 +168,40 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   if (error) {
     return <div>{error}</div>;
   }
-
+  //Once the Quiz are all done, the random question option doesn't appear. It is being fixed here by rendering the component again.
   if (quizData.length === 0) {
-    return <div>No questions available for this topic.</div>;
+    return (
+      <div>
+        <div className="flex justify-end mb-4 mr-4">
+          <label className="inline-flex items-center">
+            <span className="mr-4 text-sm md:text-lg">Random Questions</span>
+            <input
+              type="checkbox"
+              checked={showAllQuestions}
+              onChange={() =>
+                setShowAllQuestions((prev) => {
+                  setCurrentQuestionIndex(0);
+                  return !prev;
+                })
+              }
+              className="hidden mr-2"
+            />
+            <span
+              className={`w-8 h-4 flex items-center flex-shrink-0 p-0 bg-blue-300 rounded-full duration-300 ease-in-out ${
+                showAllQuestions ? "bg-blue-400" : "bg-gray-600"
+              }`}
+            >
+              <span
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-400 ease-in-out ${
+                  showAllQuestions ? "translate-x-4 bg-blue-700" : "bg-white"
+                }`}
+              ></span>
+            </span>
+          </label>
+        </div>
+        <div>No questions available for this topic.</div>
+      </div>
+    );
   }
 
   const currentQuestion = quizData[currentQuestionIndex];
