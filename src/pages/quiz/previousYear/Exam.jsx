@@ -370,51 +370,49 @@ const Exam = () => {
           {!isStarted && !isSubmitted && (
             <div className="overflow-x-auto">
               <div className="mb-4">
-                <p className="text-lg font-semibold text-center text-gray-700 bg-gradient-to-r from-blue-100 to-indigo-100 p-2 rounded-lg shadow-md mb-6">
+                <p className="text-lg font-semibold text-center text-gray-700 bg-gradient-to-r from-blue-100 to-indigo-100 p-2 rounded-lg shadow-md mb-4">
                   The Previous Year Question Papers
                 </p>
                 <div className="bg-gradient-to-r from-blue-50 to-white text-gray-800 p-6 rounded-lg shadow-lg space-y-2">
                   <p className="text-sm md:text-base font-medium">
-                    Experience real exam conditions with authentic previous year
-                    papers. Each paper is timed for{" "}
-                    <span className="font-semibold">120 minutes</span>, helping
-                    you benchmark your current preparation.
+                    Experience real exam conditions with the previous year
+                    papers to benchmark your current preparation.
                   </p>
                   <p className="text-xs md:text-sm italic">
                     Answers are aligned with the official UPSC answer key.
                   </p>
                 </div>
               </div>
-              <table className="min-w-full divide-y divide-gray-200 text-sm md:text-base">
+              <table className="min-w-full divide-y divide-gray-200 text-sm md:text-base mt-8">
                 <thead>
-                  <tr className="font-bold">
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <tr className="font-bold text-center">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Year
                     </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Paper Type
                     </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Start/ Resume
                     </th>
-                    <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Remaining Time
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Time Left
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 ">
                   {filteredPapers.map((paper) => (
                     <tr key={`${paper.year}-${paper.paperType}`}>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500">
+                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500 text-center">
                         {paper.year}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500">
+                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500 text-center">
                         {paper.paperType}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-base font-medium">
+                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-xs md:text-base font-medium text-center">
                         {renderActions(paper)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500 flex flex-col">
+                      <td className="px-2 md:px-6 py-4 whitespace-nowrap text-xs md:text-base text-gray-500 flex flex-col text-center">
                         {paper.remainingTime !== null &&
                         paper.remainingTime !== undefined
                           ? `${Math.floor(
@@ -424,7 +422,7 @@ const Exam = () => {
                             )}m`
                           : "N/A"}
                         <button
-                          className="mt-2 px-3 py-1 text-pink-600 rounded text-sm"
+                          className="mt-2 px-3 py-1 text-center text-pink-600 rounded text-sm mx-auto"
                           onClick={() => resetTimer(paper._id)}
                         >
                           <FaRedo />
@@ -434,6 +432,35 @@ const Exam = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Important Points to Remember */}
+              <div className="bg-gray-100 mt-16 p-4 rounded-md shadow-sm text-sm text-gray-800">
+                <p className="text-lg font-semibold text-blue-800 mb-2">
+                  Important Points:
+                </p>
+
+                <ul className="list-disc list-inside space-y-2">
+                  <li>More questions on previous year exams to follow soon.</li>
+                  <li>
+                    You will have 120 minutes to finish the exam after starting.
+                  </li>
+                  <li>You can save your progress and resume later.</li>
+                  <li>
+                    The exam will auto-submit once the 120-minute timer runs
+                    out. You can also click the submit button before the timer
+                    expires.
+                  </li>
+                  <li>
+                    Your score will be calculated based on UPSC&apos;s current
+                    marking criteria, including negative marking.
+                  </li>
+                  <li>
+                    If you want to retake the exam afresh, click the reset
+                    button. There is no limit to how many times you can take
+                    this exam.
+                  </li>
+                </ul>
+              </div>
             </div>
           )}
           {isStarted && !isSubmitted && currentPaper && (

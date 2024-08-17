@@ -41,6 +41,24 @@ const Home = ({
         <meta property="og:type" content="website" />
       </Helmet>
 
+      {/* Banner for PYQ LDCE  */}
+      {!isLoggedIn && (
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center mt-4">
+          <p className="text-sm md:text-base lg:text-lg font-semibold">
+            Try Previous Year Questions - SO LDCE
+            <span className=" ml-2 inline-block bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md animate-pulse">
+              NEW
+            </span>{" "}
+          </p>
+          <Link
+            to="/register"
+            className="pl-2 text-sm md:text-base lg:text-lg  text-yellow-200 text-lg hover:text-yellow-400 underline transition-colors duration-200 ease-in-out"
+          >
+            Login/Register to access
+          </Link>
+        </div>
+      )}
+
       {!isPaymentMade && isLoggedIn && <AccountActivationNotice />}
       <div
         className={`flex flex-col lg:flex-row mx-auto items-center justify-center ${
@@ -60,6 +78,7 @@ const Home = ({
             />
           </picture>
         </div>
+
         {/* Text Section */}
         <div className="flex flex-col items-center justify-center w-full lg:w-3/5 p-4 lg:p-8">
           <div className="w-full flex flex-col md:flex-row items-center justify-center gap-2">
@@ -94,6 +113,7 @@ const Home = ({
           </div>
         </div>
       </div>
+
       <div className="max-w-screen-lg mx-auto overflow-y-auto">
         {!isLoggedIn && (
           <div>
@@ -112,6 +132,20 @@ const Home = ({
       {/* This is the DashBoard which should appear only when the user is logged In */}
       {isLoggedIn && isPaymentMade && (
         <div>
+          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center my-4">
+            <p className="text-base lg:text-lg font-semibold">
+              Try Previous Year Questions - SO LDCE
+              <span className="ml-2 inline-block bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md animate-pulse">
+                NEW
+              </span>
+            </p>
+            <Link
+              to="/pages/quiz/previousYear/Exam"
+              className="pl-2 text-yellow-200 text-lg hover:text-yellow-400 underline transition-colors duration-200 ease-in-out"
+            >
+              Click Here
+            </Link>
+          </div>
           <Dashboard userStats={userStats} username={username} />
         </div>
       )}

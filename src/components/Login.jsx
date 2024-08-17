@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { PropTypes } from "prop-types";
 import Loading from "./Loading";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 
 Login.propTypes = {
   verifyToken: PropTypes.func,
@@ -109,6 +110,13 @@ export default function Login({ verifyToken }) {
             <div className="text-center" onClick={handleCredentialCheck}>
               <Button buttonText="Sign In" />
             </div>
+
+            <p className="text-sm text-gray-600 mx-auto">
+              Dont have an account?{" "}
+              <Link to="/register" className="text-blue-500 hover:underline">
+                Register here
+              </Link>
+            </p>
 
             {msg && (
               <div
