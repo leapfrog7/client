@@ -27,7 +27,7 @@ const Exam = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const yearsToShow = ["2016-17"]; // Only show these years
+  const yearsToShow = ["2016-17", "2018"]; // Only show these years
 
   useEffect(() => {
     // Fetch available papers and their status
@@ -389,13 +389,13 @@ const Exam = () => {
                     <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Year
                     </th>
-                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
                       Paper Type
                     </th>
-                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
                       Start/ Resume
                     </th>
-                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 md:px-6 py-3 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
                       Time Left
                     </th>
                   </tr>
