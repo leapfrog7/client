@@ -12,7 +12,7 @@ const Timer = ({ duration, onTimeUp }) => {
     }
 
     const timerId = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
+      setTimeLeft(timeLeft - 1);
     }, 1000);
 
     return () => clearInterval(timerId);
