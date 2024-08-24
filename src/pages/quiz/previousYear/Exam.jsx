@@ -27,7 +27,7 @@ const Exam = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  const yearsToShow = ["2016-17", "2018"]; // Only show these years
+  const yearsToShow = ["2016-17", "2018", "2019-20"]; // Only show these years
 
   useEffect(() => {
     // Fetch available papers and their status
