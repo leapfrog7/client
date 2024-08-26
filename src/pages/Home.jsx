@@ -43,9 +43,9 @@ const Home = ({
 
       {/* Banner for PYQ LDCE  */}
       {!isLoggedIn && (
-        <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center mt-4">
+        <div className="bg-gradient-to-r from-pink-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center mt-4">
           <p className="text-sm md:text-base lg:text-lg font-semibold">
-            Try Previous Year Questions - SO LDCE
+            Now access - Previous Year Questions (2016-17 to 2023)- SO LDCE
             <span className=" ml-2 inline-block bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md animate-pulse">
               NEW
             </span>{" "}
