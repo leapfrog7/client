@@ -64,7 +64,7 @@ export default function QuizDetails() {
       {/* Stats part */}
       <div className="my-6 flex flex-col items-center justify-center p-6 bg-gradient-to-r from-pink-100 to-purple-100 text-gray-700 rounded-lg shadow-lg">
         <h1 className="text-2xl md:text-4xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-          Stats of our Question Bank
+          Stats of our 7000+ Question Bank
         </h1>
         <div className="flex flex-col md:flex-row gap-8 w-full max-w-6xl text-center">
           {/* Total Questions */}
@@ -72,7 +72,7 @@ export default function QuizDetails() {
             <h2 className="text-xl md:text-2xl font-semibold mb-4 flex items-center justify-center">
               <FaDatabase className="text-blue-600 mr-2" /> Total Questions
             </h2>
-            <p className="text-lg md:text-xl font-bold">5,810 Questions</p>
+            <p className="text-lg md:text-xl font-bold">3,606 Questions</p>
             <p className="text-gray-600 mt-2">
               Explore a vast collection of questions covering various topics.
             </p>
@@ -85,7 +85,7 @@ export default function QuizDetails() {
               <FaQuestionCircle className="text-green-600 mr-2" /> AoBR
               Exclusive
             </h2>
-            <p className="text-lg md:text-xl font-bold">2,200 Questions</p>
+            <p className="text-lg md:text-xl font-bold">2,204 Questions</p>
             <p className="text-gray-600 mt-2">
               Dive deep into AoBR with exclusive quizzes.
             </p>
