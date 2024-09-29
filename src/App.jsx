@@ -26,6 +26,7 @@ import DFPR_2024 from "./pages/quiz/DFPR_2024";
 import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
+
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
@@ -44,6 +45,7 @@ import Unauthorized from "./pages/Unauthorized";
 import NotLoggedIn from "./pages/NotLoggedIn";
 import TokenExpired from "./pages/TokenExpired";
 import FAQPage from "./pages/FAQPage";
+import FRPage from "./pages/quiz/FR";
 
 const App = () => {
   //States
@@ -104,6 +106,11 @@ const App = () => {
         title: "Office Procedure",
         progress: "0",
         path: "/pages/quiz/paper-ii/csmop",
+      },
+      {
+        title: "FR",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/fr_sr",
       },
     ],
   });
@@ -337,6 +344,9 @@ const App = () => {
                 />
               }
             />
+
+            <Route path="/pages/quiz/paper-ii/frtest" element={<FRPage />} />
+
             <Route
               path="/pages/quiz/paper-i/parliamentary-procedure"
               element={
@@ -378,6 +388,18 @@ const App = () => {
               }
             />
             <Route
+              path="/pages/quiz/paper-ii/fr_sr"
+              element={
+                <FRPage
+                  progress={userStats.paperII[6].progress}
+                  quizAttempted={String(
+                    userStats.paperII[6].attemptedQuestions
+                  )}
+                />
+              }
+            />
+
+            <Route
               path="/pages/quiz/addQuestions"
               element={<AddQuestionsForm />}
             />
@@ -413,3 +435,14 @@ const App = () => {
 };
 
 export default App;
+
+// To add a new dashboard tile -
+/*Files to be changed- 
+
+on FrontEnd - App.jsx (add the Route and edit userStats), 
+Make a file with the topic to show on the Route created above. 
+In the Tabs file, the topic Name should match the dbTitle. 
+
+On server-
+edit the file userStats.js
+edit the file */

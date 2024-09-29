@@ -203,6 +203,13 @@ const MCQManagement = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      //Resetting the form field
+      newQuestion.questionText = "";
+      newQuestion.options = ["", "", "", ""];
+      newQuestion.correctAnswer = "";
+      newQuestion.explanation = "";
+
       setShowAddQuestionModal(false);
       fetchQuestions(); // Refresh questions list
     } catch (error) {
