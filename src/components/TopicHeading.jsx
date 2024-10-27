@@ -60,6 +60,38 @@ export default function TopicHeading({ topicName }) {
     // Step 1: Fetch the topic ID based on topic name
     const fetchTopicId = async () => {
       try {
+        // This mapping is for matching the topic name which is visible with that of the what is stored in database
+        if (topicName == "Conduct Rules") {
+          topicName = "Conduct_Rules";
+        }
+
+        if (topicName == "CCS CCA Rules") {
+          topicName = "CCA_Rules";
+        }
+
+        if (topicName == "Pension Rules") {
+          topicName = "Pension_Rules";
+        }
+        if (topicName == "RTI Act") {
+          topicName = "RTI_Act";
+        }
+
+        if (topicName == "CCS Leave Rules") {
+          topicName = "Leave_Rules";
+        }
+        if (topicName == "Parliamentary Procedure") {
+          topicName = "Parliamentary_Procedure";
+        }
+        if (topicName == "DFPR, 2024") {
+          topicName = "DFPR_2024";
+        }
+        if (topicName == "Office Procedure") {
+          topicName = "Office_Procedure";
+        }
+        if (topicName == "FR") {
+          topicName = "FR_SR";
+        }
+
         const response = await axios.get(`${BASE_URL}/quiz/getTopicId`, {
           params: { topicName },
           headers: {
