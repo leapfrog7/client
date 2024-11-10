@@ -597,34 +597,46 @@ const Exam = () => {
               </div>
 
               <div className="space-y-4">
-                {evaluatedResponses.map((response, index) => (
-                  <div
-                    key={index}
-                    className="p-4 bg-gray-100 rounded-lg shadow-md"
-                  >
-                    <h3 className="font-semibold text-lg mb-2">
-                      {questions[index].questionText}
-                    </h3>
+                {evaluatedResponses.map((response) => {
+                  // Find the question from questions array using questionId
+                  const question = questions.find(
+                    (q) => q._id.toString() === response.questionId
+                  );
 
-                    <p className="text-sm">
-                      <span className="font-semibold">Your Answer: </span>
-                      <span
-                        className={
-                          response.isCorrect ? "text-green-600" : "text-red-600"
-                        }
-                      >
-                        {response.userAnswer || "Unanswered"}
-                      </span>
-                    </p>
+                  return (
+                    <div
+                      key={response.questionId}
+                      className="p-4 bg-gray-100 rounded-lg shadow-md"
+                    >
+                      <h3 className="font-semibold text-lg mb-2">
+                        {question
+                          ? question.questionText
+                          : "Question text not found"}
+                      </h3>
 
-                    <p className="text-sm">
-                      <span className="font-semibold">Correct Answer: </span>
-                      <span className="text-green-600">
-                        {response.correctAnswer}
-                      </span>
-                    </p>
-                  </div>
-                ))}
+                      <p className="text-sm">
+                        <span className="font-semibold">Your Answer: </span>
+                        <span
+                          className={
+                            response.isCorrect
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {response.userAnswer || "Unanswered"}
+                        </span>
+                      </p>
+
+                      <p className="text-sm">
+                        <span className="font-semibold">Correct Answer: </span>
+                        <span className="text-green-600">
+                          {response.correctAnswer ||
+                            "Correct answer not available"}
+                        </span>
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="mt-8 text-center">
