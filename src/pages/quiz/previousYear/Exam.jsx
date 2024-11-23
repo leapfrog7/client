@@ -501,6 +501,7 @@ const Exam = () => {
                   </p>
                 )}
               </div>
+
               <div className="mt-4 flex flex-col gap-2 ">
                 <div className="flex justify-between lg:w-2/3 lg:mx-auto lg:justify-around my-4 ">
                   <button
