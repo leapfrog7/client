@@ -91,6 +91,9 @@ export default function TopicHeading({ topicName }) {
         if (topicName == "FR") {
           topicName = "FR_SR";
         }
+        if (topicName == "Economy") {
+          topicName = "CA_Economy";
+        }
 
         const response = await axios.get(`${BASE_URL}/quiz/getTopicId`, {
           params: { topicName },

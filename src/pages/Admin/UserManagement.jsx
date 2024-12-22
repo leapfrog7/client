@@ -268,7 +268,6 @@ const UserManagement = () => {
                     <button
                       onClick={() => handleResetPassword(user._id)}
                       className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
-                      disabled
                     >
                       <FaRedo />
                     </button>
