@@ -25,6 +25,7 @@ import RTI from "./pages/quiz/RTI";
 import OfficeProcedure from "./pages/quiz/OfficeProcedure";
 import DFPR_2024 from "./pages/quiz/DFPR_2024";
 import CA_Economy from "./pages/quiz/CA_Economy";
+import CA_Schemes from "./pages/quiz/CA_Schemes";
 import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
@@ -85,6 +86,11 @@ const App = () => {
         title: "Economy",
         progress: "0",
         path: "/pages/quiz/paper-i/CA_Economy",
+      },
+      {
+        title: "Govt. Schemes",
+        progress: "0",
+        path: "/pages/quiz/paper-i/CA_Schemes",
       },
     ],
     paperII: [
@@ -347,8 +353,17 @@ const App = () => {
               path="/pages/quiz/paper-i/CA_Economy"
               element={
                 <CA_Economy
-                  progress={userStats.paperI[4].progress}
+                  progress={userStats.paperI[5].progress}
                   quizAttempted={String(userStats.paperI[5].attemptedQuestions)}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-i/CA_Schemes"
+              element={
+                <CA_Schemes
+                  progress={userStats.paperI[6].progress}
+                  quizAttempted={String(userStats.paperI[6].attemptedQuestions)}
                 />
               }
             />
