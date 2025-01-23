@@ -1,3 +1,6 @@
+// className={`absolute left-full top-0 mt-1 w-48 bg-white rounded-md shadow-lg p-2 ${
+//         hoveredSubItem === subIndex ? "block" : "hidden"
+
 import { useState } from "react";
 import { navItems } from "../data/menuItems";
 import { Link } from "react-router-dom";
@@ -38,7 +41,7 @@ export default function NavBar() {
   };
 
   return (
-    <div className="hidden md:flex space-x-4">
+    <div className="px-4 py-2 hidden md:flex space-x-4  rounded-lg">
       {navItems.map((item, index) => (
         <div
           key={index}
@@ -48,7 +51,7 @@ export default function NavBar() {
         >
           <Link
             to={item.path}
-            className="text-white flex items-center space-x-2 hover:text-yellow-200 p-2"
+            className="text-gray-100 flex items-center space-x-2  hover:text-yellow-400  px-2  py-1 hover:rounded-md"
           >
             <item.icon />
             <span>{item.label}</span>

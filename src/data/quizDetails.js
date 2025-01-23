@@ -8,6 +8,8 @@ import { FaPersonCane } from "react-icons/fa6";
 import { GiPayMoney } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
 import { LiaNetworkWiredSolid } from "react-icons/lia";
+import { TfiAgenda } from "react-icons/tfi";
+import { HiOutlineBanknotes } from "react-icons/hi2";
 
 export const paperI_Items = [
   {
@@ -34,6 +36,16 @@ export const paperI_Items = [
     icon: LiaNetworkWiredSolid,
     title: "AoBR",
     description: "Allocation of Business Rule, 1961 (fully updated).",
+  },
+  {
+    icon: TfiAgenda,
+    title: "FR",
+    description: "Fundamental Rules",
+  },
+  {
+    icon: HiOutlineBanknotes,
+    title: "Economy & Schemes",
+    description: "Indian Economy and Govt. Schemes",
   },
 ];
 

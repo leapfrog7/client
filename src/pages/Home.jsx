@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import FeatureCarousel from "../components/FeatureCarousel";
 import AccountActivationNotice from "../components/AccountActivationNotice";
 import { Helmet } from "react-helmet";
+import { SiTestrail } from "react-icons/si";
+import { RiContactsBook3Line } from "react-icons/ri";
 // import Carousel_N from "../components/Carousel_N";
 
 // import axios from "axios";
@@ -41,7 +43,95 @@ const Home = ({
         <meta property="og:type" content="website" />
       </Helmet>
 
-      {/* Banner for PYQ LDCE  */}
+      {!isPaymentMade && isLoggedIn && <AccountActivationNotice />}
+      <div
+        className={`flex flex-col lg:flex-row mx-auto justify-center ${
+          isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""
+        }`}
+      >
+        {/* Image Background Section */}
+        <div className="lg:w-1/2 2xl:w-1/3 md:h-auto flex items-center justify-center flex-col my-2">
+          <picture className="w-full bg-cover bg-center">
+            <source srcSet="/homeLarge2.png" media="(min-width: 1200px)" />
+            <source srcSet="/homeLarge2.png" media="(min-width: 768px)" />
+            <source srcSet="/homeLarge2.png" media="(max-width: 767px)" />
+            <img
+              src="/home1-large.png"
+              alt="Background"
+              className="w-full h-full object-cover"
+            />
+          </picture>
+          <div className="mt-6 w-2/3 text-center">
+            <p className="text-gray-600 text-sm">
+              Curious about our quizzes? Try a free sample!
+            </p>
+            <a
+              className="bg-customFuchsia text-white py-3 px-4 rounded-lg shadow hover:bg-fuchsia-700 transition duration-300 flex items-center 
+                    justify-center gap-2 mt-4 inline-block"
+              href="/pages/quiz/SampleQuiz"
+            >
+              <span>Take Sample Quiz</span> <SiTestrail />
+            </a>
+          </div>
+        </div>
+
+        {/* Text Section */}
+        <div className="flex flex-col w-full lg:w-1/2 lg:p-2">
+          <div className="w-full flex flex-col items-center gap-6">
+            <div className="text-center md:text-left px-2">
+              <h1 className="text-2xl md:text-3xl font-bold my-4 text-center ">
+                Welcome to <span className="text-customBlue">UnderSigned</span>
+              </h1>
+              <p className="text-base mb-4 text-gray-700 text-center">
+                Our platform is designed to help you excel in your exams with a
+                wide range of quizzes tailored specifically for LDCE aspirants.
+              </p>
+              <p className="text-base mb-4 text-gray-700 text-center">
+                We equip you with all the essential tools for success, including
+                progress tracking, bookmarking of important questions,
+                topic-wise quizzes, and the option to focus exclusively on
+                unattempted questions.
+              </p>
+              <div className="flex justify-center items-center">
+                <Link
+                  to="/register"
+                  className="bg-cyan-800 rounded-md px-6 text-white my-4 py-2 flex items-center justify-center gap-2 hover:bg-cyan-500 w-1/2"
+                >
+                  <span>Register</span>
+                  <RiContactsBook3Line className="text-xl" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-center ">
+              <PricingSection />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {!isLoggedIn && (
+        <div className="lg:w-11/12 bg-gradient-to-r from-yellow-100 via-yellow-50 to-yellow-200 text-gray-600 p-6 rounded-lg shadow-lg text-center mt-6 mx-2 lg:mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl font-bold">
+            Mock Test - Previous Year Questions (2016-17 to 2023) - SO LDCE
+            {/* <span className="ml-2 inline-block bg-red-500 text-white text-xs md:text-sm font-semibold px-3 py-1 rounded-full shadow-md animate-pulse">
+              NEW
+            </span> */}
+          </p>
+          <p className="text-sm md:text-base mt-2">
+            Enhance your preparation with a comprehensive collection of 1200
+            PYQs designed for LDCE aspirants as mock tests.
+          </p>
+          <Link
+            to="/subscribe"
+            className="inline-block mt-4 bg-blue-800 text-white text-sm md:text-base font-medium px-6 py-2 rounded-lg shadow-md hover:bg-blue-500 transition duration-300"
+          >
+            Subscribe to Access
+          </Link>
+        </div>
+      )}
+
+      {/* Banner for PYQ LDCE 
       {!isLoggedIn && (
         <div className="bg-gradient-to-r from-pink-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center mt-4">
           <p className="text-sm md:text-base lg:text-lg font-semibold">
@@ -57,67 +147,12 @@ const Home = ({
             Login/Register to access
           </Link>
         </div>
-      )}
+      )} */}
 
-      {!isPaymentMade && isLoggedIn && <AccountActivationNotice />}
-      <div
-        className={`flex flex-col lg:flex-row mx-auto items-center justify-center ${
-          isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""
-        }`}
-      >
-        {/* Image Background Section */}
-        <div className="w-full lg:w-2/5 md:w-1/2 md:h-auto flex items-center justify-center">
-          <picture className="w-full h-full bg-cover bg-center">
-            <source srcSet="/homeLarge2.png" media="(min-width: 1200px)" />
-            <source srcSet="/homeLarge2.png" media="(min-width: 768px)" />
-            <source srcSet="/homeLarge2.png" media="(max-width: 767px)" />
-            <img
-              src="/home1-large.png"
-              alt="Background"
-              className="w-full h-full object-cover"
-            />
-          </picture>
-        </div>
-
-        {/* Text Section */}
-        <div className="flex flex-col items-center justify-center w-full lg:w-3/5 p-4 lg:p-8">
-          <div className="w-full flex flex-col md:flex-row items-center justify-center gap-2">
-            <div className="w-full md:w-3/5 flex items-center justify-center p-4 lg:p-8 bg-white">
-              <div className="max-w-lg text-center md:text-left">
-                <h1 className="text-2xl md:text-4xl font-bold mb-4">
-                  Welcome to{" "}
-                  <span className="text-customBlue">UnderSigned</span>
-                </h1>
-                <p className="text-base md:text-lg mb-4 text-gray-700">
-                  Our platform is designed to help you excel in your exams with
-                  a wide range of quizzes tailored specifically for LDCE
-                  aspirants.
-                </p>
-                <p className="text-base md:text-lg mb-4 text-gray-700">
-                  We equip you with all the essential tools for success,
-                  including progress tracking, bookmarking of important
-                  questions, topic-wise quizzes, and the option to focus
-                  exclusively on unattempted questions.
-                </p>
-                <Link
-                  className="bg-blue-500 text-white my-4 px-6 py-2 rounded hover:bg-blue-600"
-                  to="/register"
-                >
-                  Register
-                </Link>
-              </div>
-            </div>
-            <div className="w-full md:w-1/2 flex items-center justify-center p-4 lg:p-8 bg-white">
-              <PricingSection />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-screen-lg mx-auto overflow-y-auto">
+      <div className="mx-auto overflow-y-auto mt-2">
         {!isLoggedIn && (
           <div>
-            <h2 className="max-w-80 mx-auto rounded-lg text-2xl font-bold text-center text-gray-700 mb-2 ">
+            <h2 className="w-full mx-auto rounded-lg text-2xl font-bold text-center text-gray-700 mb-2 mt-4">
               Features
             </h2>
             <FeatureCarousel />

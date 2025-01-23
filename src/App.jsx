@@ -18,7 +18,7 @@ import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
 import Subscribe from "./pages/Subscribe";
 import SampleQuiz from "./pages/quiz/SampleQuiz";
-import SharePopup from "./components/SharePopup";
+// import SharePopup from "./components/SharePopup";
 import Constitution from "./pages/quiz/Constitution";
 import Conduct from "./pages/quiz/Conduct";
 import RTI from "./pages/quiz/RTI";
@@ -238,7 +238,7 @@ const App = () => {
         </div>
 
         {/* Share Popup */}
-        <SharePopup />
+        {/* <SharePopup /> */}
 
         <div className="flex-grow min-h-screen">
           <Routes>

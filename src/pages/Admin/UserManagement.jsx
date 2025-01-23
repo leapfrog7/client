@@ -8,7 +8,7 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
   const [editingUser, setEditingUser] = useState(null);
-  const [newPassword] = useState("undersigned123");
+  const [newPassword] = useState("Garry@123");
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [showEmail, setShowEmail] = useState(false);
