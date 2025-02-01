@@ -1,4 +1,11 @@
-import { FaHome, FaInfo, FaUserPlus, FaWhatsapp } from "react-icons/fa";
+import {
+  FaHome,
+  FaInfo,
+  FaUserPlus,
+  FaWhatsapp,
+  FaInstagram,
+  FaFacebook,
+} from "react-icons/fa";
 import { BiLogoGmail } from "react-icons/bi";
 import { MdOutlineFeaturedPlayList } from "react-icons/md";
 
@@ -40,7 +47,7 @@ const Footer = () => {
           {/* Contact Information */}
           <div className="mb-4 md:mb-0 mx-auto text-center">
             <h2 className="text-xl font-bold mb-2">Contact Us</h2>
-            <p className="flex justify-center items-center gap-2">
+            <p className="flex justify-center items-center gap-2 mb-2">
               <a
                 href="mailto:leapfrog.testseries@gmail.com"
                 className="hover:text-yellow-500 flex items-center"
@@ -49,7 +56,7 @@ const Footer = () => {
                 leapfrog.testseries@gmail.com
               </a>
             </p>
-            <p className="flex justify-center items-center gap-2">
+            <p className="flex justify-center items-center gap-2 mb-2">
               <a
                 href="https://wa.me/918368371597"
                 className="hover:text-yellow-500 flex items-center"
@@ -58,6 +65,32 @@ const Footer = () => {
               >
                 <FaWhatsapp className="mr-2" />
                 +91 8368371597
+              </a>
+            </p>
+
+            {/* Facebook */}
+            <p className="flex justify-center items-center gap-2 mb-2">
+              <a
+                href="https://facebook.com/share/1KMR86RCkT/"
+                className="hover:text-yellow-500 flex items-center"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaFacebook className="mr-2 text-lg text-white" />
+                Facebook
+              </a>
+            </p>
+
+            {/* Instagram */}
+            <p className="flex justify-center items-center gap-2 mb-2">
+              <a
+                href="https://instagram.com/_undersigned?igsh=MXd4aWhqcDVlbnZ1aA=="
+                className="hover:text-yellow-500 flex items-center"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaInstagram className="mr-2 text-lg text-white" />
+                Instagram
               </a>
             </p>
           </div>

@@ -1,47 +1,55 @@
 import PropTypes from "prop-types";
 import DashboardCard from "./DashboardCards";
-import { AiOutlineDashboard } from "react-icons/ai";
+import DashboardHeader from "./DashBoardHeader";
+// import { FiBarChart2 } from "react-icons/fi";
+import { useMemo } from "react";
 
 const Dashboard = ({ userStats }) => {
+  // ✅ Use default values to prevent errors
+  const paperITopics = useMemo(() => userStats?.paperI || [], [userStats]);
+  const paperIITopics = useMemo(() => userStats?.paperII || [], [userStats]);
+
   return (
     <div className="min-h-screen bg-white flex flex-col p-4 mt-2 text-gray-700 md:rounded-md">
-      <h1 className="text-xl md:text-3xl font-bold mt-4 mb-6 text-center text-gray-600 flex items-center justify-center">
-        Your Dashboard{" "}
-        <AiOutlineDashboard className="ml-2 text-yellow-600 text-3xl" />
-      </h1>
+      {/* Dashboard Header */}
 
+      <DashboardHeader />
+      {/* Paper I Section */}
       <div className="mb-8 text-center">
-        <h2 className="text-base md:text-lg font-bold mb-4 rounded-lg bg-gradient-to-r from-pink-200 to-rose-300 px-4 py-2 text-pink-700">
+        <h2 className="text-xl md:text-2xl font-extrabold mb-5 border border-l-white border-r-white border-t-black border-b-black bg-gradient-to-r  px-5 py-3 text-red-700  tracking-wide">
           Paper I
         </h2>
+
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {userStats.paperI.map((topic, index) => (
+          {paperITopics.map((topic, index) => (
             <DashboardCard
               key={index}
               title={topic.title}
-              progress={topic.progress}
+              progress={parseFloat(topic.progress) || 0} // ✅ Ensure it's a number
               path={topic.path}
-              attemptedQuestions={topic.attemptedQuestions}
-              bgColor={"bg-gradient-to-r from-pink-200 to-rose-100"}
-              textColor={"text-pink-800"}
+              attemptedQuestions={topic.attemptedQuestions || 0}
+              bgColor="bg-gradient-to-r from-pink-200 to-rose-100"
+              textColor="text-pink-800"
             />
           ))}
         </div>
       </div>
+
+      {/* Paper II Section */}
       <div className="text-center">
-        <h2 className="font-bold text-base md:text-lg mb-4 text-purple-800 bg-gradient-to-r from-purple-300 to-blue-100 rounded-lg px-4 py-2">
+        <h2 className="text-xl md:text-2xl font-extrabold mb-5 border border-l-white border-r-white border-t-black border-b-black bg-gradient-to-r  px-5 py-3 text-blue-700 tracking-wide ">
           Paper II
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6  ">
-          {userStats.paperII.map((topic, index) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {paperIITopics.map((topic, index) => (
             <DashboardCard
               key={index}
               title={topic.title}
-              progress={topic.progress}
+              progress={parseFloat(topic.progress) || 0} // ✅ Ensure it's a number
               path={topic.path}
-              attemptedQuestions={topic.attemptedQuestions}
-              bgColor={" bg-gradient-to-r from-purple-100 to-blue-100"}
-              textColor={"text-purple-800"}
+              attemptedQuestions={topic.attemptedQuestions || 0}
+              bgColor="bg-gradient-to-r from-purple-100 to-blue-100"
+              textColor="text-purple-800"
             />
           ))}
         </div>
@@ -50,8 +58,26 @@ const Dashboard = ({ userStats }) => {
   );
 };
 
+// ✅ Removed `username` from PropTypes since it's unused
 Dashboard.propTypes = {
-  userStats: PropTypes.object,
-  username: PropTypes.string,
+  userStats: PropTypes.shape({
+    paperI: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        progress: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        path: PropTypes.string.isRequired,
+        attemptedQuestions: PropTypes.number, // ✅ No longer marked as required
+      })
+    ),
+    paperII: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        progress: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        path: PropTypes.string.isRequired,
+        attemptedQuestions: PropTypes.number, // ✅ No longer marked as required
+      })
+    ),
+  }),
 };
+
 export default Dashboard;

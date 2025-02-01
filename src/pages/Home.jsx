@@ -167,21 +167,44 @@ const Home = ({
       {/* This is the DashBoard which should appear only when the user is logged In */}
       {isLoggedIn && isPaymentMade && (
         <div>
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg text-center my-4">
-            <p className="text-base lg:text-lg font-semibold">
-              Try Previous Year Questions - SO LDCE
-              <span className="ml-2 inline-block bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md animate-pulse">
-                NEW
-              </span>
-            </p>
+          <Dashboard userStats={userStats} username={username} />
+
+          <div className="bg-blue-100 border-l-4 border-blue-600 text-gray-800 px-2 py-4 md:px-6 rounded-md shadow-sm my-6 mx-1 flex items-center justify-between">
+            {/* Text Section */}
+            <div className="flex items-center gap-2 md:gap-4">
+              <p className="text-base lg:text-lg font-medium">
+                Access{" "}
+                <span className="font-bold">Previous Year Questions</span> for
+                SO LDCE
+              </p>
+            </div>
+
+            {/* CTA Link */}
             <Link
               to="/pages/quiz/previousYear/Exam"
-              className="pl-2 text-yellow-200 text-lg hover:text-yellow-400 underline transition-colors duration-200 ease-in-out"
+              className="text-blue-800 font-bold hover:text-blue-600 transition duration-200 ease-in-out bg-yellow-300 px-4 py-2 md: rounded-md text-sm md:text-base text-center"
             >
-              Click Here
+              Click Here →
             </Link>
           </div>
-          <Dashboard userStats={userStats} username={username} />
+        </div>
+      )}
+
+      {!isLoggedIn && (
+        <div className="bg-gradient-to-r from-gray-50 to-gray-200 mx-4 mb-8  py-4 rounded-lg shadow-md text-center">
+          <p className="text-lg font-semibold text-gray-800">
+            Still have questions?
+          </p>
+          <p className="text-sm text-gray-600 mt-2">
+            Check out our{" "}
+            <Link
+              to="/faqs"
+              className="text-cyan-600 hover:text-cyan-800 font-bold underline transition duration-300 "
+            >
+              FAQs
+            </Link>{" "}
+            for more information.
+          </p>
         </div>
       )}
     </div>

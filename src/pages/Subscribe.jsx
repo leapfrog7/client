@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 
 const Subscribe = () => {
   const upiLink =
-    "upi://pay?pa=7827097711@ptyes&pn=Seema%Bhardwaj&am=999.00&cu=INR&tn=Payment%20for%20Undersigned%20registration";
+    "upi://pay?pa=7827097711@ptyes&pn=Seema%Bhardwaj&am=1199.00&cu=INR&tn=Payment%20for%20Undersigned%20registration";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-200 to-gray-100 sm:text-sm">

@@ -107,7 +107,7 @@ export default function QuizDetails() {
           <p className="text-lg md:text-xl font-semibold">
             Ready to test your knowledge?{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-              Start your quiz journey now!
+              Start your LDCE journey now!
             </span>
           </p>
         </div>

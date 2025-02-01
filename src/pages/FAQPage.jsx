@@ -20,6 +20,36 @@ const FAQPage = () => {
         "We cover topics for both Paper I and Paper II as listed on our website. The quizzes are structured to cover all essential topics comprehensively. Only the topics mentioned on our website are available at present.",
     },
     {
+      question: "What is the Pricing Structure?",
+      answer:
+        "We currently offer a single subscription plan priced at ₹1,199/-. This subscription includes access to all topics under Paper I and Paper II, as listed on our website, along with Previous Year Questions. Additionally, any updates or new content added to the portal will be accessible at no extra charge. Please note that the pricing is subject to change without prior notice.",
+    },
+    {
+      question: "What is the validity period of my account?",
+      answer:
+        "Your account will remain valid until the next LDCE exam, with a maximum limit of two years from the date of purchase. This ensures your subscription won’t expire right before the exam, eliminating the need for any further renewals.",
+    },
+    {
+      question: "When can I expect Discounts?",
+      answer:
+        "Our subscription is already offered at a discounted rate of ₹1,199/-. Given this competitive pricing, we are unable to provide any further discounts.",
+    },
+    {
+      question: "Is there any discounts for renewal of subscription?",
+      answer:
+        "Yes, we offer a 50% discount to our previous subscribers if they choose to renew their subscription within 3 months after it expires. ",
+    },
+    {
+      question: "When should I buy this subscription?",
+      answer:
+        "If you are eligible to appear for the next LDCE exam, it’s best to purchase the subscription now. The price will remain unchanged until the exam date, and your subscription will remain valid until the next LDCE exam, subject to a maximum duration of two years from the date of purchase.",
+    },
+    {
+      question: "How do I make a payment?",
+      answer:
+        "Currently, we only accept payments through UPI. You need to make the payment via UPI and share a screenshot of the transaction on the provided WhatsApp number.",
+    },
+    {
       question: "How can I track my progress?",
       answer:
         "You can track your progress through the user dashboard, which provides an overview of your quiz completion status and topic wise quiz attempted so far.",
@@ -39,11 +69,7 @@ const FAQPage = () => {
       answer:
         "Since the questions are stored in a cloud database and accessed through the server, there can be a slight delay. We recommend having a high-speed internet connection for the best experience.",
     },
-    {
-      question: "How do I make a payment?",
-      answer:
-        "Currently, we only accept payments through UPI. You need to make the payment via UPI and share a screenshot of the transaction on the provided WhatsApp number.",
-    },
+
     {
       question: "How long does it take to activate my account after payment?",
       answer:
@@ -54,11 +80,7 @@ const FAQPage = () => {
       answer:
         "Once your account is activated, we will convey a confirmation through WhatsApp and you will need to log back in afresh. You can also approach us via WhatsApp for any queries or confirmation.",
     },
-    {
-      question: "What is the validity period of my account?",
-      answer:
-        "The account validity is one year from the time of activation. You will have access to all features and quizzes during this period. Any future updation or addition of any topic will also be available",
-    },
+
     {
       question: "What should I do if I have any issues or need clarification?",
       answer:
@@ -92,21 +114,21 @@ const FAQPage = () => {
         <meta property="og:type" content="website" />
       </Helmet>
       <h1 className="bg-white rounded-md text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-700 flex gap-2 items-center justify-center">
-        <span>Frequently Asked Questions</span>{" "}
+        <span className="text-customBlue">Frequently Asked Questions</span>{" "}
         <img src="/faq.png" width={60} height={60} />
       </h1>
       {faqs.map((faq, index) => (
         <div key={index} className="mb-4">
           <div
             onClick={() => toggleQuestion(index)}
-            className="cursor-pointer bg-gradient-to-r from-rose-500 to-pink-500 p-4 rounded-lg shadow-md hover:bg-pink-300 transition duration-300 text-white"
+            className="cursor-pointer bg-gradient-to-r from-red-100 to-yellow-100 p-4 rounded-lg shadow-md hover:bg-blue-300 transition duration-300 text-red-800"
           >
             <h2 className="text-sm md:text-base xl:text-lg font-semibold">
               {faq.question}
             </h2>
           </div>
           {openQuestionIndex === index && (
-            <div className="bg-white p-4 border-l-4 border-pink-700 text-gray-600 rounded-r-lg shadow-inner text-sm md:text-base xl:text-lg">
+            <div className="bg-white p-4 border-b-4 border-red-200 text-yellow-800 rounded-r-lg shadow-inner text-sm md:text-base xl:text-lg">
               <p>{faq.answer}</p>
             </div>
           )}
