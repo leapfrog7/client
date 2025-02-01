@@ -90,9 +90,9 @@ const DashboardHeader = () => {
             <p className="text-red-400">{error}</p>
           </div>
         ) : (
-          <div className="bg-black bg-opacity-20 backdrop-blur-md p-4 rounded-lg shadow-md text-white text-center">
+          <div className="bg-black bg-opacity-20 backdrop-blur-md p-4 rounded-lg shadow-md text-white text-center w-full md:w-1/2">
             <h2 className="text-lg font-bold mb-2">Quick Progress Stats</h2>
-            <div className="flex md:flex-row items-center gap-6">
+            <div className="flex md:flex-row items-center gap-6 justify-around">
               <div className="flex flex-col items-center">
                 <p className="text-lg md:text-xl lg:text-2xl font-semibold">
                   {stats.attemptedPaperI}
