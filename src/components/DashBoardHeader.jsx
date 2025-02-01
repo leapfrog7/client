@@ -68,7 +68,7 @@ const DashboardHeader = () => {
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col items-center md:items-start text-white">
           <h1 className="text-3xl md:text-5xl font-extrabold flex items-center gap-3">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
+            <span className="leading-normal bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
               My Dashboard
             </span>
             <FiBarChart2 className="text-pink-300 text-4xl md:text-5xl" />
