@@ -41,7 +41,7 @@ export default function NavBar() {
   };
 
   return (
-    <div className="px-4 py-2 hidden md:flex space-x-4  rounded-lg">
+    <div className="px-4 py-2 hidden md:flex space-x-4  rounded-lg z-20">
       {navItems.map((item, index) => (
         <div
           key={index}
