@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Pagination from "./Pagination";
+// import Pagination from "./Pagination";
 import { jwtDecode } from "jwt-decode";
-import { FaTrash, FaRedo, FaEdit } from "react-icons/fa";
+import { FaTrash, FaRedo, FaEdit, FaSearch } from "react-icons/fa";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -14,9 +14,10 @@ const UserManagement = () => {
   const [showEmail, setShowEmail] = useState(false);
   const [showMobile, setShowMobile] = useState(false);
   const [showBatch, setShowBatch] = useState(false);
-
+  // ✅ Search Input State
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10);
+  const usersPerPage = 10;
 
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1/"; //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1/";
@@ -55,21 +56,62 @@ const UserManagement = () => {
     }
   };
 
+  // ✅ Function to Handle Search Input
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset pagination when searching
+  };
+
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
   };
 
   const filteredUsers = users.filter((user) => {
-    if (filter === "all") return true;
-    return filter === "paid" ? user.paymentMade : !user.paymentMade;
+    if (
+      filter !== "all" &&
+      (filter === "paid" ? !user.paymentMade : user.paymentMade)
+    ) {
+      return false;
+    }
+
+    // ✅ Search by Name, Email, or Mobile
+    return (
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.mobile.includes(searchQuery)
+    );
   });
 
   //For Pagination
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // ✅ Number of Page Numbers to Show
+  const maxPageButtons = 3;
+
+  // ✅ Function to Generate Page Range
+  const getPageNumbers = () => {
+    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+    if (endPage - startPage + 1 < maxPageButtons) {
+      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    }
+
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
+
+  // ✅ Function to Navigate Pages
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
 
   const handleEditUser = (user) => {
     setEditingUser({ ...user });
@@ -161,7 +203,7 @@ const UserManagement = () => {
 
   return (
     <div>
-      <h2 className="text-lg md:text-xl font-bold mb-4 pl-4">
+      <h2 className="text-lg md:text-xl font-bold mb-4 pl-4 text-center text-blue-700 tracking-wide">
         User Management
       </h2>
       <div className="mb-4 flex items-center justify-center gap-3 text-sm">
@@ -207,6 +249,33 @@ const UserManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* ✅ Search & Filter Section */}
+      <div className="flex flex-wrap items-center justify-center gap-4 my-4">
+        {/* Search Input */}
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-3 text-gray-500" />
+          <input
+            type="text"
+            placeholder="Search by name, email, or mobile"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="text-sm pl-10 pr-3 py-2 border rounded-lg shadow-sm w-64 focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+
+        {/* Filter Dropdown */}
+        <select
+          value={filter}
+          onChange={handleFilterChange}
+          className="p-2 border rounded shadow-sm"
+        >
+          <option value="all">All</option>
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+        </select>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border text-center text-sm md:text-base px-1">
           <thead>
@@ -222,68 +291,148 @@ const UserManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {currentUsers.map((user) => (
-              <tr key={user._id}>
-                <td className="py-2 px-2 md:px-4 border">{user.name}</td>
-                {showEmail && (
-                  <td className="py-2 px-2 md:px-4 border">{user.email}</td>
-                )}
-                {showMobile && (
-                  <td className="py-2 px-2 md:px-4 border">{user.mobile}</td>
-                )}
-                {showBatch && (
-                  <td className="py-2 px-2 md:px-4 border">{user.batch}</td>
-                )}
-                <td className="py-2 px-2 md:px-4 border">
-                  {user.paymentMade ? "Paid" : "Unpaid"}
-                </td>
-                <td className="py-2 px-2 md:px-4 border text-center flex gap-2 flex-col md:flex-row">
-                  <div>
-                    <button
-                      onClick={() => handleChangePaymentStatus(user)}
-                      className={` text-xs md:text-sm lg:text-base px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
-                        user.paymentMade
-                          ? "bg-green-200 hover:bg-green-300 text-green-800"
-                          : "bg-red-200 hover:bg-red-300 text-red-800"
-                      } `}
-                    >
-                      {user.paymentMade ? `Mark as Unpaid ` : `Mark as Paid `}
-                    </button>
-                  </div>
-                  <div className="flex gap-1 text-center items-center justify-center text-xs md:text-sm lg:text-base">
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="bg-yellow-200 text-slate-500 px-4 py-2 rounded hover:bg-yellow-300 transition duration-200"
-                    >
-                      <FaEdit />
-                    </button>
+            {currentUsers.map((user) => {
+              const activationDate = user.paymentMadeDate
+                ? new Date(user.paymentMadeDate)
+                : null;
+              const today = new Date();
+              const daysSinceActivation = activationDate
+                ? Math.floor((today - activationDate) / (1000 * 60 * 60 * 24))
+                : 0;
 
-                    <button
-                      onClick={() => handleDeleteUser(user._id)}
-                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-500 transition duration-200"
-                      disabled
-                    >
-                      <FaTrash />
-                    </button>
-                    <button
-                      onClick={() => handleResetPassword(user._id)}
-                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
-                    >
-                      <FaRedo />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+              return (
+                <tr key={user._id}>
+                  <td className="py-2 px-2 md:px-4 border">{user.name}</td>
+                  {showEmail && (
+                    <td className="py-2 px-2 md:px-4 border">{user.email}</td>
+                  )}
+                  {showMobile && (
+                    <td className="py-2 px-2 md:px-4 border">{user.mobile}</td>
+                  )}
+                  {showBatch && (
+                    <td className="py-2 px-2 md:px-4 border">{user.batch}</td>
+                  )}
+                  <td className="py-2 px-4 border">
+                    {user.paymentMade ? "Paid" : "Unpaid"}
+
+                    {/* ✅ Payment Activation Date (Only if Paid) */}
+                    {user.paymentMade && user.paymentMadeDate && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Activated on:{" "}
+                        <span className="font-semibold text-green-700">
+                          {activationDate.toLocaleDateString()}
+                        </span>
+                        {/* ✅ Days Since Activation */}
+                        <div
+                          className={`mt-1 ${
+                            daysSinceActivation > 365
+                              ? "text-red-600 font-semibold"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {daysSinceActivation} days since activation
+                        </div>
+                      </div>
+                    )}
+                  </td>
+                  <td className="py-2 px-2 md:px-4 border text-center flex gap-2 flex-col md:flex-row">
+                    <div>
+                      <button
+                        onClick={() => handleChangePaymentStatus(user)}
+                        className={` text-xs md:text-sm lg:text-base px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
+                          user.paymentMade
+                            ? "bg-green-200 hover:bg-green-300 text-green-800"
+                            : "bg-red-200 hover:bg-red-300 text-red-800"
+                        } `}
+                      >
+                        {user.paymentMade ? `Mark as Unpaid ` : `Mark as Paid `}
+                      </button>
+                    </div>
+                    <div className="flex gap-1 text-center items-center justify-center text-xs md:text-sm lg:text-base">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="bg-yellow-200 text-slate-500 px-4 py-2 rounded hover:bg-yellow-300 transition duration-200"
+                      >
+                        <FaEdit />
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteUser(user._id)}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-500 transition duration-200"
+                        disabled
+                      >
+                        <FaTrash />
+                      </button>
+                      <button
+                        onClick={() => handleResetPassword(user._id)}
+                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
+                      >
+                        <FaRedo />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <Pagination
-        entriesPerPage={usersPerPage}
-        totalEntries={filteredUsers.length}
-        paginate={paginate}
-        currentPage={currentPage}
-      />
+
+      {/* ✅ Compact Pagination UI */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+          {/* First Button */}
+          <button
+            onClick={() => paginate(1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition disabled:bg-gray-100"
+          >
+            First
+          </button>
+
+          {/* Previous Button */}
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition disabled:bg-gray-100"
+          >
+            Prev
+          </button>
+
+          {/* Dynamic Page Numbers */}
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              onClick={() => paginate(page)}
+              className={`px-3 py-1 rounded-md ${
+                currentPage === page
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          {/* Next Button */}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition disabled:bg-gray-100"
+          >
+            Next
+          </button>
+
+          {/* Last Button */}
+          <button
+            onClick={() => paginate(totalPages)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition disabled:bg-gray-100"
+          >
+            Last
+          </button>
+        </div>
+      )}
 
       {editingUser && (
         <div className="mt-4 p-4 bg-white border rounded-lg shadow-lg">

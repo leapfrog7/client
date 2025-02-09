@@ -134,15 +134,50 @@ const MCQManagement = () => {
 
   const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  // const renderPagination = () => {
+  //   const pageNumbers = [];
+  //   const maxPageNumbersToShow = 5;
+  //   let startPage = Math.max(
+  //     currentPage - Math.floor(maxPageNumbersToShow / 2),
+  //     1
+  //   );
+  //   let endPage = Math.min(startPage + maxPageNumbersToShow - 1, totalPages);
+
+  //   if (endPage - startPage + 1 < maxPageNumbersToShow) {
+  //     startPage = Math.max(endPage - maxPageNumbersToShow + 1, 1);
+  //   }
+
+  //   for (let i = startPage; i <= endPage; i++) {
+  //     pageNumbers.push(
+  //       <button
+  //         key={i}
+  //         onClick={() => paginate(i)}
+  //         className={`px-4 py-2 mx-1 rounded ${
+  //           currentPage === i
+  //             ? "bg-blue-500 text-white"
+  //             : "bg-gray-200 text-gray-700"
+  //         } hover:bg-blue-700 transition duration-200`}
+  //       >
+  //         {i}
+  //       </button>
+  //     );
+  //   }
+
+  //   return pageNumbers;
+  // };
 
   const renderPagination = () => {
     const pageNumbers = [];
-    const maxPageNumbersToShow = 5;
-    let startPage = Math.max(
-      currentPage - Math.floor(maxPageNumbersToShow / 2),
-      1
-    );
+    const maxPageNumbersToShow = 3; // Show only 3 pages at a time
+    const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+
+    let startPage = Math.max(currentPage - 1, 1);
     let endPage = Math.min(startPage + maxPageNumbersToShow - 1, totalPages);
 
     if (endPage - startPage + 1 < maxPageNumbersToShow) {
@@ -154,18 +189,54 @@ const MCQManagement = () => {
         <button
           key={i}
           onClick={() => paginate(i)}
-          className={`px-4 py-2 mx-1 rounded ${
+          className={`px-3 py-1 mx-1 rounded-md ${
             currentPage === i
               ? "bg-blue-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          } hover:bg-blue-700 transition duration-200`}
+              : "bg-gray-200 hover:bg-gray-300"
+          }`}
         >
           {i}
         </button>
       );
     }
 
-    return pageNumbers;
+    return (
+      <div className="flex justify-center items-center gap-2 mt-4 text-sm">
+        <button
+          onClick={() => paginate(1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          First
+        </button>
+
+        <button
+          onClick={() => paginate(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        {pageNumbers}
+
+        <button
+          onClick={() => paginate(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          Next
+        </button>
+
+        <button
+          onClick={() => paginate(totalPages)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          Last
+        </button>
+      </div>
+    );
   };
 
   const handleAddQuestionChange = (e) => {
@@ -238,7 +309,9 @@ const MCQManagement = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">MCQ Management</h2>
+      <h2 className="text-xl font-bold mb-4 text-center text-green-700">
+        MCQ Management
+      </h2>
 
       <div className="mb-4 flex gap-2 text-sm md:text-base justify-around items-center">
         <div className="flex flex-col md:flex-row gap-2">

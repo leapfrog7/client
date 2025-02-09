@@ -154,6 +154,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { GrCaretNext, GrCaretPrevious } from "react-icons/gr";
 import { AiOutlineDelete } from "react-icons/ai"; // ✅ Import delete icon
+// import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 const BookmarkComponent = ({ userId, topicId }) => {
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState([]);
@@ -237,76 +238,108 @@ const BookmarkComponent = ({ userId, topicId }) => {
     return <div>No bookmarks available for this topic.</div>;
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-white rounded-lg shadow-md">
-        <h2 className="text-xl md:text-2xl font-bold mb-4 w-full text-center text-gray-800">
-          Bookmarked Questions
-        </h2>
+    <div className="min-h-screen bg-white">
+      {/* <div className="bg-white rounded-lg shadow-md"> */}
+      {/* <h2 className="text-xl md:text-2xl font-bold mb-4 w-full text-center text-gray-800">
+        Bookmarked Questions
+      </h2> */}
 
-        {paginatedQuestions.map((question, index) => (
-          <div
-            key={index}
-            className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 "
-          >
-            <div className="flex justify-between items-end ">
-              <p
-                className="cursor-pointer font-semibold text-gray-900"
-                onClick={() => toggleExpand(question._id)}
-              >
-                {`Q${startIndex + index + 1}: ${question.questionText}`}
-              </p>
-              <button
-                onClick={() => removeBookmark(question._id)}
-                className="bg-red-200 text-red-600 hover:text-red-800 transition duration-200 ease-in-out p-1 rounded-md"
-              >
-                <AiOutlineDelete className="text-lg" />
-              </button>
-            </div>
-
-            {expandedQuestionId === question._id && (
-              <div className="mt-2 bg-gray-50 rounded-lg p-2">
-                {question.options.map((option, i) => (
-                  <p key={i} className="text-gray-700">
-                    {option}
-                  </p>
-                ))}
-                <p className="mt-4 text-gray-700">
-                  <span className="text-green-800 font-semibold bg-green-100 rounded-md px-2 py-1">
-                    {`Correct Answer: ${question.correctAnswer}`}
-                  </span>
-                  <br />
-                  <br />
-                  <span className="whitespace-pre-line">
-                    <strong>Explanation:</strong> {question.explanation}
-                  </span>
-                </p>
-              </div>
-            )}
+      {paginatedQuestions.map((question, index) => (
+        <div
+          key={index}
+          className="mb-4 text-sm md:text-base shadow-lg rounded-lg p-4 "
+        >
+          <div className="flex justify-between items-end ">
+            <p
+              className="cursor-pointer font-semibold text-gray-900 whitespace-pre-line"
+              onClick={() => toggleExpand(question._id)}
+            >
+              {`Q${startIndex + index + 1}: ${question.questionText}`}
+            </p>
+            <button
+              onClick={() => removeBookmark(question._id)}
+              className="bg-red-200 text-red-600 hover:text-red-800 transition duration-200 ease-in-out p-1 rounded-md"
+            >
+              <AiOutlineDelete className="text-lg" />
+            </button>
           </div>
-        ))}
 
-        {/* Pagination Controls */}
-        <div className="flex justify-center my-4 pb-4 gap-4">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-            className="px-4 py-2 mx-1 text-xs md:text-base bg-blue-500 text-white rounded-full disabled:bg-gray-400"
-          >
-            <GrCaretPrevious />
-          </button>
-          <span className="px-4 py-2 text-xs md:text-base mx-1 bg-gray-200 rounded">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-            className="px-4 text-xs md:text-base py-2 mx-1 bg-blue-500 text-white rounded-full disabled:bg-gray-400"
-          >
-            <GrCaretNext />
-          </button>
+          {expandedQuestionId === question._id && (
+            // <div className="mt-2 bg-gray-50 rounded-lg p-2">
+            //   {question.options.map((option, i) => (
+            //     <p key={i} className="text-gray-700">
+            //       {option}
+            //     </p>
+            //   ))}
+            //   <p className="mt-4 text-gray-700">
+            //     <span className="text-green-800 font-semibold bg-green-100 rounded-md px-2 py-1">
+            //       {`Correct Answer: ${question.correctAnswer}`}
+            //     </span>
+            //     <br />
+            //     <br />
+            //     <span className="whitespace-pre-line">
+            //       <strong>Explanation:</strong> {question.explanation}
+            //     </span>
+            //   </p>
+            // </div>
+            <div className="mt-2 bg-gray-50 rounded-lg p-4 shadow-sm">
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                {question.options.map((option, i) => (
+                  <li
+                    key={i}
+                    className="px-2 py-1 rounded-md hover:bg-gray-100 transition"
+                  >
+                    {option}
+                  </li>
+                ))}
+              </ul>
+
+              <p className="mt-4 text-gray-700 space-y-3">
+                {/* Answer Section */}
+                <span className="flex items-center gap-2 bg-green-50 border-l-4 border-green-500 rounded-md px-3 py-2 shadow-sm">
+                  <span className="font-bold text-green-700">
+                    Correct Answer: <br />
+                    <span className="text-green-700 font-normal mt-1">
+                      {question.correctAnswer}
+                    </span>
+                  </span>
+                </span>
+
+                {/* Explanation Section */}
+                <div className="bg-blue-50 border-l-4 border-blue-400 rounded-md px-3 py-2 shadow-sm">
+                  <strong className="text-blue-700">Explanation:</strong>
+                  <p className="text-gray-700 mt-1 whitespace-pre-line leading-relaxed">
+                    {question.explanation}
+                  </p>
+                </div>
+              </p>
+            </div>
+          )}
         </div>
+      ))}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center my-4 pb-4 gap-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(currentPage - 1)}
+          className="px-4 py-2 mx-1 text-xs md:text-base bg-blue-500 text-white rounded-full disabled:bg-gray-400"
+        >
+          <GrCaretPrevious />
+        </button>
+        <span className="px-4 py-2 text-xs md:text-base mx-1 bg-gray-200 rounded">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage(currentPage + 1)}
+          className="px-4 text-xs md:text-base py-2 mx-1 bg-blue-500 text-white rounded-full disabled:bg-gray-400"
+        >
+          <GrCaretNext />
+        </button>
       </div>
     </div>
+    // </div>
   );
 };
 

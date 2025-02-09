@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import UserManagement from "./UserManagement";
 import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
 import PrevYear from "./PrevYear";
+import {
+  FaUsers,
+  FaQuestionCircle,
+  FaChartBar,
+  FaBook,
+  FaHistory,
+} from "react-icons/fa"; // ✅ Import icons
 
 const AdminDashboard = () => {
-  const location = useLocation();
-  const [activeTab, setActiveTab] = useState(location.pathname);
-
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -18,22 +22,17 @@ const AdminDashboard = () => {
       const token = localStorage.getItem("jwtToken");
       if (token) {
         const decodedToken = jwtDecode(token);
-        if (decodedToken.userType === "Admin") {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
+        setIsAdmin(decodedToken.userType === "Admin");
       } else {
         setIsAdmin(false);
       }
     };
-
     checkAdminStatus();
   }, []);
 
   if (!isAdmin) {
     return (
-      <div className="p-8 mx-auto flex flex-col text-center gap-4 ">
+      <div className="p-8 mx-auto flex flex-col text-center gap-4">
         <span className="text-3xl bg-red-100 text-red-800 py-6">
           Unauthorized Access
         </span>
@@ -45,74 +44,90 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-2 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl lg:text-3xl font-bold mb-6 px-4">
-        Admin Dashboard
-      </h1>
-      <div className="mb-6 border-b border-gray-300">
-        <nav className="bg-white shadow-md py-2 px-1">
-          <div className="max-w-full mx-auto px-0 lg:px-8 overflow-x-auto">
-            <div className="flex justify-center items-center h-16 text-center pb-4 space-x-2 min-w-max">
-              <Link
-                to="users"
-                className={`text-sm md:text-base px-2 py-2 transition duration-300 ease-in-out ${
-                  activeTab.includes("users")
-                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
-                    : "text-gray-500 hover:text-blue-500"
-                }`}
-                onClick={() => setActiveTab("users")}
-              >
-                User Management
-              </Link>
-              <Link
-                to="mcqs"
-                className={`text-sm md:text-base px-2 py-2 transition duration-300 ease-in-out ${
-                  activeTab.includes("mcqs")
-                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
-                    : "text-gray-500 hover:text-blue-500"
-                }`}
-                onClick={() => setActiveTab("mcqs")}
-              >
-                MCQ Management
-              </Link>
-              <Link
-                to="revenue"
-                className={`text-sm md:text-base px-2 py-2 transition duration-300 ease-in-out ${
-                  activeTab.includes("revenue")
-                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
-                    : "text-gray-500 hover:text-blue-500"
-                }`}
-                onClick={() => setActiveTab("revenue")}
-              >
-                Revenue Management
-              </Link>
-              <Link
-                to="aobr"
-                className={`text-sm md:text-base px-4 py-2 ${
-                  activeTab.includes("ministry-work-allocation")
-                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
-                    : "text-gray-500 hover:text-blue-500"
-                }`}
-                onClick={() => setActiveTab("ministry-work-allocation")}
-              >
-                AoBR Management
-              </Link>
-              <Link
-                to="prevYear"
-                className={`text-sm md:text-base px-4 py-2 ${
-                  activeTab.includes("prevYear")
-                    ? "border-b-2 border-blue-500 text-blue-500 font-semibold bg-blue-50 rounded-md"
-                    : "text-gray-500 hover:text-blue-500"
-                }`}
-                onClick={() => setActiveTab("prevYear")}
-              >
-                Previous Years
-              </Link>
-            </div>
-          </div>
-        </nav>
+    <div className="p-4 bg-gray-100 min-h-screen">
+      <div className="bg-gradient-to-r from-green-200 to-teal-500 rounded-lg shadow-md my-4 p-4">
+        <h1 className="text-xl lg:text-2xl font-bold text-center text-gray-800 tracking-wider">
+          Admin Dashboard
+        </h1>
       </div>
-      <div className="mt-6">
+
+      {/* Dashboard Navigation as Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 w-11/12 mx-auto">
+        {/* User Management */}
+        <Link
+          to="users"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-blue-50 transition-all duration-300 ease-in-out"
+        >
+          <FaUsers className="text-4xl text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            User Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Manage registered users, update profiles, and track subscriptions.
+          </p>
+        </Link>
+
+        {/* MCQ Management */}
+        <Link
+          to="mcqs"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-green-50 transition-all duration-300 ease-in-out"
+        >
+          <FaQuestionCircle className="text-4xl text-green-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            MCQ Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Create, edit, and organize multiple-choice questions.
+          </p>
+        </Link>
+
+        {/* Revenue Management */}
+        <Link
+          to="revenue"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-yellow-50 transition-all duration-300 ease-in-out"
+        >
+          <FaChartBar className="text-4xl text-yellow-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            Revenue Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Track user payments, subscriptions, and financial insights.
+          </p>
+        </Link>
+
+        {/* AoBR Management */}
+        <Link
+          to="aobr"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-purple-50 transition-all duration-300 ease-in-out"
+        >
+          <FaBook className="text-4xl text-purple-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            AoBR Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Manage AoBR topics and study materials.
+          </p>
+        </Link>
+
+        {/* Previous Years */}
+        <Link
+          to="prevYear"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-red-50 transition-all duration-300 ease-in-out"
+        >
+          <FaHistory className="text-4xl text-red-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            Previous Years
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Access previous year questions and answer sets.
+          </p>
+        </Link>
+      </div>
+      <div className="text-5xl text-black mx-auto text-center border border-gray-400 w-11/12 mt-8">
+        <h2></h2>
+      </div>
+      {/* Routes Section */}
+      <div className="mt-8">
         <Routes>
           <Route path="users" element={<UserManagement />} />
           <Route path="mcqs" element={<MCQManagement />} />

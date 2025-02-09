@@ -216,16 +216,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   const score = calculateScore();
 
-  const getScoreClass = (score) => {
-    if (score >= 8) {
-      return "bg-green-300 text-green-800";
-    } else if (score >= 5) {
-      return "bg-yellow-300 text-yellow-800";
-    } else {
-      return "bg-red-300 text-red-800";
-    }
-  };
-
   return (
     <div className="min-h-screen">
       <div className="flex justify-end mb-4 mr-4">
@@ -332,17 +322,24 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               )}
             </button>
             {showExplanation[currentQuestionIndex] && (
-              <div className="mt-2 text-gray-700 text-sm md:text-base">
-                <p style={{ whiteSpace: "pre-line" }}>
-                  <span className="text-green-800 font-semibold p-1">
-                    {" "}
-                    Answer -{" "}
-                    <span className="bg-green-100 rounded-sm px-2">
+              <div className="mt-4 text-gray-700 text-sm md:text-base space-y-3">
+                {/* Answer Section */}
+                <div className="flex items-center gap-2 bg-green-50 border-l-4 border-green-500 rounded-md px-3 py-2 shadow-sm">
+                  <span className="font-semibold text-green-800">
+                    Answer: <br />
+                    <span className="text-green-700 font-bold px-1 py-1 rounded-md shadow-sm">
                       {currentQuestion.correctAnswer}
                     </span>
                   </span>
-                  <br /> {currentQuestion.explanation}
-                </p>
+                </div>
+
+                {/* Explanation Section */}
+                <div className="bg-blue-50 border-l-4 border-blue-400 rounded-md px-3 py-2 shadow-sm">
+                  <strong className="text-blue-700">Explanation:</strong>
+                  <p className="mt-1 whitespace-pre-line leading-relaxed text-gray-700">
+                    {currentQuestion.explanation}
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -365,19 +362,27 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         </div>
       ) : (
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Quiz Results</h2>
+          <h2 className="text-xl font-bold mb-4">Quiz Results</h2>
+          {/* Dynamic Score Display */}
           <p
-            className={`text-lg font-bold my-4 p-1 text-center rounded-lg ${getScoreClass(
-              score
-            )}`}
+            className={`text-base font-bold my-4 py-2 px-4 text-center rounded-full shadow-sm ${
+              score >= quizData.length * 0.7
+                ? "bg-green-100 text-green-700"
+                : score >= quizData.length * 0.4
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
           >
-            Your Score: {calculateScore()} / {quizData.length}
+            🎯 Your Score: {calculateScore()} / {quizData.length}
           </p>
           {quizData.map((question, index) => (
-            <div key={index} className="mb-4">
-              <p className="font-semibold">{`Question ${index + 1}: ${
-                question.questionText
-              }`}</p>
+            <div
+              key={index}
+              className="mb-4 p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-300"
+            >
+              <p className="font-semibold text-gray-700">{`Question ${
+                index + 1
+              }: ${question.questionText}`}</p>
               <p
                 className={`text-${
                   selectedAnswers[index] === question.correctAnswer
@@ -385,14 +390,18 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                     : "red"
                 }-700 my-2`}
               >
-                {`Your Answer: ${selectedAnswers[index]}`}
+                {/* {`Your Answer: ${selectedAnswers[index]}`} */}
+                {selectedAnswers[index] === question.correctAnswer
+                  ? "✅"
+                  : "❌"}{" "}
+                Your Answer: {selectedAnswers[index] || "Not Attempted"}
               </p>
               {selectedAnswers[index] !== question.correctAnswer && (
                 <p className="text-green-800 font-semibold">{`Correct Answer: ${question.correctAnswer}`}</p>
               )}
               <button
                 onClick={() => toggleExplanation(index)}
-                className="mt-4 px-4 py-2 bg-yellow-200 text-black rounded flex items-center"
+                className="mt-4 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500  hover:from-blue-500 hover:to-cyan-500 text-white rounded flex items-center"
               >
                 {showExplanation[index]
                   ? "Hide Explanation"
@@ -404,32 +413,33 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                 )}
               </button>
               {showExplanation[index] && (
-                <div className="mt-2 text-gray-700">
-                  <p>
-                    {question.correctAnswer} <br />
-                    <br />
+                <div className="mt-3 bg-blue-50 border-l-4 border-blue-400 p-3 rounded-md shadow-inner transition-all duration-300 ease-in-out">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    <strong className="text-blue-700">Explanation:</strong>{" "}
                     {question.explanation}
                   </p>
                 </div>
               )}
             </div>
           ))}
-          <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 gap-4 mx-auto">
+
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 mx-auto">
+            {/* Review Again Button */}
             <button
               onClick={() => setIsSubmitted(false)}
-              className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 sm:mb-4 flex items-center justify-center"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-full shadow-lg hover:from-indigo-600 hover:to-blue-500 transform  flex items-center gap-2"
             >
-              <span>Review Again</span> <MdPreview className="ml-2 text-lg" />
+              <MdPreview className="text-xl" />
+              <span>Review Again</span>
             </button>
 
+            {/* Take Another Quiz Button */}
             <button
-              onClick={() => {
-                window.location.reload();
-              }}
-              className="px-6 py-3 bg-pink-600 text-white font-semibold rounded-lg shadow-md hover:bg-pink-800 flex items-center justify-center"
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-full shadow-lg hover:from-rose-500 hover:to-pink-500 transform flex items-center gap-2"
             >
-              <span>Take Another Quiz</span>{" "}
-              <IoReload className="ml-2 text-lg" />
+              <IoReload className="text-xl" />
+              <span>Take Another Quiz</span>
             </button>
           </div>
         </div>
