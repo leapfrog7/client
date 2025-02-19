@@ -5,6 +5,8 @@ import UserManagement from "./UserManagement";
 import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
+import FeedbackManagement from "./FeedbackManagement";
+import { VscFeedback } from "react-icons/vsc";
 import PrevYear from "./PrevYear";
 import {
   FaUsers,
@@ -122,6 +124,20 @@ const AdminDashboard = () => {
             Access previous year questions and answer sets.
           </p>
         </Link>
+
+        {/* Feedback management  */}
+        <Link
+          to="feedbackMgmt"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-red-50 transition-all duration-300 ease-in-out"
+        >
+          <VscFeedback className="text-4xl text-purple-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            Feedback Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Manage all your feedbacks.
+          </p>
+        </Link>
       </div>
       <div className="text-5xl text-black mx-auto text-center border border-gray-400 w-11/12 mt-8">
         <h2></h2>
@@ -134,6 +150,7 @@ const AdminDashboard = () => {
           <Route path="revenue" element={<RevenueManagement />} />
           <Route path="aobr" element={<AobrManagement />} />
           <Route path="prevYear" element={<PrevYear />} />
+          <Route path="feedbackMgmt" element={<FeedbackManagement />} />
         </Routes>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { MdOutlineBookmarkRemove } from "react-icons/md";
 import { IoReload } from "react-icons/io5";
 import { MdPreview } from "react-icons/md";
 import { TailSpin } from "react-loader-spinner"; // Importing the loading spinner
+import QuestionFeedback from "./QuestionFeedback";
 
 const QuizComponent = ({ userId, topicName, topicId }) => {
   const [quizData, setQuizData] = useState([]);
@@ -321,6 +322,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                 <FaChevronDown className="ml-2" />
               )}
             </button>
+            {/* {console.log(quizData[currentQuestionIndex]._id)} */}
+            <QuestionFeedback questionId={quizData[currentQuestionIndex]._id} />
+
             {showExplanation[currentQuestionIndex] && (
               <div className="mt-4 text-gray-700 text-sm md:text-base space-y-3">
                 {/* Answer Section */}

@@ -23,14 +23,14 @@ export default function CA_Economy({ progress, quizAttempted }) {
       try {
         const decodedToken = jwtDecode(token);
         const currentTime = Date.now() / 1000; // Current time in seconds
-        console.log(decodedToken, currentTime);
+        // console.log(decodedToken.iat - 34554, currentTime);
         if (decodedToken.exp < currentTime) {
           // Check if the token is expired
           console.log("Token expired");
           localStorage.removeItem("jwtToken");
           navigate("/pages/TokenExpired");
         } else {
-          console.log(decodedToken.userId);
+          // console.log(decodedToken.userId);
           setUserId(decodedToken.userId);
         }
       } catch (error) {

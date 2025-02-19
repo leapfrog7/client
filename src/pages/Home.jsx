@@ -51,16 +51,14 @@ const Home = ({
       >
         {/* Image Background Section */}
         <div className="lg:w-1/2 2xl:w-1/3 md:h-auto flex items-center justify-center flex-col my-2">
-          <picture className="w-full bg-cover bg-center">
-            <source srcSet="/homeLarge2.png" media="(min-width: 1200px)" />
-            <source srcSet="/homeLarge2.png" media="(min-width: 768px)" />
-            <source srcSet="/homeLarge2.png" media="(max-width: 767px)" />
+          <div className="w-full">
             <img
-              src="/home1-large.png"
-              alt="Background"
-              className="w-full h-full object-cover"
+              src="/homeLarge2.png"
+              alt="Homepage Background"
+              className="w-full h-auto object-cover rounded-lg"
             />
-          </picture>
+          </div>
+
           <div className="mt-6 w-2/3 text-center">
             <p className="text-gray-600 text-sm">
               Curious about our quizzes? Try a free sample!
