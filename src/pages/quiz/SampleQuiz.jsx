@@ -5,6 +5,7 @@ import { TailSpin } from "react-loader-spinner"; // Importing the loading spinne
 import { IoReload } from "react-icons/io5";
 import { MdPreview } from "react-icons/md";
 import { Helmet } from "react-helmet";
+import { Link } from "react-router-dom";
 
 const SampleQuizComponent = () => {
   const [quizData, setQuizData] = useState([]);
@@ -118,12 +119,6 @@ const SampleQuizComponent = () => {
         <h1 className="ml-2 text-lg md:text-xl lg:text-2xl text-gray-700 ">
           Sample Quiz*
         </h1>
-        <a
-          className="text-white bg-pink-600 py-2 px-4 rounded-md font-semibold mr-2 text-sm md:text-base"
-          href="/subscribe"
-        >
-          Click to Subscribe
-        </a>
       </div>
       {!isSubmitted ? (
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -192,7 +187,15 @@ const SampleQuizComponent = () => {
                       {currentQuestion.correctAnswer}
                     </span>
                   </span>
-                  <br /> {currentQuestion.explanation}
+                  <br />
+                  <br />{" "}
+                  <div className="bg-blue-50 p-2 rounded-lg border-2 border-white border-l-blue-700">
+                    <span className="text-blue-700 font-bold">
+                      Explanation:{" "}
+                    </span>
+                    <br />
+                    {currentQuestion.explanation}
+                  </div>
                 </p>
               </div>
             )}
@@ -289,7 +292,14 @@ const SampleQuizComponent = () => {
       <p className="text-center text-yellow-700 my-4 text-sm w-11/12">
         *The database for this sample quiz represents just under 1% of our
         comprehensive MCQ collection. <br />
-        <span className="text-yellow-700">Subscribe to get full access.</span>
+        <br />
+        The bookmarking feature is visible upon subscription.
+        <Link
+          to="/subscribe"
+          className="ml-8 bg-blue-500 my-4 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-800 transition duration-300 flex items-center justify-center"
+        >
+          Subscribe to get full access
+        </Link>
       </p>
     </div>
   );

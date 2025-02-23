@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import "tailwindcss/tailwind.css";
+import { motion } from "framer-motion";
 
 const slides = [
   {
@@ -50,7 +51,7 @@ const NewCarousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       nextSlide();
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [currentIndex]);
 
@@ -73,15 +74,29 @@ const NewCarousel = () => {
             key={index}
             className="w-full flex-shrink-0 flex items-center flex-col 2xl:flex-row"
           >
-            <div className="min-h-48 w-full 2xl:w-1/3 p-6 bg-gray-100 flex flex-col justify-center">
-              <h2 className="text-xl font-bold mb-3">{slide.title}</h2>
-              <ul className="list-disc list-inside">
+            <div className="min-h-36 w-full 2xl:w-1/3 p-6 bg-gradient-to-b from-slate-300 to-white flex flex-col justify-center ">
+              <h2 className="text-base lg:text-xl font-bold mb-2 text-gray-700 tracking-wide uppercase">
+                {slide.title}
+              </h2>
+              <motion.ul
+                key={currentIndex} // This will trigger re-animation when slide changes
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5, staggerChildren: 0.2 }}
+                className="list-none"
+              >
                 {slide.features.map((feature, i) => (
-                  <li key={i} className="text-gray-700">
-                    {feature}
-                  </li>
+                  <motion.li
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: i * 0.2 }}
+                    className="flex  gap-2 text-gray-700 text-sm lg:text-base pb-1"
+                  >
+                    <span className="text-pink-500">📌</span> {feature}
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
             </div>
             <img
               src={slide.image}
@@ -100,25 +115,25 @@ const NewCarousel = () => {
       {/* Navigation Buttons */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-20 p-2 rounded-full text-white hover:bg-opacity-70"
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft size={18} />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 p-2 rounded-full text-white hover:bg-opacity-70"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-20 p-2 rounded-full text-white hover:bg-opacity-70"
       >
-        <ChevronRight size={24} />
+        <ChevronRight size={18} />
       </button>
 
       {/* Pagination Dots */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentIndex ? "bg-white w-4" : "bg-gray-400"
+              index === currentIndex ? "bg-pink-500 w-4" : "bg-gray-400"
             }`}
           />
         ))}

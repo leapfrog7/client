@@ -2,73 +2,107 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FaRegHandPointUp } from "react-icons/fa";
 import { PiCurrencyInr } from "react-icons/pi";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
-// import { SiTestrail } from "react-icons/si";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 const PricingSection = () => {
   const originalPrice = 1499;
-  const discountedPrice = 1199;
+  const discountedPrice = 999;
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const section = document.getElementById("pricing-section");
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+          setIsVisible(true);
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="shadow-md rounded-lg mx-auto px-12 py-2 text-center bg-orange-50">
-      <h2 className="text-2xl font-bold mb-4 text-customBlue">
-        Simplified Pricing
-      </h2>
-
-      <div className="mb-6">
-        <div className="text-lg flex justify-center items-baseline space-x-2">
-          <span className="text-gray-500 line-through flex items-center">
-            <PiCurrencyInr /> {originalPrice}
-          </span>
-          <span className="text-yellow-500 text-2xl font-bold flex items-center">
-            <PiCurrencyInr /> {discountedPrice}
-          </span>
+    <div
+      id="pricing-section"
+      className="w-full bg-white dark:bg-gray-900 py-10 px-6 md:px-12"
+    >
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        {/* Left Side - Pricing Title & Description */}
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-800 dark:text-white mb-4">
+            Our Pricing Plan
+          </h2>
+          <div className="mt-1">
+            <span className="inline-block w-40 h-1 bg-blue-500 rounded-full"></span>
+            <span className="inline-block w-3 h-1 mx-1 bg-blue-500 rounded-full"></span>
+            <span className="inline-block w-1 h-1 bg-blue-500 rounded-full"></span>
+          </div>
+          <h4 className="text-lg font-medium text-gray-700 dark:text-white capitalize lg:text-xl my-4">
+            Topics covering
+          </h4>
+          <div className="space-y-3 text-base md:text-lg font-semibold">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="flex items-center text-gray-700 dark:text-gray-300"
+            >
+              <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
+              <span>Paper 1</span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex items-center text-gray-700 dark:text-gray-300"
+            >
+              <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
+              <span>Paper 2</span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="flex items-center text-gray-700 dark:text-gray-300"
+            >
+              <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
+              <span>Previous Year Questions</span>
+            </motion.div>
+          </div>
         </div>
-        <p className="text-gray-600 text-sm mt-1">
-          Subscription valid until the{" "}
-          <span className="font-bold">LDCE 2025</span> <br />
-          <span className="text-xs">
-            {" "}
-            (Maximum validity: 2 years from purchase date)
-          </span>
-        </p>
-      </div>
 
-      <button
-        className="bg-customBlue text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition duration-300 flex items-center justify-center mx-auto"
-        onClick={() => navigate("/subscribe")}
-      >
-        Subscribe Now <FaRegHandPointUp className="ml-2 text-lg" />
-      </button>
-      {/* <p className="text-sm py-2 text-pink-800">includes</p> */}
-      <div className="flex justify-center my-4 space-x-2 text-sm">
-        <div className="flex items-center text-customPink bg-pink-100 px-6 py-2 rounded-md shadow">
-          <FontAwesomeIcon icon={faCheck} className="text-customPink mr-1" />
-          <span className="px-2">Paper 1</span>
-        </div>
-        <div className="flex items-center text-customPurple bg-purple-100 px-6 py-2 rounded-md shadow">
-          <FontAwesomeIcon icon={faCheck} className="mr-1" />
-          <span className="px-2">Paper 2</span>
+        {/* Right Side - Pricing Card */}
+        <div className="bg-slate-100 dark:bg-gray-800 shadow-2xl rounded-lg px-10 py-6 max-w-md mx-auto w-full border border-gray-300 dark:border-gray-700">
+          <p className="mt-4 text-indigo-500 dark:text-gray-300 text-lg lg:text-xl text-center font-semibold">
+            Get unlimited access to all features.
+          </p>
+          <div className="py-4 text-3xl font-semibold text-gray-700 dark:text-gray-300 sm:text-4xl flex justify-center items-center gap-4">
+            <span className="text-gray-500 line-through text-lg flex items-center">
+              <PiCurrencyInr /> {originalPrice}
+            </span>
+            <span className="text-blue-800 text-4xl lg:text-5xl font-extrabold flex items-center text-shadow">
+              <PiCurrencyInr /> {discountedPrice}
+            </span>
+          </div>
+          <p className="mt-1 text-gray-500 dark:text-gray-300 text-sm md:text-base text-center">
+            Subscription valid until{" "}
+            <span className="font-bold">LDCE 2025</span> (Max 2 years from
+            purchase date)
+          </p>
+          <button
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-5 rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 flex items-center justify-center text-lg font-semibold mt-6 "
+            onClick={() => navigate("/subscribe")}
+          >
+            Subscribe Now <FaRegHandPointUp className="ml-3 text-xl" />
+          </button>
+          <hr className="border-gray-300 dark:border-gray-700 my-4" />
         </div>
       </div>
-      <div className="flex items-center text-customBlue bg-blue-100 px-6 py-2 rounded-md shadow mb-2">
-        <FontAwesomeIcon icon={faCheck} className="mr-1" />
-        <span className="px-2">Previous Year Questions</span>
-      </div>
-
-      {/* <div className="mt-6">
-        <p className="text-gray-600 text-sm">
-          Curious about our quizzes? Try a free sample!
-        </p>
-        <a
-          className="bg-customFuchsia text-white py-3 px-4 rounded-lg shadow hover:bg-fuchsia-700 transition duration-300 flex items-center 
-          justify-center gap-2 mt-4 inline-block"
-          href="/pages/quiz/SampleQuiz"
-        >
-          <span>Take Sample Quiz</span> <SiTestrail />
-        </a>
-      </div> */}
     </div>
   );
 };

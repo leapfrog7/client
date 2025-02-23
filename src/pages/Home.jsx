@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import QuizDetails from "../components/QuizDetails";
-// import PricingSection from "../components/PricingSection";
+import PricingSection from "../components/PricingSection";
 import Dashboard from "../components/Dashboard";
 import { useEffect } from "react";
 // import FeatureCarousel from "../components/FeatureCarousel";
@@ -117,7 +117,9 @@ const Home = ({
       >
         <CTA />
       </div>
-
+      <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""}`}>
+        <PricingSection />
+      </div>
       <div className="mx-auto w-full overflow-y-auto mt-2">
         {!isLoggedIn && (
           <div>

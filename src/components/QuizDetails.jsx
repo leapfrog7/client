@@ -10,7 +10,7 @@ import { paperI_Items, paperII_Items } from "../data/quizDetails";
 export default function QuizDetails() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <h1 className="text-xl md:text-2xl font-bold text-center mt-4">
+      <h1 className="text-xl md:text-2xl font-bold text-center mt-4 lg:mt-12">
         Topics Currently Available
       </h1>
 
@@ -115,7 +115,7 @@ PaperSection.propTypes = {
 
 function StatCard({ icon: Icon, color, title, count, description, footnote }) {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg transition-shadow duration-300 ease-in-out transform hover:-translate-y-1">
+    <div className="bg-white p-4 rounded-lg shadow-lg transition-shadow duration-300 ease-in-out transform">
       <h2 className="text-base lg:text-xl font-semibold mb-2 flex items-center justify-center">
         <Icon className={`${color} mr-2`} /> {title}
       </h2>

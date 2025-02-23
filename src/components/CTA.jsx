@@ -8,15 +8,19 @@ export default function CTA() {
     <div className="flex flex-col md:flex-row items-center justify-center w-full p-8 gap-12 max-w-7xl mx-auto">
       {/* Text Section */}
       <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
-        <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
+        <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-700 leading-tight">
           Stay Ahead of the Competition{" "}
           <motion.span
             className="text-blue-700"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 2.0 }}
           >
-            Prepare Smarter!{" "}
+            <div className="bg-white w-full h-auto pt-2">
+              <h2 className="text-4xl lg:text-5xl font-manrope font-black leading-snug text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-pink-500 to-purple-500 lg:py-4">
+                Prepare Smarter!
+              </h2>
+            </div>
           </motion.span>
         </h1>
 
@@ -45,7 +49,7 @@ export default function CTA() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xl">📊</span>
+            <span className="text-xl">📈</span>
             <p className="text-base lg:text-xl text-gray-700 font-medium">
               Track progress & bookmark key questions.
             </p>
@@ -70,9 +74,9 @@ export default function CTA() {
       {/* Image Background Section */}
       <div className="w-full lg:w-1/2 flex flex-col items-center">
         <img
-          src="/homeLarge2.png"
+          src="/newHome.png"
           alt="Homepage Background"
-          className="w-full h-auto object-cover rounded-2xl shadow-xl"
+          className="w-full h-auto object-cover rounded-2xl"
         />
         <div className="mt-6 text-center w-full max-w-sm">
           <p className="text-gray-500 text-sm tracking-wide uppercase">
