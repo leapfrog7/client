@@ -37,15 +37,16 @@ export const paperI_Items = [
     title: "AoBR",
     description: "Allocation of Business Rule, 1961 (fully updated).",
   },
-  {
-    icon: TfiAgenda,
-    title: "FR",
-    description: "Fundamental Rules",
-  },
+
   {
     icon: HiOutlineBanknotes,
     title: "Economy & Schemes",
     description: "Indian Economy and Govt. Schemes",
+  },
+  {
+    icon: TfiAgenda,
+    title: "FR",
+    description: "Fundamental Rules",
   },
 ];
 
