@@ -27,14 +27,11 @@ const PricingSection = () => {
   }, []);
 
   return (
-    <div
-      id="pricing-section"
-      className="w-full bg-white dark:bg-gray-900 py-10 px-6 md:px-12"
-    >
+    <div id="pricing-section" className="w-full bg-white py-10 px-6 md:px-12">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
         {/* Left Side - Pricing Title & Description */}
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-800 dark:text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">
             Our Pricing Plan
           </h2>
           <div className="mt-1">
@@ -42,7 +39,7 @@ const PricingSection = () => {
             <span className="inline-block w-3 h-1 mx-1 bg-blue-500 rounded-full"></span>
             <span className="inline-block w-1 h-1 bg-blue-500 rounded-full"></span>
           </div>
-          <h4 className="text-lg font-medium text-gray-700 dark:text-white capitalize lg:text-xl my-4">
+          <h4 className="text-lg font-medium text-gray-700 capitalize lg:text-xl my-4">
             Topics covering
           </h4>
           <div className="space-y-3 text-base md:text-lg font-semibold">
@@ -50,7 +47,7 @@ const PricingSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="flex items-center text-gray-700 dark:text-gray-300"
+              className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
               <span>Paper 1</span>
@@ -59,7 +56,7 @@ const PricingSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex items-center text-gray-700 dark:text-gray-300"
+              className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
               <span>Paper 2</span>
@@ -68,7 +65,7 @@ const PricingSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="flex items-center text-gray-700 dark:text-gray-300"
+              className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
               <span>Previous Year Questions</span>
@@ -77,11 +74,11 @@ const PricingSection = () => {
         </div>
 
         {/* Right Side - Pricing Card */}
-        <div className="bg-slate-100 dark:bg-gray-800 shadow-2xl rounded-lg px-10 py-6 max-w-md mx-auto w-full border border-gray-300 dark:border-gray-700">
-          <p className="mt-4 text-indigo-500 dark:text-gray-300 text-lg lg:text-xl text-center font-semibold">
+        <div className="bg-slate-100  shadow-2xl rounded-lg px-10 py-6 max-w-md mx-auto w-full border border-gray-300 ">
+          <p className="mt-4 text-indigo-500  text-lg lg:text-xl text-center font-semibold">
             Get unlimited access to all features.
           </p>
-          <div className="py-4 text-3xl font-semibold text-gray-700 dark:text-gray-300 sm:text-4xl flex justify-center items-center gap-4">
+          <div className="py-4 text-3xl font-semibold text-gray-700  sm:text-4xl flex justify-center items-center gap-4">
             <span className="text-gray-500 line-through text-lg flex items-center">
               <PiCurrencyInr /> {originalPrice}
             </span>
@@ -89,7 +86,7 @@ const PricingSection = () => {
               <PiCurrencyInr /> {discountedPrice}
             </span>
           </div>
-          <p className="mt-1 text-gray-500 dark:text-gray-300 text-sm md:text-base text-center">
+          <p className="mt-1 text-gray-500 text-sm md:text-base text-center">
             Subscription valid until{" "}
             <span className="font-bold">LDCE 2025</span> (Max 2 years from
             purchase date)
@@ -100,7 +97,7 @@ const PricingSection = () => {
           >
             Subscribe Now <FaRegHandPointUp className="ml-3 text-xl" />
           </button>
-          <hr className="border-gray-300 dark:border-gray-700 my-4" />
+          <hr className="border-gray-300" />
         </div>
       </div>
     </div>
