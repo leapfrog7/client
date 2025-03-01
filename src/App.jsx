@@ -48,6 +48,7 @@ import Unauthorized from "./pages/Unauthorized";
 import NotLoggedIn from "./pages/NotLoggedIn";
 import TokenExpired from "./pages/TokenExpired";
 import FAQPage from "./pages/FAQPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FRPage from "./pages/quiz/FR";
 
 const App = () => {
@@ -262,6 +263,7 @@ const App = () => {
             <Route path="/subscribe" element={<Subscribe />} />
             <Route path="/FAQs" element={<FAQPage />} />
             <Route path="/about" element={<About />} />
+            <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
             <Route
               path="/login"
               element={<Login verifyToken={verifyClientToken} />}

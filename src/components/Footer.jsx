@@ -42,6 +42,12 @@ const Footer = () => {
                   FAQs
                 </a>
               </li>
+              <li className="flex items-center justify-center">
+                <MdOutlineFeaturedPlayList className="mr-2" />
+                <a href="/PrivacyPolicy" className="hover:text-yellow-500">
+                  Privacy Policy
+                </a>
+              </li>
             </ul>
           </div>
           {/* Contact Information */}

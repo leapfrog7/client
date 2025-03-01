@@ -6,7 +6,7 @@ import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
 import FeedbackManagement from "./FeedbackManagement";
-import VisitorManagement from "./VisitorManagement";
+// import VisitorManagement from "./VisitorManagement";
 import { VscFeedback } from "react-icons/vsc";
 import PrevYear from "./PrevYear";
 import {
@@ -15,7 +15,6 @@ import {
   FaChartBar,
   FaBook,
   FaHistory,
-  FaEye,
 } from "react-icons/fa"; // ✅ Import icons
 
 const AdminDashboard = () => {
@@ -142,7 +141,7 @@ const AdminDashboard = () => {
         </Link>
 
         {/* Visitor management  */}
-        <Link
+        {/* <Link
           to="visitorManagement"
           className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-indigo-50 transition-all duration-300 ease-in-out"
         >
@@ -153,7 +152,7 @@ const AdminDashboard = () => {
           <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
             View and analyze visitor activity.
           </p>
-        </Link>
+        </Link> */}
       </div>
       <div className="text-5xl text-black mx-auto text-center border border-gray-400 w-11/12 mt-8">
         <h2></h2>
@@ -167,7 +166,7 @@ const AdminDashboard = () => {
           <Route path="aobr" element={<AobrManagement />} />
           <Route path="prevYear" element={<PrevYear />} />
           <Route path="feedbackMgmt" element={<FeedbackManagement />} />
-          <Route path="visitorManagement" element={<VisitorManagement />} />
+          {/* <Route path="visitorManagement" element={<VisitorManagement />} /> */}
         </Routes>
       </div>
     </div>

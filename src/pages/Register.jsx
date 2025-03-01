@@ -6,6 +6,7 @@ import axios from "axios";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import TermsAndConditions from "../components/TermsAndConditions";
 import {
   FaUser,
   FaMobileAlt,
@@ -33,6 +34,10 @@ export default function Register() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [runConfetti, setRunConfetti] = useState(false);
+
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+
   //States for the input fields
   const [isNameFocused, setIsNameFocused] = useState(false);
   const [isMobileFocused, setIsMobileFocused] = useState(false);
@@ -87,6 +92,8 @@ export default function Register() {
     if (!password) newErrors.password = "Password is required";
     if (password !== confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
+    if (!agreeTerms)
+      newErrors.agreeTerms = "You must agree to the Terms & Conditions";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -306,11 +313,60 @@ export default function Register() {
                 )}
               </div>
             </div>
+            <div className="flex items-center my-4">
+              <input
+                type="checkbox"
+                id="agreeTerms"
+                checked={agreeTerms}
+                onChange={() => setAgreeTerms(!agreeTerms)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="agreeTerms" className="ml-2 text-gray-600">
+                I agree to the
+                <button
+                  type="button"
+                  onClick={() => setShowTermsModal(true)}
+                  className="text-blue-500 underline ml-1 hover:text-blue-700"
+                >
+                  Terms & Conditions
+                </button>
+              </label>
+            </div>
+            {errors.agreeTerms && (
+              <div className="text-red-600 text-xs">{errors.agreeTerms}</div>
+            )}
+
             <div className="text-center" onClick={registerUser}>
               <Button buttonText="Register" />
             </div>
           </>
         )}
+
+        {showTermsModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div className="bg-white p-4 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-2/3 max-h-[95vh] overflow-y-auto relative">
+              <button
+                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                onClick={() => setShowTermsModal(false)}
+              >
+                ✕
+              </button>
+
+              <div className=" p-2 overflow-y-auto border-t border-gray-200">
+                <TermsAndConditions />
+              </div>
+              <div className="text-right mt-4">
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+                  onClick={() => setShowTermsModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {msg && (
           <div className="mt-6 text-center p-4 bg-green-100 text-green-800 rounded-lg">
             <p className="text-lg font-semibold">{msg}</p>
