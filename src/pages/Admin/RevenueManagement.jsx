@@ -341,7 +341,7 @@ const RevenueManagement = () => {
         `${BASE_URL}revenue/${revenueId}`,
         {
           confirmed: true,
-          amount: 1199,
+          amount: 999,
         },
         {
           headers: {

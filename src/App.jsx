@@ -51,6 +51,9 @@ import FAQPage from "./pages/FAQPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import FRPage from "./pages/quiz/FR";
 
+//Public Pages
+import CghsUnitPublic from "./pages/Tools/CghsUnitPublic";
+
 const App = () => {
   //States
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -456,6 +459,12 @@ const App = () => {
               path="/AdminDashboard/mcqManagement"
               element={<MCQ_Management />}
             /> */}
+
+            {/* Public Routes */}
+            <Route
+              path="/pages/public/cghs-units"
+              element={<CghsUnitPublic />}
+            />
           </Routes>
         </div>
         <Footer />

@@ -6,8 +6,11 @@ import MCQManagement from "./MCQ_Management";
 import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
 import FeedbackManagement from "./FeedbackManagement";
+import CghsUnitManagement from "./CghsUnitManagement";
 // import VisitorManagement from "./VisitorManagement";
 import { VscFeedback } from "react-icons/vsc";
+import { FaHospital } from "react-icons/fa";
+
 import PrevYear from "./PrevYear";
 import {
   FaUsers,
@@ -139,6 +142,19 @@ const AdminDashboard = () => {
             Manage all your feedbacks.
           </p>
         </Link>
+        {/* CGHS management */}
+        <Link
+          to="cghs"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-cyan-50 transition-all duration-300 ease-in-out"
+        >
+          <FaHospital className="text-4xl text-cyan-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            CGHS Unit Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Add and manage CGHS empanelled hospitals and labs.
+          </p>
+        </Link>
 
         {/* Visitor management  */}
         {/* <Link
@@ -166,6 +182,7 @@ const AdminDashboard = () => {
           <Route path="aobr" element={<AobrManagement />} />
           <Route path="prevYear" element={<PrevYear />} />
           <Route path="feedbackMgmt" element={<FeedbackManagement />} />
+          <Route path="cghs" element={<CghsUnitManagement />} />
           {/* <Route path="visitorManagement" element={<VisitorManagement />} /> */}
         </Routes>
       </div>
