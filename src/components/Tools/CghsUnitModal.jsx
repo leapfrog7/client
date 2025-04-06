@@ -59,7 +59,7 @@ const CghsUnitModal = ({ isOpen, unit, onClose }) => {
           &times;
         </button>
 
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+        <h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
           🏥 {name}
         </h2>
 
@@ -181,9 +181,14 @@ const CghsUnitModal = ({ isOpen, unit, onClose }) => {
               <p className="flex items-center gap-2 font-semibold">
                 <FaNotesMedical className="text-teal-500" /> Empanelled For:
               </p>
-              <ul className="ml-6 list-disc mt-1">
+              <ul className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
                 {empanelledFor.map((item, i) => (
-                  <li key={i}>{item}</li>
+                  <li
+                    key={i}
+                    className="px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-xs md:text-sm shadow-sm flex items-center justify-center"
+                  >
+                    {item}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -191,23 +196,52 @@ const CghsUnitModal = ({ isOpen, unit, onClose }) => {
 
           {/* Opening Hours */}
           {googleData?.openingHours?.length > 0 && (
-            <div className="md:col-span-2 mt-2">
-              <p className="font-semibold">🕒 Opening Hours:</p>
-              <ul className="ml-6 list-disc mt-1">
-                {googleData.openingHours.map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
+            <div className="md:col-span-2 mt-4">
+              <p className="font-semibold text-sm mb-2">🕒 Opening Hours</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
+                {googleData.openingHours.map((line, i) => {
+                  const [day, ...rest] = line.split(":");
+                  const time = rest.join(":").trim();
+
+                  return (
+                    <div
+                      key={i}
+                      className="flex justify-between items-center bg-gray-100 rounded px-4 py-2 shadow-sm"
+                    >
+                      <span className="font-medium text-gray-700">{day}</span>
+                      <span className="text-gray-600 text-xs md:text-sm">
+                        {time}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
           {/* Notes */}
           {notes && (
-            <div className="md:col-span-2 mt-2">
-              <p className="font-semibold">📝 Notes:</p>
-              <p className="ml-1">{notes}</p>
+            <div className="md:col-span-2 mt-4">
+              <p className="font-semibold text-lg mb-2">📝 Notes</p>
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded shadow-sm text-gray-800 text-sm leading-relaxed">
+                {notes ? (
+                  notes
+                ) : (
+                  <span className="italic text-gray-500">
+                    No notes available.
+                  </span>
+                )}
+              </div>
             </div>
           )}
+        </div>
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-indigo-700 text-white rounded hover:bg-gray-800 transition"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
