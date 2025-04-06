@@ -6,6 +6,8 @@ const CghsUnitList = ({ units, onEdit, onDelete }) => {
   const [selectedCity, setSelectedCity] = useState("Delhi");
   const [filteredUnits, setFilteredUnits] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const itemsPerPage = 10;
 
   const validCities = [
@@ -35,6 +37,33 @@ const CghsUnitList = ({ units, onEdit, onDelete }) => {
     setCurrentPage(1);
   }, [selectedCity, units]);
 
+  useEffect(() => {
+    const cityFiltered = units.filter(
+      (unit) =>
+        unit?.address?.city?.trim().toLowerCase() ===
+        selectedCity.trim().toLowerCase()
+    );
+
+    const query = searchQuery.trim().toLowerCase();
+
+    const searched =
+      query.length >= 3
+        ? cityFiltered.filter((unit) => {
+            const nameMatch = unit.name?.toLowerCase().includes(query);
+            const addressMatch =
+              unit.address?.line1?.toLowerCase().includes(query) ||
+              unit.address?.line2?.toLowerCase().includes(query);
+            const empanelledMatch = unit.empanelledFor?.some((item) =>
+              item.toLowerCase().includes(query)
+            );
+            return nameMatch || addressMatch || empanelledMatch;
+          })
+        : cityFiltered;
+
+    setFilteredUnits(searched);
+    setCurrentPage(1);
+  }, [selectedCity, units, searchQuery]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredUnits.slice(indexOfFirstItem, indexOfLastItem);
@@ -44,6 +73,16 @@ const CghsUnitList = ({ units, onEdit, onDelete }) => {
     <div className="mt-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
         <h3 className="text-lg font-bold">Showing Units in:</h3>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="🔍 Search by name, address, or specialty..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full md:w-96"
+          />
+        </div>
+
         <select
           value={selectedCity}
           onChange={(e) => setSelectedCity(e.target.value)}
