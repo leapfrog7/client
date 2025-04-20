@@ -4,6 +4,7 @@ import EditCghsUnitModal from "./cghsComponents/EditCghsUnitModal";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const CghsUnitManagement = () => {
   const [editingUnit, setEditingUnit] = useState(null);
@@ -15,6 +16,30 @@ const CghsUnitManagement = () => {
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+
+    if (!token) {
+      setIsAuthorized(false);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000); // in seconds
+
+      if (decoded.exp && decoded.exp > currentTime) {
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    } catch (err) {
+      console.error("Invalid token:", err);
+      setIsAuthorized(false);
+    }
+  }, []);
 
   const fetchUnits = async () => {
     try {
@@ -68,6 +93,21 @@ const CghsUnitManagement = () => {
     fetchUnits(); // Refresh the list
     handleCloseModal();
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="p-8 text-center text-red-600">
+        <h2 className="text-2xl font-bold mb-2">🚫 Unauthorized Access</h2>
+        <p className="text-sm text-gray-700">
+          Your session may have expired or you are not authorized to view this
+          page.
+        </p>
+        <a href="/" className="mt-4 inline-block text-blue-600 underline">
+          Go Back Home
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-8">

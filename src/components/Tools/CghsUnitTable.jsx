@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
 
 const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -16,7 +16,9 @@ const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
       <table className="min-w-full text-sm">
         <thead className="bg-gray-100">
           <tr>
-            <th className="text-left p-3 w-3/4">Unit</th>
+            <th className="text-center text-gray-600 p-3 w-3/4">
+              Empanelled Units
+            </th>
             {/* <th className="text-left p-3">Empanelled For</th>
             {showDistance && <th className="text-left p-3">Radial Distance</th>}
             <th className="text-center p-3">Map</th>
@@ -97,7 +99,7 @@ const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
                           🩺 {empanelledText}
                         </div>
 
-                        {empanelledText.length > 180 && (
+                        {empanelledText.length > 140 && (
                           <button
                             onClick={() => toggleExpand(unit._id)}
                             className="text-blue-500 text-xs mt-1 hover:underline"
@@ -135,9 +137,10 @@ const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
 
                         <button
                           onClick={() => onMoreOptions(unit)}
-                          className="bg-indigo-100 text-indigo-700 px-3 py-2 rounded hover:bg-indigo-200 transition text-xs md:text-sm shadow-sm"
+                          className="bg-indigo-100 text-indigo-700 flex items-center gap-1 px-3 py-2 rounded hover:bg-indigo-200 transition text-xs md:text-sm shadow-sm"
                         >
                           More Details
+                          <FaArrowRight className="text-xs md:text-sm " />
                         </button>
                       </div>
                     </div>

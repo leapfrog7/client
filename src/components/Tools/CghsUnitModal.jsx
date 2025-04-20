@@ -185,7 +185,7 @@ const CghsUnitModal = ({ isOpen, unit, onClose }) => {
                 {empanelledFor.map((item, i) => (
                   <li
                     key={i}
-                    className="px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-xs md:text-sm shadow-sm flex items-center justify-center"
+                    className="px-4 py-2 bg-indigo-50 text-indigo-800 rounded-lg text-xs md:text-sm shadow-sm flex items-center justify-center"
                   >
                     {item}
                   </li>

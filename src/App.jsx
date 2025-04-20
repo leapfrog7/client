@@ -220,7 +220,9 @@ const App = () => {
 
         <div
           className={`${
-            isLoggedIn ? "bg-gradient-to-tl from-amber-50 to-yellow-200" : ""
+            isLoggedIn
+              ? "bg-gradient-to-tl from-amber-50 to-yellow-200"
+              : "bg-gradient-to-tl from-amber-50 to-yellow-200"
           } w-full px-6  py-2 flex justify-between items-center mx-auto`}
         >
           {isLoggedIn ? (
@@ -236,6 +238,7 @@ const App = () => {
           ) : (
             <>
               <span></span>
+
               <SignInButton verifyToken={verifyClientToken} />
             </>
           )}

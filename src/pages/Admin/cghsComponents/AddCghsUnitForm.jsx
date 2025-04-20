@@ -26,7 +26,7 @@ const AddCghsUnitForm = ({ fetchUnits }) => {
     address: {
       line1: "",
       line2: "",
-      city: validCities[4],
+      city: validCities[0],
       state: "",
       pincode: "",
     },
@@ -113,7 +113,7 @@ const AddCghsUnitForm = ({ fetchUnits }) => {
         address: {
           line1: "",
           line2: "",
-          city: validCities[4],
+          city: validCities[0],
           state: "",
           pincode: "",
         },
