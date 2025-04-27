@@ -15,8 +15,8 @@ const CghsRatePublic = () => {
 
   const ratesPerPage = 10;
 
-  const BASE_URL = "http://localhost:5000/api/v1/public"; // Replace with your live URL
-  // const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
+  //   const BASE_URL = "http://localhost:5000/api/v1/public"; // Replace with your live URL
+  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public";
 
   const cityOptions = [
     { value: "Delhi", label: "Delhi-NCR" },

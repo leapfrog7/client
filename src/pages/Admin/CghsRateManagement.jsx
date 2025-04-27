@@ -21,8 +21,8 @@ const CghsRateManagement = () => {
     note: "",
     tags: "",
   });
-  //   const BASE_URL = "https://server-v4dy.onrender.com";
-  const BASE_URL = "http://localhost:5000";
+  const BASE_URL = "https://server-v4dy.onrender.com";
+  // const BASE_URL = "http://localhost:5000";
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
