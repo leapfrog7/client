@@ -159,13 +159,13 @@ const CghsRatePublic = () => {
         <table className="min-w-full text-sm rounded-md overflow-hidden">
           <thead className="bg-gray-50 text-gray-500">
             <tr>
-              <th className="px-3 py-2 text-left text-xs md:text-sm lg:text-base">
+              <th className="px-3 py-2 text-left text-sm md:text-sm lg:text-base">
                 Tests / Procedure
               </th>
-              <th className="px-3 py-2 text-center text-xs md:text-sm lg:text-base">
+              <th className="px-3 py-2 text-center text-sm md:text-sm lg:text-base">
                 Non-NABH Rate (₹)
               </th>
-              <th className="px-3 py-2 text-center text-xs md:text-sm lg:text-base">
+              <th className="px-3 py-2 text-center text-sm md:text-sm lg:text-base">
                 NABH Rate (₹)
               </th>
             </tr>
@@ -189,21 +189,21 @@ const CghsRatePublic = () => {
                   {/* Merged Name + CGHS Code + Note */}
                   <td className="px-0 md:px-2 py-0 align-top">
                     <div className="flex flex-col gap-1 p-2 rounded-l-lg">
-                      <p className="text-blue-700 text-xs font-semibold md:text-base">
+                      <p className="text-blue-700 text-sm font-semibold md:text-base">
                         {rate.name}
                       </p>
 
                       {/* CGHS Code */}
                       {rate.cghsCode && (
-                        <span className="inline-block bg-blue-50 text-blue-600 text-xs font-light px-2 py-1 rounded-full max-w-max shadow-sm">
+                        <span className="inline-block bg-blue-50 text-blue-600 text-xs font-light px-2 py-1 rounded-lg max-w-max shadow-sm">
                           CGHS Code: {rate.cghsCode}
                         </span>
                       )}
 
                       {/* Note */}
                       {rate.note && (
-                        <div className="inline-block bg-amber-50 px-2 py-1 rounded-full shadow-md max-w-max">
-                          <p className="text-xs italic font-thin text-amber-500">
+                        <div className="inline-block px-1 md:px-2 py-1 rounded-md shadow-sm max-w-max">
+                          <p className="text-xs font-light text-amber-700">
                             {rate.note
                               .toLowerCase()
                               .split(" ")
