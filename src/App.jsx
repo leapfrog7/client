@@ -13,6 +13,7 @@ import SignOutButton from "./components/SignOutButton";
 import SignInButton from "./components/SignInButton";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 import Logo from "./components/Logo";
 import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
@@ -53,6 +54,7 @@ import FRPage from "./pages/quiz/FR";
 
 //Public Pages
 import CghsUnitPublic from "./pages/Tools/CghsUnitPublic";
+import CghsRatesPublic from "./pages/Tools/CghsRatesPublic";
 
 const App = () => {
   //States
@@ -200,6 +202,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="flex flex-col min-h-screen w-full overflow-hidden">
         <nav className="bg-customBlue p-4">
           <div className="container mx-auto md:w-11/12 flex justify-between items-center">
@@ -468,8 +471,14 @@ const App = () => {
               path="/pages/public/cghs-units"
               element={<CghsUnitPublic />}
             />
+
+            <Route
+              path="/pages/public/cghs-rates"
+              element={<CghsRatesPublic />}
+            />
           </Routes>
         </div>
+
         <Footer />
       </div>
 

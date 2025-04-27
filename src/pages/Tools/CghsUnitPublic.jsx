@@ -8,6 +8,7 @@ import { FaTreeCity } from "react-icons/fa6";
 import { IoMdWifi } from "react-icons/io";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import Select from "react-select";
+import { Link } from "react-router-dom";
 
 const validCities = [
   "Delhi",
@@ -41,6 +42,14 @@ const CghsUnitPublic = () => {
     label: city,
     value: city,
   }));
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, []);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -143,7 +152,7 @@ const CghsUnitPublic = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 md:w-11/12 mx-auto">
+    <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
           CGHS Empanelled Centers
@@ -300,6 +309,25 @@ const CghsUnitPublic = () => {
           error={nearbyError}
         />
       )}
+
+      <div className="bg-indigo-50 rounded-lg p-6 my-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+        <div className="text-center md:text-left">
+          <h3 className="text-lg md:text-xl font-semibold text-indigo-700">
+            Looking for CGHS Rates?
+          </h3>
+          <p className="text-gray-600 text-sm md:text-base mt-1">
+            Find CGHS rates for Tests/ Procedure and Implants city-wise.
+          </p>
+        </div>
+
+        <Link
+          to="/pages/public/cghs-rates"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-full transition"
+        >
+          Explore CGHS Units
+        </Link>
+      </div>
+
       <p className="text-xs text-gray-400 mt-12 text-center px-4">
         <strong>Disclaimer:</strong> While every effort has been made to ensure
         the accuracy of the information presented, users are advised that

@@ -3,6 +3,7 @@
 // import PropTypes from "prop-types";
 // import CghsUnitTable from "./CghsUnitTable";
 // import { RiMapPinRangeLine } from "react-icons/ri";
+// import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 
 // const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
 
@@ -10,6 +11,9 @@
 //   const [radiusKm, setRadiusKm] = useState(5000);
 //   const [nearbyUnits, setNearbyUnits] = useState([]);
 //   const [loading, setLoading] = useState(false);
+
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const itemsPerPage = 10;
 
 //   useEffect(() => {
 //     if (!userLocation) return;
@@ -22,6 +26,7 @@
 //           `${BASE_URL}/nearby?lat=${lat}&lng=${lng}&radius=${radiusKm}`
 //         );
 //         setNearbyUnits(Array.isArray(response.data) ? response.data : []);
+//         setCurrentPage(1); // reset page on new fetch
 //       } catch (err) {
 //         console.error("Error fetching nearby units:", err);
 //       } finally {
@@ -31,6 +36,12 @@
 
 //     fetchNearbyUnits();
 //   }, [userLocation, radiusKm]);
+
+//   // Pagination calculations
+//   const indexOfLast = currentPage * itemsPerPage;
+//   const indexOfFirst = indexOfLast - itemsPerPage;
+//   const currentUnits = nearbyUnits.slice(indexOfFirst, indexOfLast);
+//   const totalPages = Math.ceil(nearbyUnits.length / itemsPerPage);
 
 //   return (
 //     <div className="bg-white p-0 rounded mb-8">
@@ -42,7 +53,7 @@
 //         ) : userLocation ? (
 //           <>
 //             <div className="mb-2">
-//               <div className="inline-flex items-center gap-3 bg-indigo-600  rounded-lg px-4 py-2 shadow-sm w-full justify-center">
+//               <div className="inline-flex items-center gap-3 bg-indigo-600 rounded-lg px-4 py-2 shadow-sm w-full justify-center">
 //                 <label
 //                   htmlFor="radius"
 //                   className="text-sm text-white font-medium whitespace-nowrap"
@@ -60,7 +71,6 @@
 //                   <option value="2000">2 km</option>
 //                   <option value="5000">5 km</option>
 //                   <option value="10000">10 km</option>
-//                   {/* <option value="20000">20 km</option> */}
 //                 </select>
 //               </div>
 //             </div>
@@ -101,16 +111,52 @@
 //           <span className="text-sm">Loading nearby units...</span>
 //         </div>
 //       ) : (
-//         nearbyUnits.length > 0 && (
+//         currentUnits.length > 0 && (
 //           <div className="mt-6">
-//             {/* <h4 className="text-lg font-semibold mb-2 pl-2">
-//               Nearby CGHS Units:
-//             </h4> */}
 //             <CghsUnitTable
-//               units={nearbyUnits}
+//               units={currentUnits}
 //               onMoreOptions={onMoreOptions}
 //               showDistance={true}
 //             />
+
+//             {/* Pagination Controls */}
+//             {totalPages > 1 && (
+//               <div className="flex justify-center items-center gap-2 mt-6 flex-wrap text-sm">
+//                 <button
+//                   disabled={currentPage === 1}
+//                   onClick={() => setCurrentPage((prev) => prev - 1)}
+//                   className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+//                   aria-label="Previous"
+//                 >
+//                   <MdNavigateBefore size={20} />
+//                 </button>
+
+//                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+//                   (page) => (
+//                     <button
+//                       key={`nearby-page-${page}`}
+//                       onClick={() => setCurrentPage(page)}
+//                       className={`px-3 py-1 rounded-full border transition ${
+//                         currentPage === page
+//                           ? "bg-blue-600 text-white border-blue-600"
+//                           : "bg-white text-gray-700 hover:bg-blue-50"
+//                       }`}
+//                     >
+//                       {page}
+//                     </button>
+//                   )
+//                 )}
+
+//                 <button
+//                   disabled={currentPage === totalPages}
+//                   onClick={() => setCurrentPage((prev) => prev + 1)}
+//                   className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+//                   aria-label="Next"
+//                 >
+//                   <MdNavigateNext size={20} />
+//                 </button>
+//               </div>
+//             )}
 //           </div>
 //         )
 //       )}
@@ -131,7 +177,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import CghsUnitTable from "./CghsUnitTable";
 import { RiMapPinRangeLine } from "react-icons/ri";
-import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import { MdNavigateBefore, MdNavigateNext, MdCancel } from "react-icons/md";
 
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
 
@@ -140,6 +186,7 @@ const NearbyUnits = ({ userLocation, error, onMoreOptions }) => {
   const [nearbyUnits, setNearbyUnits] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -155,6 +202,7 @@ const NearbyUnits = ({ userLocation, error, onMoreOptions }) => {
         );
         setNearbyUnits(Array.isArray(response.data) ? response.data : []);
         setCurrentPage(1); // reset page on new fetch
+        setSearchTerm(""); // clear search when fetching new
       } catch (err) {
         console.error("Error fetching nearby units:", err);
       } finally {
@@ -165,11 +213,27 @@ const NearbyUnits = ({ userLocation, error, onMoreOptions }) => {
     fetchNearbyUnits();
   }, [userLocation, radiusKm]);
 
+  // Filtered Units based on search
+  const filteredUnits = nearbyUnits.filter((unit) => {
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return true;
+
+    const nameMatch = unit.name?.toLowerCase().includes(query);
+    const addressMatch =
+      unit.address?.line1?.toLowerCase().includes(query) ||
+      unit.address?.line2?.toLowerCase().includes(query);
+    const specialtyMatch = unit.empanelledFor?.some((item) =>
+      item.toLowerCase().includes(query)
+    );
+
+    return nameMatch || addressMatch || specialtyMatch;
+  });
+
   // Pagination calculations
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentUnits = nearbyUnits.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(nearbyUnits.length / itemsPerPage);
+  const currentUnits = filteredUnits.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredUnits.length / itemsPerPage);
 
   return (
     <div className="bg-white p-0 rounded mb-8">
@@ -202,10 +266,31 @@ const NearbyUnits = ({ userLocation, error, onMoreOptions }) => {
                 </select>
               </div>
             </div>
+
             <p className="text-sm text-blue-600 bg-white px-4 py-1 rounded text-center">
               Showing CGHS units within <strong>{radiusKm / 1000} km</strong> of
               your location.
             </p>
+
+            {/* Search Bar */}
+            <div className="flex items-center gap-2 mt-4 mb-2 justify-center">
+              <input
+                type="text"
+                placeholder="🔍 Search by name, address or specialty..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border rounded p-2 w-full md:w-96 text-sm"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="hover:text-red-500 text-xl font-bold rounded-full relative right-8 text-gray-400"
+                  title="Clear search"
+                >
+                  <MdCancel />
+                </button>
+              )}
+            </div>
           </>
         ) : (
           <p className="text-sm text-gray-500 italic">

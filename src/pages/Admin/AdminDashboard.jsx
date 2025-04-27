@@ -7,9 +7,10 @@ import RevenueManagement from "./RevenueManagement";
 import AobrManagement from "./AobrManagement";
 import FeedbackManagement from "./FeedbackManagement";
 import CghsUnitManagement from "./CghsUnitManagement";
+import CghsRateManagement from "./CghsRateManagement";
 // import VisitorManagement from "./VisitorManagement";
 import { VscFeedback } from "react-icons/vsc";
-import { FaHospital } from "react-icons/fa";
+import { FaHospital, FaRupeeSign } from "react-icons/fa";
 
 import PrevYear from "./PrevYear";
 import {
@@ -156,6 +157,20 @@ const AdminDashboard = () => {
           </p>
         </Link>
 
+        {/* CGHS Rates Management */}
+        <Link
+          to="cghs-rates"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-green-50 transition-all duration-300 ease-in-out"
+        >
+          <FaRupeeSign className="text-4xl text-green-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            CGHS Rates Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Add and manage CGHS rates for procedures, tests, and implants.
+          </p>
+        </Link>
+
         {/* Visitor management  */}
         {/* <Link
           to="visitorManagement"
@@ -183,6 +198,7 @@ const AdminDashboard = () => {
           <Route path="prevYear" element={<PrevYear />} />
           <Route path="feedbackMgmt" element={<FeedbackManagement />} />
           <Route path="cghs" element={<CghsUnitManagement />} />
+          <Route path="cghs-rates" element={<CghsRateManagement />} />
           {/* <Route path="visitorManagement" element={<VisitorManagement />} /> */}
         </Routes>
       </div>
