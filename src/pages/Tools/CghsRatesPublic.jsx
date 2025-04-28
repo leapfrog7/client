@@ -99,7 +99,7 @@ const CghsRatePublic = () => {
 
   return (
     <div className="p-2 max-w-7xl mx-auto animate-fade-in">
-      <h1 className="text-2xl font-bold text-center text-blue-800 mb-3">
+      <h1 className="text-xl md:text-2xl font-bold text-center text-blue-900 mb-3">
         Find CGHS Approved Rates
       </h1>
       <p className="text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto">
@@ -202,7 +202,7 @@ const CghsRatePublic = () => {
 
                       {/* Note */}
                       {rate.note && (
-                        <div className="inline-block px-1 md:px-2 py-1 rounded-md shadow-sm max-w-max">
+                        <div className="inline-block px-1 md:px-2 py-1 rounded-md ">
                           <p className="text-xs font-light text-amber-700">
                             {rate.note
                               .toLowerCase()
@@ -233,7 +233,7 @@ const CghsRatePublic = () => {
                   </td>
 
                   {/* Non-NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-xs md:text-sm  text-gray-600 rounded-r-lg">
+                  <td className="px-4 py-4 text-center align-top text-sm md:text-sm  text-gray-600 rounded-r-lg">
                     {rate.rates?.[selectedCity]?.nabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nabhRate}`
                       : rate.rates?.Delhi?.nabhRate !== undefined
@@ -241,7 +241,7 @@ const CghsRatePublic = () => {
                       : "N/A"}
                   </td>
                   {/* NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-xs md:text-sm text-gray-600 ">
+                  <td className="px-4 py-4 text-center align-top text-sm md:text-sm text-gray-600 ">
                     {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nonNabhRate}`
                       : rate.rates?.Delhi?.nonNabhRate !== undefined

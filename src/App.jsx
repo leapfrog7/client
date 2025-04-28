@@ -55,6 +55,7 @@ import FRPage from "./pages/quiz/FR";
 //Public Pages
 import CghsUnitPublic from "./pages/Tools/CghsUnitPublic";
 import CghsRatesPublic from "./pages/Tools/CghsRatesPublic";
+import PayMatrix from "./pages/Tools/PayMatrix";
 
 const App = () => {
   //States
@@ -475,6 +476,10 @@ const App = () => {
             <Route
               path="/pages/public/cghs-rates"
               element={<CghsRatesPublic />}
+            />
+            <Route
+              path="/pages/public/7thCPC-paymatrix"
+              element={<PayMatrix />}
             />
           </Routes>
         </div>
