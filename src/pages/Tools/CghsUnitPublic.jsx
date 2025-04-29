@@ -129,21 +129,27 @@ const CghsUnitPublic = () => {
   const generatePageNumbers = () => {
     const pages = [];
 
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    if (totalPages <= 6) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
     } else {
       pages.push(1);
 
-      if (currentPage > 3) pages.push("...");
+      if (currentPage > 4) {
+        pages.push("...");
+      }
 
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
 
-      for (let i = start; i <= end; i++) {
+      for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
 
-      if (currentPage < totalPages - 2) pages.push("...");
+      if (currentPage < totalPages - 3) {
+        pages.push("...");
+      }
 
       pages.push(totalPages);
     }
@@ -276,7 +282,7 @@ const CghsUnitPublic = () => {
                   </span>
                 ) : (
                   <button
-                    key={page}
+                    key={`page-${idx}`}
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-1 rounded-full border transition ${
                       currentPage === page
@@ -324,7 +330,7 @@ const CghsUnitPublic = () => {
           to="/pages/public/cghs-rates"
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-full transition"
         >
-          Explore CGHS Units
+          Explore CGHS Rates
         </Link>
       </div>
 

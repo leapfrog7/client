@@ -59,37 +59,63 @@ const CghsRatePublic = () => {
     );
   });
 
+  // const generatePageNumbers = () => {
+  //   const pages = [];
+
+  //   if (totalPages <= 6) {
+  //     // Show all pages if total is 6 or less
+  //     for (let i = 1; i <= totalPages; i++) {
+  //       pages.push(i);
+  //     }
+  //   } else {
+  //     if (currentPage <= 6) {
+  //       // If current page is in first 6 pages, show 1 to 6 and last page
+  //       for (let i = 1; i <= 6; i++) {
+  //         pages.push(i);
+  //       }
+  //       pages.push(totalPages);
+  //     } else {
+  //       // After 7th page, show 1, ..., currentPage, ..., lastPage
+  //       pages.push(1);
+  //       pages.push("...");
+  //       pages.push(currentPage);
+  //       pages.push("...");
+  //       pages.push(totalPages);
+  //     }
+  //   }
+
+  //   return pages;
+  // };
+
   const generatePageNumbers = () => {
-    const pageNumbers = [];
-    if (totalPages <= 5) {
+    const pages = [];
+
+    if (totalPages <= 6) {
       for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
+        pages.push(i);
       }
     } else {
-      if (currentPage <= 3) {
-        pageNumbers.push(1, 2, 3, 4, "...", totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pageNumbers.push(
-          1,
-          "...",
-          totalPages - 3,
-          totalPages - 2,
-          totalPages - 1,
-          totalPages
-        );
-      } else {
-        pageNumbers.push(
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages
-        );
+      pages.push(1);
+
+      if (currentPage > 4) {
+        pages.push("...");
       }
+
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage < totalPages - 3) {
+        pages.push("...");
+      }
+
+      pages.push(totalPages);
     }
-    return pageNumbers;
+
+    return pages;
   };
 
   const indexOfLastRate = currentPage * ratesPerPage;
@@ -276,7 +302,7 @@ const CghsRatePublic = () => {
               </span>
             ) : (
               <button
-                key={page}
+                key={`page-${idx}`}
                 onClick={() => setCurrentPage(page)}
                 className={`px-3 py-1 rounded-full border transition ${
                   currentPage === page
