@@ -2,7 +2,12 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
 
-const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
+const CghsUnitTable = ({
+  units,
+  totalCount,
+  onMoreOptions,
+  showDistance = false,
+}) => {
   const [expandedRow, setExpandedRow] = useState(null);
   // const empanelledRef = useRef(null);
   // const [isOverflowing, setIsOverflowing] = useState(false);
@@ -17,7 +22,10 @@ const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
         <thead className="bg-gray-100">
           <tr>
             <th className="text-center text-gray-600 p-3 w-3/4">
-              Empanelled Units
+              Empanelled Units{" "}
+              <span className="ml-2 text-xs text-gray-400 font-normal">
+                ({totalCount} total)
+              </span>
             </th>
             {/* <th className="text-left p-3">Empanelled For</th>
             {showDistance && <th className="text-left p-3">Radial Distance</th>}
@@ -45,10 +53,10 @@ const CghsUnitTable = ({ units, onMoreOptions, showDistance = false }) => {
                 .join(", ");
 
               return (
-                <tr key={unit._id} className="border-t hover:bg-gray-50">
+                <tr key={unit._id} className=" hover:bg-gray-50">
                   {/* 📍 Combined Name + Address */}
-                  <td className="p-3 md:px-4 text-gray-800 align-top">
-                    <div className="border rounded-lg shadow-sm p-3 bg-white hover:shadow-md transition duration-200">
+                  <td className="px-0 py-2 md:px-4 text-gray-800 align-top">
+                    <div className=" rounded-lg shadow-md p-3 bg-slate-50 hover:shadow-md transition duration-200">
                       {/* Name and Accreditation */}
                       <div className="flex items-center gap-2 flex-wrap mb-2">
                         <p className="font-semibold text-blue-700 text-sm md:text-base">

@@ -161,12 +161,32 @@ const CghsUnitPublic = () => {
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
-          CGHS Empanelled Centers
+          🏥CGHS Empanelled Centers
         </h2>
-        <p className="text-xs md:text-sm text-gray-600 max-w-2xl mx-auto">
+        {/* <p className="text-xs md:text-sm text-gray-600 max-w-2xl mx-auto">
           Search, explore, and find nearby units, check available specialties,
           and get directions — all in one place.
-        </p>
+        </p> */}
+
+        <div className="mt-2 text-center bg-gray-100 py-2 rounded-lg">
+          <p className="text-base text-gray-600 mb-2 font-bold">
+            All in One Place
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 text-xs md:text-sm lg:text-base">
+            <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full flex items-center gap-1">
+              🔍 Search & Explore
+            </span>
+            <span className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full flex items-center gap-1">
+              🏥 Find Nearby Units
+            </span>
+            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full flex items-center gap-1">
+              ✅ See Empanelled facilities
+            </span>
+            <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full flex items-center gap-1">
+              🧭 Get Directions
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="flex w-full md:w-96 mx-auto border rounded-full overflow-hidden text-sm md:text-base font-medium mb-6 shadow-sm">
@@ -259,6 +279,7 @@ const CghsUnitPublic = () => {
             units={currentUnits}
             onMoreOptions={setSelectedUnit}
             showDistance={false}
+            totalCount={filteredUnits.length}
           />
 
           {/* Pagination */}
@@ -318,7 +339,7 @@ const CghsUnitPublic = () => {
 
       <div className="bg-indigo-50 rounded-lg p-6 my-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
         <div className="text-center md:text-left">
-          <h3 className="text-lg md:text-xl font-semibold text-indigo-700">
+          <h3 className="text-base md:text-xl font-semibold text-indigo-700">
             Looking for CGHS Rates?
           </h3>
           <p className="text-gray-600 text-sm md:text-base mt-1">
@@ -328,9 +349,9 @@ const CghsUnitPublic = () => {
 
         <Link
           to="/pages/public/cghs-rates"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-full transition"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-full transition"
         >
-          Explore CGHS Rates
+          Explore Latest CGHS Rates
         </Link>
       </div>
 
