@@ -12,17 +12,17 @@ import { Link } from "react-router-dom";
 
 const validCities = [
   "Delhi",
-  "Gurugram",
+  // "Gurugram",
   "Faridabad",
   "Ghaziabad",
   "Noida",
-  "Mumbai",
-  "Chennai",
-  "Kolkata",
-  "Hyderabad",
-  "Bhopal",
-  "Indore",
-  "Bengaluru",
+  // "Mumbai",
+  // "Chennai",
+  // "Kolkata",
+  // "Hyderabad",
+  // "Bhopal",
+  // "Indore",
+  // "Bengaluru",
 ];
 
 // const BASE_URL = "http://localhost:5000/api/v1/public/cghsUnits"; // Replace with your live URL

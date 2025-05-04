@@ -8,6 +8,7 @@ import payMatrixData from "../../data/payMatrixData";
 // import NpsResultTable from "../../components/Tools/NPSvsUPS/NpsResultTable";
 import NpsUpsSummary from "../../components/Tools/NPSvsUPS/NpsUpsSummary";
 import NpsTableAccordion from "../../components/Tools/NPSvsUPS/NpsTableAccordion";
+import SimulationGuide from "../../components/Tools/NPSvsUPS/SimulationGuide";
 
 // import NpsCalculator from "../../components/Tools/NPSvsUPS/NpsCalculator";
 
@@ -24,10 +25,16 @@ const NpsEstimator = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-      <h1 className="text-3xl font-bold text-center text-blue-800">
-        NPS vs UPS Estimator
+    <div className="max-w-6xl mx-auto px-4 pt-8 space-y-2">
+      <h1 className="text-xl md:text-2xl font-extrabold text-center text-blue-800">
+        Compare Your Retirement Options{" "}
+        <span className="block">NPS or UPS</span>
       </h1>
+      <p className="text-center text-gray-700 text-sm sm:text-base">
+        Explore how your pension and retirement benefits may shape up under both
+        schemes. Adjust key assumptions and make informed decisions with this
+        interactive estimator.
+      </p>
 
       {/* User Input Form */}
       <div className="bg-white p-6 rounded shadow">
@@ -39,10 +46,12 @@ const NpsEstimator = () => {
 
       {/* Summary after calculation */}
       {results.length > 0 && (
-        <NpsUpsSummary
-          data={results}
-          joiningDate={submittedFormData?.joiningDate}
-        />
+        <div className="transition-all duration-700 ease-out animate-fade-in">
+          <NpsUpsSummary
+            data={results}
+            joiningDate={submittedFormData?.joiningDate}
+          />
+        </div>
       )}
 
       {/* Toggle Table Button */}
@@ -50,7 +59,7 @@ const NpsEstimator = () => {
         <div className="text-center">
           <button
             onClick={() => setShowTable(!showTable)}
-            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            className="mt-4 px-6 py-2 bg-blue-600 text-sm md:text-base text-white rounded hover:bg-blue-700 transition"
           >
             {showTable
               ? "Hide Monthly Projection Table"
@@ -68,6 +77,33 @@ const NpsEstimator = () => {
           <NpsTableAccordion data={results} />
         </div>
       )}
+
+      <div>
+        <SimulationGuide />
+      </div>
+
+      {/* <div className="text-xs md:text-sm bg-red-50 border-l-4 border-red-400 p-4 mt-8 rounded">
+        <h4 className="text-red-700 font-semibold mb-2">📌 Disclaimer</h4>
+        <p className="text-gray-800 text-xs md:text-sm leading-relaxed">
+          The above analysis is a simulation tool intended to provide a general
+          idea of how retirement benefits under NPS and UPS might evolve over
+          time, based on a set of assumed variables. This should{" "}
+          <span className="font-semibold">not</span> be construed as financial
+          planning advice or a recommendation to opt for either scheme.
+        </p>
+        <p className="text-gray-800 text-xs md:text-sm leading-relaxed mt-2">
+          While every effort has been made to ensure accuracy, the calculations
+          are based on user inputs, average assumptions, and simplifications of
+          applicable rules. The actual benefits may vary significantly due to
+          changes in government policy, market behavior, or individual
+          circumstances.
+        </p>
+        <p className="text-gray-800 text-xs md:text-sm leading-relaxed mt-2">
+          We accept no liability for decisions made based on this tool. Users
+          are encouraged to consult qualified financial advisors or official
+          government sources for detailed guidance.
+        </p>
+      </div> */}
     </div>
   );
 };
