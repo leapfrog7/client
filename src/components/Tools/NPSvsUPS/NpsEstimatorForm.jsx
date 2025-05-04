@@ -142,8 +142,10 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
             htmlFor="expectedDaIncreaseRate"
             className="text-sm md:text-base font-semibold text-gray-700 mb-1 lg:mt-3"
           >
-            Expected DA Increase (% every 6 months):{" "}
-            <span className="text-sm mt-1 text-blue-700 p-2 bg-blue-50  font-semibold  text-center">
+            <span className="p-2">
+              Expected DA Increase (% every 6 months):
+            </span>{" "}
+            <span className="block md:inline-block max-w-28 md:w-auto mx-auto text-sm mt-1 text-blue-700 p-2 bg-blue-50  font-semibold  text-center">
               {formData.expectedDaIncreaseRate}%
             </span>
           </label>
@@ -247,7 +249,7 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
           <label className="text-sm font-semibold md:text-base text-gray-700">
             Expected NPS Annual Return (%) :
           </label>
-          <span className="text-sm mt-1 text-blue-700 font-semibold bg-blue-50 p-2 rounded text-center ml-2">
+          <span className="block md:inline-block max-w-28 md:w-auto mx-auto text-sm mt-1 text-blue-700 font-semibold bg-blue-50 p-2 rounded text-center">
             {formData.expectedReturn}%
           </span>
           <input
@@ -268,7 +270,7 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
         {/*Pay Commission Hike */}
         <div className="text-sm md:text-base font-semibold  text-gray-700 shadow-md px-3 py-2">
           <label>Expected Pay Commission Hike (%) : </label>{" "}
-          <span className="text-center text-blue-700 font-semibold p-2 bg-blue-50 rounded-md">
+          <span className=" block md:inline-block max-w-28 md:w-auto mx-auto text-center text-blue-700 font-semibold p-2 bg-blue-50 rounded-md">
             {formData.payCommissionHikePercent}%
           </span>
           <input
