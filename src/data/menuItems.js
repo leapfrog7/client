@@ -15,6 +15,7 @@ import { LiaHandsHelpingSolid } from "react-icons/lia";
 import { BsTools } from "react-icons/bs";
 import { CiHospital1 } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
+import { VscTable } from "react-icons/vsc";
 
 export const navItems = [
   {
@@ -135,6 +136,11 @@ export const navItems = [
         label: "CGHS Units",
         path: "/pages/public/cghs-units",
         icon: CiHospital1, // Matching your Economy icon style
+      },
+      {
+        label: "Pay Matrix",
+        path: "/pages/public/7thCPC-paymatrix",
+        icon: VscTable, // Matching your Economy icon style
       },
     ],
   },

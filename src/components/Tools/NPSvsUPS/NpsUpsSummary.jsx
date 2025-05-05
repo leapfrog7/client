@@ -3,6 +3,7 @@
 import PropTypes from "prop-types";
 import { format } from "date-fns";
 import { useState } from "react";
+import SafeSlider from "./SafeSlider";
 
 const NpsUpsSummary = ({ data, joiningDate }) => {
   const [annuityPercent, setAnnuityPercent] = useState(40);
@@ -11,6 +12,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
   //   const [guaranteedPeriod, setGuaranteedPeriod] = useState(0); // in years
   const [lifeExpectancy, setLifeExpectancy] = useState(80); // Default: 80 years
   const [discountRate, setDiscountRate] = useState(6); // Annual discount rate
+  const [upsPensionPercent, setUpsPensionPercent] = useState(100); // default 100%
 
   if (!data || data.length === 0) return null;
 
@@ -146,6 +148,20 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
   const totalPvUpsReduced =
     presentValueUpsReduced + upsCorpusLumpsum + upsLumpsum;
 
+  const upsLumpsumWithdraw = Math.round(
+    corpusUps * ((100 - upsPensionPercent) / 100)
+  );
+  const reducedPensionWithDR = Math.round(
+    totalPensionWithDR * (upsPensionPercent / 100)
+  );
+
+  // Utility function (place it outside your component or in a utils file)
+  const formatIndianCurrencyShort = (value) => {
+    if (value >= 1e7) return `₹${(value / 1e7).toFixed(2)} Cr`;
+    if (value >= 1e5) return `₹${(value / 1e5).toFixed(2)} Lac`;
+    return `₹${value.toLocaleString("en-IN")}`;
+  };
+
   return (
     <div className="bg-gray-50 p-2 sm:p-6 rounded shadow text-sm sm:text-base space-y-6">
       <h2 className="text-center text-lg sm:text-xl font-bold text-amber-700">
@@ -170,23 +186,25 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
 
           <div className="bg-blue-50 border border-blue-200 py-4 px-2 rounded shadow-sm">
             <h3 className="text-blue-700 font-semibold mb-2">🔷 NPS Summary</h3>
-            <p className="py-2">
-              <strong>Total Corpus:</strong> ₹{corpusNps.toLocaleString()}
+            <p className="py-2 font-semibold">
+              <span>Total Corpus: </span>
+              {formatIndianCurrencyShort(corpusNps)}
             </p>
 
             <label className="block p-4 bg-white rounded">
               <span className="font-medium text-gray-700">
                 Select Annuity Ratio % (40–100):
               </span>
-              <input
-                type="range"
+              <SafeSlider
+                name="annuityPercent"
                 min={40}
                 max={100}
                 step={1}
                 value={annuityPercent}
-                onChange={(e) => setAnnuityPercent(Number(e.target.value))}
+                onChange={(val) => setAnnuityPercent(Number(val))}
                 className="w-full"
               />
+
               <span className="block text-center mt-1 text-blue-800 font-semibold">
                 Annuity: {annuityPercent}% | Lumpsum: {100 - annuityPercent}%
               </span>
@@ -199,13 +217,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                   {annuityRate}%
                 </span>
               </span>
-              <input
-                type="range"
+              <SafeSlider
+                name="annuityRate"
                 min={1}
                 max={15}
                 step="0.1"
                 value={annuityRate}
-                onChange={(e) => setAnnuityRate(Number(e.target.value))}
+                onChange={(val) => setAnnuityRate(Number(val))}
                 className="w-full border rounded px-2 py-1 mt-1"
               />
             </label>
@@ -227,26 +245,55 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
               </select>
             </label> */}
 
-            <ul className="list-disc list-inside ml-2 mt-2 text-sm sm:text-base">
-              <li>
-                <strong>Monthly Pension (approx):</strong> ₹
-                {monthlyPension.toLocaleString()}
-              </li>
-              <li>
-                <strong>Adjusted Annuity Corpus:</strong> ₹
-                {effectiveAnnuityCorpus.toLocaleString()}
-              </li>
-              <li>
-                <strong>Lumpsum at Retirement:</strong> ₹
-                {adjustedLumpsum.toLocaleString()}
-              </li>
-              {/* {guaranteedPeriod > 0 && (
-                <li>
-                  <strong>Guaranteed Payout ({guaranteedPeriod} yrs):</strong> ₹
-                  {totalGuaranteedPayout.toLocaleString()}
-                </li>
-              )} */}
-            </ul>
+            <table className="w-full text-sm sm:text-base mt-2">
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2 font-medium text-gray-700 flex items-center gap-2">
+                    Monthly Pension
+                    <span className="relative group cursor-pointer text-blue-600">
+                      ℹ️
+                      <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-48">
+                        This is the approximate monthly pension based on annuity
+                        rate and corpus used.
+                      </div>
+                    </span>
+                  </td>
+                  <td className="py-2 text-right font-semibold">
+                    {formatIndianCurrencyShort(monthlyPension)}
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 font-medium text-gray-700 flex items-center gap-2">
+                    Corpus for Annuity
+                    <span className="relative group cursor-pointer text-blue-600">
+                      ℹ️
+                      <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-48">
+                        Portion of NPS corpus allocated for monthly pension
+                        purchase.
+                      </div>
+                    </span>
+                  </td>
+                  <td className="py-2 text-right font-semibold">
+                    {formatIndianCurrencyShort(effectiveAnnuityCorpus)}
+                  </td>
+                </tr>
+                <tr className="border-b">
+                  <td className="py-2 font-medium text-gray-700 flex items-center gap-2">
+                    Lumpsum at Retirement
+                    <span className="relative group cursor-pointer text-blue-600">
+                      ℹ️
+                      <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-48">
+                        Amount you receive immediately at retirement from
+                        remaining NPS corpus.
+                      </div>
+                    </span>
+                  </td>
+                  <td className="py-2 text-right font-semibold">
+                    {formatIndianCurrencyShort(adjustedLumpsum)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -256,32 +303,58 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
           <p>
             <strong>Total Corpus:</strong> ₹{corpusUps.toLocaleString()}
           </p>
-          <ul className="list-disc list-inside ml-2">
-            <li className="mt-2">
-              <strong>Qualifying Service:</strong> {qualifyingYears} years
-            </li>
-            <li className="mt-2">
-              <strong>Average Basic (Last 12 months):</strong> ₹
-              {averageBasicLastYear.toLocaleString()}
-            </li>
-            <li className="mt-2">
-              <strong>Assured Payout:</strong> ₹
-              {assuredPension.toLocaleString()}
-              /mo
-            </li>
-            <li className="mt-2">
-              <strong>+ Dearness Relief ({daPercent}%):</strong> ₹
-              {drAmount.toLocaleString()}/mo
-            </li>
-            <li className="mt-2 font-semibold">
-              <strong>Total Payout with DR:</strong> ₹
-              {totalPensionWithDR.toLocaleString()}/mo
-            </li>
-            <li className="mt-2">
-              <strong>Lumpsum at Retirement (1/10th × 6m blocks):</strong> ₹
-              {upsLumpsum.toLocaleString()}
-            </li>
-            <div className="bg-white m-1 p-1 rounded">
+          <table className="w-full text-sm sm:text-base mt-2">
+            <tbody>
+              <tr className="border-b">
+                <td className="py-2 font-medium text-gray-700">
+                  Qualifying Service
+                </td>
+                <td className="py-2 text-right font-semibold">
+                  {qualifyingYears} years
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium text-gray-700">
+                  Avg. Basic Pay (Last 12 mo)
+                </td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(averageBasicLastYear)}
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium text-gray-700">
+                  Assured Payout
+                </td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(assuredPension)} /mo
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium text-gray-700">
+                  + Dearness Relief ({daPercent}%)
+                </td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(drAmount)} /mo
+                </td>
+              </tr>
+              <tr className="border-b font-semibold text-green-800">
+                <td className="py-2">Total Payout with DR</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(totalPensionWithDR)} /mo
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium text-gray-700">
+                  Lumpsum (1/10 × 6m blocks)
+                </td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(upsLumpsum)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* <div className="bg-white m-1 p-1 rounded">
               <li className="mt-2">
                 <strong>
                   Reduced Assured Payout with DR (if 60% Lumpsum taken):
@@ -292,8 +365,46 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                 <strong>60% Lumpsum (optional):</strong> ₹
                 {Math.round(corpusUps * 0.6).toLocaleString()}
               </li>
-            </div>
-          </ul>
+            </div> */}
+          <div className="bg-white m-1 px-2 py-2 rounded mt-4 border">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select UPS Pension % (40–100):
+            </label>
+            <SafeSlider
+              name="upsPensionPercent"
+              min={40}
+              max={100}
+              step={1}
+              value={upsPensionPercent}
+              onChange={(val) => setUpsPensionPercent(Number(val))}
+              className="w-full"
+            />
+            <span className="text-center block text-blue-700 font-semibold mt-1">
+              Assured Payout : {upsPensionPercent}% | Lumpsum:{" "}
+              {100 - upsPensionPercent}%
+            </span>
+
+            <table className="w-full text-sm sm:text-base mt-3">
+              <tbody>
+                <tr className="border-b">
+                  <td className="py-2 font-medium text-gray-700">
+                    Reduced Payout with DR
+                  </td>
+                  <td className="py-2 text-right  font-semibold">
+                    {formatIndianCurrencyShort(reducedPensionWithDR)} /mo
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 font-medium text-gray-700">
+                    Lumpsum Withdrawn
+                  </td>
+                  <td className="py-2 text-right font-semibold">
+                    {formatIndianCurrencyShort(upsLumpsumWithdraw)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <p className="text-lg sm:text-xl bg-blue-100 text-blue-800 mt-6 text-center font-bold rounded shadow-md py-2">
@@ -312,13 +423,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
               <span className="text-blue-700 font-semibold  text-center mt-1">
                 {lifeExpectancy} years
               </span>
-              <input
-                type="range"
+              <SafeSlider
+                name="lifeExpectancy"
                 min={62}
                 max={110}
                 step={1}
                 value={lifeExpectancy}
-                onChange={(e) => setLifeExpectancy(Number(e.target.value))}
+                onChange={(val) => setLifeExpectancy(Number(val))}
                 className="w-full"
               />
             </label>
@@ -330,13 +441,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
               <span className="text-blue-700 font-semibold  text-center mt-1">
                 {discountRate}%
               </span>
-              <input
-                type="range"
+              <SafeSlider
+                name="discountRate"
                 min={1}
                 max={10}
                 step={0.1}
                 value={discountRate}
-                onChange={(e) => setDiscountRate(Number(e.target.value))}
+                onChange={(val) => setDiscountRate(Number(val))}
                 className="w-full"
               />
             </label>
@@ -399,13 +510,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             <span className="font-bold text-gray-700">
               DR Increase Rate (% every 6 months): {drIncreaseRate}%
             </span>
-            <input
-              type="range"
+            <SafeSlider
+              name="drIncreaseRate"
               min={0}
               max={10}
               step={0.1}
               value={drIncreaseRate}
-              onChange={(e) => setDrIncreaseRate(parseFloat(e.target.value))}
+              onChange={(val) => setDrIncreaseRate(parseFloat(val))}
               className="w-10/12 mt-1"
             />
           </label>

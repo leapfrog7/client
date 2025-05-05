@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import SafeSlider from "./SafeSlider";
 
 const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -150,15 +151,23 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
             </span>
           </label>
 
-          <input
-            type="range"
+          {/* SafeSlider component to prevent unintended changes on mobile when scrolling vertically. */}
+          <SafeSlider
             name="expectedDaIncreaseRate"
             id="expectedDaIncreaseRate"
             min={0}
             max={10}
             step={0.1}
-            value={formData.expectedDaIncreaseRate}
-            onChange={handleChange}
+            value={Number(formData.expectedDaIncreaseRate)}
+            onChange={(val) =>
+              handleChange({
+                target: {
+                  name: "expectedDaIncreaseRate",
+                  value: val,
+                  type: "range",
+                },
+              })
+            }
             className="w-full"
           />
         </div>
@@ -252,14 +261,21 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
           <span className="block md:inline-block max-w-28 md:w-auto mx-auto text-sm mt-1 text-blue-700 font-semibold bg-blue-50 p-2 rounded text-center">
             {formData.expectedReturn}%
           </span>
-          <input
-            type="range"
+          <SafeSlider
             name="expectedReturn"
             min={2}
             max={20}
             step={0.1}
-            value={formData.expectedReturn}
-            onChange={handleChange}
+            value={Number(formData.expectedReturn)}
+            onChange={(val) =>
+              handleChange({
+                target: {
+                  name: "expectedReturn",
+                  value: val,
+                  type: "range",
+                },
+              })
+            }
             required
             className="mt-1 block w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -273,15 +289,22 @@ const NpsEstimatorForm = ({ payMatrixData, onSubmit }) => {
           <span className=" block md:inline-block max-w-28 md:w-auto mx-auto text-center text-blue-700 font-semibold p-2 bg-blue-50 rounded-md">
             {formData.payCommissionHikePercent}%
           </span>
-          <input
-            type="range"
+          <SafeSlider
             name="payCommissionHikePercent"
             id="payCommissionHikePercent"
             min={0}
             max={50}
             step={0.5}
-            value={formData.payCommissionHikePercent}
-            onChange={handleChange}
+            value={Number(formData.payCommissionHikePercent)}
+            onChange={(val) =>
+              handleChange({
+                target: {
+                  name: "payCommissionHikePercent",
+                  value: val,
+                  type: "range",
+                },
+              })
+            }
             // placeholder="e.g. 15% or 20%..."
             className="mt-1 block w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
