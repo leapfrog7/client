@@ -301,7 +301,8 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
         <div className="bg-green-50 border border-green-200 py-4 px-2 rounded shadow-sm">
           <h3 className="text-green-700 font-semibold mb-2">🟩 UPS Summary</h3>
           <p>
-            <strong>Total Corpus:</strong> ₹{corpusUps.toLocaleString()}
+            <strong>Total Corpus: </strong>
+            {formatIndianCurrencyShort(corpusUps)}
           </p>
           <table className="w-full text-sm sm:text-base mt-2">
             <tbody>
@@ -367,8 +368,8 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
               </li>
             </div> */}
           <div className="bg-white m-1 px-2 py-2 rounded mt-4 border">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select UPS Pension % (40–100):
+            <label className="block text-sm font-medium text-gray-700 mb-1 font-semibold">
+              Select Reduced UPS Payout % (40–100):
             </label>
             <SafeSlider
               name="upsPensionPercent"
@@ -460,119 +461,169 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             📊 NPS Present Value Analysis
           </h3>
 
-          <div className="mt-4 text-gray-800 text-sm sm:text-base">
-            <p>
-              <strong>Monthly Pension:</strong> ₹
-              {monthlyPension.toLocaleString()}
-            </p>
-            <p>
-              <strong>Estimated Duration:</strong> {monthsOfPension} months
-            </p>
-            {/* <p>
-              <strong>Present Value of Future NPS Payouts:</strong>{" "}
-              <span className="text-green-700 font-bold">
-                ₹{presentValueRounded.toLocaleString()}
-              </span>
-            </p> */}
-            <p>
-              <strong>Present Value of Monthly Pension:</strong> ₹
-              {Math.round(pvPensionOnly).toLocaleString()}
-            </p>
-            <p>
-              <strong>Present Value of Returned Corpus:</strong> ₹
-              {Math.round(returnOfPurchasePricePV).toLocaleString()}
-            </p>
-            <p>
-              <strong>Present Value of Lumpsum:</strong> ₹
-              {adjustedLumpsum.toLocaleString()}
-            </p>
-            <p>
-              <strong>Total Present Value (NPS):</strong>{" "}
-              <span className="text-green-700 font-bold">
-                ₹{totalPvNps.toLocaleString()}
-              </span>
-            </p>
-          </div>
+          <table className="w-full text-sm sm:text-base mt-4 text-gray-800">
+            <tbody>
+              <tr className="border-b">
+                <td className="py-2 font-medium">Monthly Pension</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(monthlyPension)}
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium">Life Expectancy after 60</td>
+                <td className="py-2 text-right font-semibold">
+                  {monthsOfPension} months
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium">PV of Monthly Pension</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(Math.round(pvPensionOnly))}
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium">PV of Returned Corpus</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(
+                    Math.round(returnOfPurchasePricePV)
+                  )}
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium">PV of Lumpsum</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(adjustedLumpsum)}
+                </td>
+              </tr>
+              <tr className="font-bold text-green-800">
+                <td className="py-2">Total PV (NPS)</td>
+                <td className="py-2 text-right font-semibold">
+                  {formatIndianCurrencyShort(totalPvNps)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* UPS Present Value Block */}
 
         <div className="bg-cyan-50 border border-cyan-300 py-4 px-2 rounded shadow-sm mt-6">
-          <h3 className="text-cyan-800 font-semibold mb-2">
+          <h3 className="text-cyan-800 font-semibold mb-4">
             📊 UPS Present Value Analysis
           </h3>
 
-          <p>
-            <strong>Initial Dearness Relief:</strong>{" "}
-            {(initialDrRate * 100).toFixed(2)}%
-          </p>
-          <label className="block mb-2">
-            <span className="font-bold text-gray-700">
-              DR Increase Rate (% every 6 months): {drIncreaseRate}%
-            </span>
-            <SafeSlider
-              name="drIncreaseRate"
-              min={0}
-              max={10}
-              step={0.1}
-              value={drIncreaseRate}
-              onChange={(val) => setDrIncreaseRate(parseFloat(val))}
-              className="w-10/12 mt-1"
-            />
-          </label>
-          <p>
-            <strong>Life Expectancy:</strong> {lifeExpectancy} years
-          </p>
-          <p>
-            <strong>Discount Rate:</strong> {discountRate.toFixed(2)}%
-          </p>
+          <table className="w-full text-sm sm:text-base text-gray-800 mb-4">
+            <tbody>
+              <tr className="border-b">
+                <td className="py-2 font-medium">Initial Dearness Relief</td>
+                <td className="py-2 text-right font-semibold w-1/5">
+                  {(initialDrRate * 100).toFixed(2)}%
+                </td>
+              </tr>
+              <tr className="">
+                <td className="pt-2 font-medium ">
+                  DR Increase Rate (every 6m)
+                </td>
 
-          <div className="mt-4 space-y-4 text-sm sm:text-base text-gray-800">
+                <td className="pt-2 text-right font-semibold">
+                  {drIncreaseRate}%
+                </td>
+              </tr>
+
+              <div className="ml-0 w-4/5">
+                <label className="block mb-2 text-center mt-2 p-2 mx-auto rounded-lg">
+                  <span className="font-bold text-gray-700 text-xs">
+                    Adjust DR Increase Rate (% every 6 months){" "}
+                  </span>
+                  <SafeSlider
+                    name="drIncreaseRate"
+                    min={0}
+                    max={10}
+                    step={0.1}
+                    value={drIncreaseRate}
+                    onChange={(val) => setDrIncreaseRate(parseFloat(val))}
+                    className="w-full mt-2"
+                  />
+                </label>
+              </div>
+              <tr className="border-b border-t">
+                <td className="py-2 font-medium">Life Expectancy</td>
+                <td className="py-2 text-right font-semibold">
+                  {monthsOfPension} months
+                </td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 font-medium">Discount Rate</td>
+                <td className="py-2 text-right font-semibold">
+                  {discountRate.toFixed(2)}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm sm:text-base mt-6">
             {/* Scenario 1: Full Pension */}
             <div className="bg-green-100 border border-green-300 p-3 rounded">
-              <h4 className="font-semibold text-green-800 mb-1">
-                Scenario 1: Full Pension (No Lumpsum)
+              <h4 className="font-semibold text-green-800 mb-2">
+                Scenario 1: Full Assured Payout (No Lumpsum)
               </h4>
-              <p>
-                <strong>Assured Payout:</strong> ₹{basePension.toLocaleString()}{" "}
-                /mo
-              </p>
-              <p>
-                <strong>Total Present Value:</strong>{" "}
-                <span className="font-bold text-green-800">
-                  ₹{presentValueUps.toLocaleString()}
-                </span>
-              </p>
+              <table className="w-full">
+                <tbody>
+                  <tr className="border-b">
+                    <td className="py-2 font-medium">Assured Payout</td>
+                    <td className="py-2 text-right font-semibold">
+                      {formatIndianCurrencyShort(basePension)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 font-medium">Total Present Value</td>
+                    <td className="py-2 text-right text-green-800 font-bold">
+                      {formatIndianCurrencyShort(presentValueUps)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             {/* Scenario 2: Reduced Pension + Lumpsum */}
             <div className="bg-blue-100 border border-blue-300 p-3 rounded">
-              <h4 className="font-semibold text-blue-800 mb-1">
-                Scenario 2: Reduced Assured Payout (40%) + Lumpsum
+              <h4 className="font-semibold text-blue-800 mb-2">
+                Scenario 2: Reduced Payout (40%) + Lumpsum
               </h4>
-              <p>
-                <strong>Reduced Assured Payout:</strong> ₹
-                {Math.round(basePension * 0.4).toLocaleString()} /mo
-              </p>
-              <p>
-                <strong>Lumpsum from UPS Corpus (60%):</strong> ₹
-                {upsCorpusLumpsum.toLocaleString()}
-              </p>
-
-              <p>
-                <strong>Lumpsum at Retirement:</strong> ₹
-                {upsLumpsum.toLocaleString()}
-              </p>
-              <p>
-                <strong>Present Value of Reduced Payout:</strong> ₹
-                {presentValueUpsReduced.toLocaleString()}
-              </p>
-              <p>
-                <strong>Total Present Value:</strong>{" "}
-                <span className="font-bold text-blue-800">
-                  ₹{totalPvUpsReduced.toLocaleString()}
-                </span>
-              </p>
+              <table className="w-full">
+                <tbody>
+                  <tr className="border-b border-b-gray-100">
+                    <td className="py-2 font-medium">Reduced Payout</td>
+                    <td className="py-2 text-right font-semibold">
+                      {formatIndianCurrencyShort(Math.round(basePension * 0.4))}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-b-gray-100">
+                    <td className="py-2 font-medium">60% UPS Corpus Lumpsum</td>
+                    <td className="py-2 text-right font-semibold">
+                      {formatIndianCurrencyShort(upsCorpusLumpsum)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-b-gray-100">
+                    <td className="py-2 font-medium">6m Block Lumpsum</td>
+                    <td className="py-2 text-right font-semibold">
+                      {formatIndianCurrencyShort(upsLumpsum)}
+                    </td>
+                  </tr>
+                  <tr className="border-b border-b-gray-100">
+                    <td className="py-2 font-medium">PV of Reduced Payout</td>
+                    <td className="py-2 text-right font-semibold">
+                      {formatIndianCurrencyShort(presentValueUpsReduced)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-2 font-medium">Total Present Value</td>
+                    <td className="py-2 text-right text-blue-800 font-bold">
+                      {formatIndianCurrencyShort(totalPvUpsReduced)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -580,35 +631,45 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
 
       {/* Comparative Conclusion */}
       <div className="bg-purple-50 border border-purple-300 py-4 px-2 rounded shadow-sm mt-6 text-sm md:text-sm">
-        <h3 className="text-purple-800 font-semibold mb-2">📌 Conclusion</h3>
-        <p>
-          <strong>Based on the assumptions provided:</strong>
+        <h3 className="text-purple-800 font-semibold mb-3">📌 Conclusion</h3>
+        <p className="text-gray-800 font-medium mb-3">
+          Based on the assumptions provided:
         </p>
 
-        <ul className="list-disc list-inside ml-4 mt-2 text-gray-800">
-          <li>
-            <strong>NPS Total Present Value:</strong> ₹
-            {totalPvNps.toLocaleString()}
-          </li>
-          <li>
-            <strong>UPS (Full Assured Payout) Total Present Value:</strong> ₹
-            {presentValueUps.toLocaleString()}
-          </li>
-          <li>
-            <strong>
-              UPS (Reduced Assured Payout + Lumpsum) Total Present Value:
-            </strong>{" "}
-            ₹{totalPvUpsReduced.toLocaleString()}
-          </li>
-        </ul>
+        <table className="w-full text-gray-800 mb-3">
+          <tbody>
+            <tr className="border-b">
+              <td className="py-2 font-medium">NPS Total Present Value</td>
+              <td className="py-2 text-right font-semibold">
+                {formatIndianCurrencyShort(totalPvNps)}
+              </td>
+            </tr>
+            <tr className="border-b">
+              <td className="py-2 font-medium">
+                UPS (Full Assured Payout) Present Value
+              </td>
+              <td className="py-2 text-right font-semibold">
+                {formatIndianCurrencyShort(presentValueUps)}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2 font-medium">
+                UPS (Reduced Payout + Lumpsum) Present Value
+              </td>
+              <td className="py-2 text-right font-semibold">
+                {formatIndianCurrencyShort(totalPvUpsReduced)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <p className="mt-3 text-purple-900 font-semibold">
+        <p className="mt-3 text-purple-900 font-semibold text-sm sm:text-base">
           {totalPvNps > totalPvUpsReduced && totalPvNps > presentValueUps
-            ? "NPS offers higher total present value under current assumptions."
+            ? "✅ NPS offers higher total present value under current assumptions."
             : totalPvUpsReduced > totalPvNps &&
               totalPvUpsReduced > presentValueUps
-            ? "UPS with reduced pension and lumpsum appears more beneficial under these assumptions."
-            : "UPS with full pension seems to provide the highest total value presently."}
+            ? "✅ UPS with reduced pension and lumpsum appears more beneficial under these assumptions."
+            : "✅ UPS with full pension seems to provide the highest total value presently."}
         </p>
       </div>
     </div>
