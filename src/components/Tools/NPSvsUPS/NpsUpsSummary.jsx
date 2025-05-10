@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { format } from "date-fns";
 import { useState } from "react";
 import SafeSlider from "./SafeSlider";
+import PVComparisonChart from "./PVComparisonChart";
 
 const NpsUpsSummary = ({ data, joiningDate }) => {
   const [annuityPercent, setAnnuityPercent] = useState(40);
@@ -327,7 +328,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                   Avg. Basic Pay (Last 12 mo)
                   <span className="relative group cursor-pointer text-blue-600 ml-1">
                     ℹ️
-                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                    <div className="absolute bottom-full mb-1 left-[-2] z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
                       The average of your basic salary over the final year
                       before retirement. Used to calculate pension.
                     </div>
@@ -386,7 +387,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                   Lumpsum (1/10 × 6m blocks)
                   <span className="relative group cursor-pointer text-blue-600 ml-1">
                     ℹ️
-                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                    <div className="absolute bottom-full mb-1 left-[3] z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
                       Under UPS, for every 6 months of service, 1/10th of Basic
                       + DA is paid as retirement benefit.
                     </div>
@@ -523,25 +524,61 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
           <table className="w-full text-sm sm:text-base mt-4 text-gray-800">
             <tbody>
               <tr className="border-b">
-                <td className="py-2 font-medium">Monthly Pension</td>
+                <td className="py-2 font-medium">
+                  Monthly NPS Payout
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                      Payout generated from your annuity purchase (e.g., 40% of
+                      NPS corpus) for a given rate of annuity.
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {formatIndianCurrencyShort(monthlyPension)}
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="py-2 font-medium">Life Expectancy after 60</td>
+                <td className="py-2 font-medium">
+                  Life Expectancy after 60
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                      Total number of months the pension will be received after
+                      retirement (e.g., 240 months = 20 years).
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {monthsOfPension} months
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="py-2 font-medium">PV of Monthly Pension</td>
+                <td className="py-2 font-medium">
+                  PV of Monthly Pension
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                      The current value of all monthly payments you will receive
+                      after retirement under NPS.
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {formatIndianCurrencyShort(Math.round(pvPensionOnly))}
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="py-2 font-medium">PV of Returned Corpus</td>
+                <td className="py-2 font-medium">
+                  PV of Returned Corpus
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                      The present value of the annuity purchase amount that is
+                      returned to your nominee upon death.
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {formatIndianCurrencyShort(
                     Math.round(returnOfPurchasePricePV)
@@ -549,13 +586,32 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                 </td>
               </tr>
               <tr className="border-b">
-                <td className="py-2 font-medium">PV of Lumpsum</td>
+                <td className="py-2 font-medium">
+                  PV of Lumpsum
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48">
+                      The present value of the portion of your NPS corpus
+                      withdrawn as lumpsum.
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {formatIndianCurrencyShort(adjustedLumpsum)}
                 </td>
               </tr>
               <tr className="font-bold text-green-800">
-                <td className="py-2">Total PV (NPS)</td>
+                <td className="py-2">
+                  Total PV (NPS)
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                      Combined present value of pension, lumpsum, and return of
+                      purchase corpus — represents the total monetary worth of
+                      NPS benefits at retirement.
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold">
                   {formatIndianCurrencyShort(totalPvNps)}
                 </td>
@@ -574,7 +630,15 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
           <table className="w-full text-sm sm:text-base text-gray-800 mb-4">
             <tbody>
               <tr className="border-b">
-                <td className="py-2 font-medium">Initial Dearness Relief</td>
+                <td className="py-2 font-medium">
+                  Initial Dearness Relief
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                      DA % at retirement (used as starting DR).
+                    </div>
+                  </span>
+                </td>
                 <td className="py-2 text-right font-semibold w-1/5">
                   {(initialDrRate * 100).toFixed(2)}%
                 </td>
@@ -582,6 +646,12 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
               <tr className="">
                 <td className="pt-2 font-medium ">
                   DR Increase Rate (every 6m)
+                  <span className="relative group cursor-pointer text-blue-600 ml-1">
+                    ℹ️
+                    <div className="absolute bottom-full mb-1 left-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                      The assumed growth in DR, applied every 6 months.
+                    </div>
+                  </span>
                 </td>
 
                 <td className="pt-2 text-right font-semibold">
@@ -625,6 +695,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             <div className="bg-green-100 border border-green-300 p-3 rounded">
               <h4 className="font-semibold text-green-800 mb-2">
                 Scenario 1: Full Assured Payout (No Lumpsum)
+                <span className="relative group cursor-pointer text-blue-600 ml-1">
+                  ℹ️
+                  <div className="absolute bottom-full mb-1 right-0 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                    Case where you take full monthly pension and no corpus
+                    withdrawal.
+                  </div>
+                </span>
               </h4>
               <table className="w-full">
                 <tbody>
@@ -648,6 +725,13 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             <div className="bg-blue-100 border border-blue-300 p-3 rounded">
               <h4 className="font-semibold text-blue-800 mb-2">
                 Scenario 2: Reduced Payout (40%) + Lumpsum
+                <span className="relative group cursor-pointer text-blue-600 ml-1">
+                  ℹ️
+                  <div className="absolute bottom-full mb-1 right-1 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                    Case where you take 60% of UPS corpus as lumpsum and receive
+                    only 40% of monthly pension.
+                  </div>
+                </span>
               </h4>
               <table className="w-full">
                 <tbody>
@@ -688,6 +772,21 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
         </div>
       </div>
 
+      {/* <div className="mt-6">
+        <h4 className="font-semibold text-purple-800 mb-2">
+          Comparative Present Value Chart
+        </h4>
+        <div className="bg-white p-3 rounded shadow-sm">
+          <Bar data={comparisonData} options={comparisonOptions} />
+        </div>
+      </div> */}
+
+      <PVComparisonChart
+        nps={totalPvNps}
+        upsFull={presentValueUps}
+        upsReduced={totalPvUpsReduced}
+      />
+
       {/* Comparative Conclusion */}
       <div className="bg-purple-50 border border-purple-300 py-4 px-2 rounded shadow-sm mt-6 text-sm md:text-sm">
         <h3 className="text-purple-800 font-semibold mb-3">📌 Conclusion</h3>
@@ -697,15 +796,19 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
 
         <table className="w-full text-gray-800 mb-3">
           <tbody>
-            <tr className="border-b">
-              <td className="py-2 font-medium">NPS Total Present Value</td>
+            <tr className="border-b ">
+              <td className="py-2 font-medium w-2/3 md:w-full">
+                NPS Total Present Value <br></br>{" "}
+                <span className="text-xs">(as per assumptions)</span>
+              </td>
               <td className="py-2 text-right font-semibold">
                 {formatIndianCurrencyShort(totalPvNps)}
               </td>
             </tr>
             <tr className="border-b">
               <td className="py-2 font-medium">
-                UPS (Full Assured Payout) Present Value
+                UPS (Full Assured Payout) Present Value <br />
+                <span className="text-xs">(Scenario 1)</span>
               </td>
               <td className="py-2 text-right font-semibold">
                 {formatIndianCurrencyShort(presentValueUps)}
@@ -713,7 +816,8 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             </tr>
             <tr>
               <td className="py-2 font-medium">
-                UPS (Reduced Payout + Lumpsum) Present Value
+                UPS (Reduced Payout + Lumpsum) Present Value <br />
+                <span className="text-xs">(Scenario 2)</span>
               </td>
               <td className="py-2 text-right font-semibold">
                 {formatIndianCurrencyShort(totalPvUpsReduced)}
