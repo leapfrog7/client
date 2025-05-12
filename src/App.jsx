@@ -57,6 +57,8 @@ import CghsUnitPublic from "./pages/Tools/CghsUnitPublic";
 import CghsRatesPublic from "./pages/Tools/CghsRatesPublic";
 import PayMatrix from "./pages/Tools/PayMatrix";
 import NpsEstimator from "./pages/Tools/NpsEstimator";
+import PublicResources from "./pages/PublicResources";
+import ResourceDetail from "./pages/ResourceDetail";
 
 const App = () => {
   //States
@@ -483,6 +485,15 @@ const App = () => {
               element={<PayMatrix />}
             />
             <Route path="/pages/public/nps-or-ups" element={<NpsEstimator />} />
+            <Route
+              path="/pages/public/resources"
+              element={<PublicResources />}
+            />
+            <Route
+              path="/pages/public/resources/:slug"
+              element={<ResourceDetail />}
+            />
+            {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
         </div>
 

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+
 import { jwtDecode } from "jwt-decode";
 import UserManagement from "./UserManagement";
 import MCQManagement from "./MCQ_Management";
@@ -8,6 +10,8 @@ import AobrManagement from "./AobrManagement";
 import FeedbackManagement from "./FeedbackManagement";
 import CghsUnitManagement from "./CghsUnitManagement";
 import CghsRateManagement from "./CghsRateManagement";
+import ResourceManagement from "./ResourceManagement";
+import SectionEditor from "./SectionEditor";
 // import VisitorManagement from "./VisitorManagement";
 import { VscFeedback } from "react-icons/vsc";
 import { FaHospital, FaRupeeSign } from "react-icons/fa";
@@ -170,6 +174,19 @@ const AdminDashboard = () => {
             Add and manage CGHS rates for procedures, tests, and implants.
           </p>
         </Link>
+        {/* Resource Management */}
+        <Link
+          to="resourceMgmt"
+          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-indigo-50 transition-all duration-300 ease-in-out"
+        >
+          <FaBook className="text-4xl text-indigo-600 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
+            Resource Management
+          </h2>
+          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+            Add and manage Rules, Acts, Manuals, and Circulars.
+          </p>
+        </Link>
 
         {/* Visitor management  */}
         {/* <Link
@@ -199,8 +216,14 @@ const AdminDashboard = () => {
           <Route path="feedbackMgmt" element={<FeedbackManagement />} />
           <Route path="cghs" element={<CghsUnitManagement />} />
           <Route path="cghs-rates" element={<CghsRateManagement />} />
+          <Route path="resourceMgmt" element={<ResourceManagement />} />
+          <Route
+            path="resourceMgmt/:slug/sections"
+            element={<SectionEditor />}
+          />
           {/* <Route path="visitorManagement" element={<VisitorManagement />} /> */}
         </Routes>
+        <Outlet /> {/* ✅ Add this to render nested routes */}
       </div>
     </div>
   );

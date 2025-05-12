@@ -727,7 +727,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                 Scenario 2: Reduced Payout (40%) + Lumpsum
                 <span className="relative group cursor-pointer text-blue-600 ml-1">
                   ℹ️
-                  <div className="absolute bottom-full mb-1 right-1 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
+                  <div className="absolute bottom-full mb-1 left-1 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
                     Case where you take 60% of UPS corpus as lumpsum and receive
                     only 40% of monthly pension.
                   </div>

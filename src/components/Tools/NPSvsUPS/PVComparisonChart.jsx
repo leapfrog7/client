@@ -28,7 +28,7 @@ const PVComparisonChart = ({ nps, upsFull, upsReduced }) => {
       {
         label: "PV (₹ Cr)",
         data: [nps / 10000000, upsFull / 10000000, upsReduced / 10000000],
-        backgroundColor: ["#004d99", "#15803d", "#0e7490"],
+        backgroundColor: ["#e28743", "#15803d", "#560CD0"],
         borderRadius: 6,
         barThickness: 60,
       },
