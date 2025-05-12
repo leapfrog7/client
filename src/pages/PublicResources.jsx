@@ -55,7 +55,7 @@ const PublicResources = () => {
 
   return (
     <div className="p-4 md:p-8 md:w-11/12  min-h-screen mx-auto">
-      <div className="py-6 sm:py-8">
+      <div className="py-1">
         <div className=" mx-auto ">
           <h1 className="text-xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">
             <FaBookOpen className="inline-block mr-2 align-middle" /> Resources
@@ -95,19 +95,19 @@ const PublicResources = () => {
       ) : filteredResources.length === 0 ? (
         <p className="text-center text-gray-500">No matching rules found.</p>
       ) : (
-        <div className="grid gap-4 lg:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xlg:grid-cols-5">
+        <div className=" grid gap-4 lg:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xlg:grid-cols-5">
           {filteredResources.map((rule) => (
             <div
               key={rule.slug}
-              className="border rounded-lg p-4 md:p-5 lg:p-6 xlg:p-7 shadow-sm hover:shadow-md transition-all bg-white flex flex-col justify-between"
+              className="border py-4 shadow-sm hover:shadow-md transition-all bg-white flex flex-col justify-between rounded"
             >
-              <div>
-                <div className="flex items-center justify-center gap-1 md:gap-2 lg:gap-4 mb-2 bg-gray-100 p-1 rounded-lg">
-                  <span className="text-lg lg:text-3xl">
+              <div className="min-h-16">
+                <div className="flex items-center justify-center gap-1 md:gap-2 lg:gap-4 mb-2 bg-teal-50 w-full">
+                  <span className="text-lg lg:text-3xl ml-2">
                     {getIconForRule(rule)}
                   </span>
 
-                  <h2 className="text-sm md:text-base lg:text-lg font-semibold text-gray-800">
+                  <h2 className="text-center text-sm md:text-base lg:text-lg font-semibold text-gray-800 mr-2">
                     {rule.title}
                   </h2>
                 </div>
@@ -118,7 +118,7 @@ const PublicResources = () => {
                     className="w-full h-40 object-cover rounded mb-3"
                   />
                 )}
-                <p className="text-xs md:text-sm lg:text-base text-gray-600 line-clamp-3">
+                <p className="text-xs md:text-sm lg:text-base text-gray-600 line-clamp-3 px-4">
                   {rule.description}
                 </p>
               </div>
