@@ -292,7 +292,7 @@ const SectionEditor = () => {
             >
               Remove
             </button>
-            {block.type === "text" ? (
+            {block.type === "text" || block.type === "note" ? (
               <div className="bg-white border rounded p-2">
                 <ReactQuill
                   theme="snow"
@@ -304,11 +304,17 @@ const SectionEditor = () => {
                   placeholder="Write your content here..."
                   modules={{
                     toolbar: [
-                      ["bold", "italic", "underline"],
-                      [{ header: [1, 2, 3, false] }],
-                      [{ list: "ordered" }, { list: "bullet" }],
-                      ["link"],
-                      ["clean"],
+                      [{ header: [1, 2, 3, false] }], // Headers
+                      ["bold", "italic", "underline", "strike"], // Basic text formatting
+                      [{ list: "ordered" }, { list: "bullet" }], // Lists
+                      [{ script: "sub" }, { script: "super" }], // Subscript/superscript
+                      [{ indent: "-1" }, { indent: "+1" }], // Indentation
+                      [{ direction: "rtl" }], // Right-to-left
+                      [{ size: ["small", false, "large", "huge"] }], // Font size
+                      [{ color: [] }, { background: [] }], // Font color and background color
+                      ["link", "image", "video"], // Media
+                      ["blockquote", "code-block"], // Blockquotes and code blocks
+                      ["clean"], // Remove formatting
                     ],
                   }}
                 />

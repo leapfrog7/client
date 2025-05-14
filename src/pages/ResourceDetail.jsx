@@ -17,6 +17,8 @@ const ResourceDetail = () => {
   const [expandedSections, setExpandedSections] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pendingAnchor, setPendingAnchor] = useState(null);
+
   const navigate = useNavigate();
 
   const highlightText = (text, term) => {
@@ -106,6 +108,48 @@ const ResourceDetail = () => {
       return null;
     });
   };
+  useEffect(() => {
+    if (!loading && rule) {
+      const hash = window.location.hash;
+      if (!hash) return;
+
+      const targetIndex = rule.sections.findIndex((section) => {
+        const anchorId = `section-${section.ruleNumber
+          .replace(/\\s+/g, "-")
+          .toLowerCase()}`;
+        return `#${anchorId}` === hash;
+      });
+
+      if (targetIndex !== -1) {
+        const targetPage = Math.floor(targetIndex / itemsPerPage) + 1;
+        setPendingAnchor(hash); // store it temporarily
+        setCurrentPage(targetPage); // trigger re-render
+      }
+    }
+  }, [loading, rule]);
+
+  useEffect(() => {
+    if (!pendingAnchor) return;
+
+    const scrollToAnchor = () => {
+      const el = document.querySelector(pendingAnchor);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("ring-2", "ring-cyan-500", "rounded");
+        setTimeout(
+          () => el.classList.remove("ring-2", "ring-cyan-500", "rounded"),
+          2000
+        );
+        setPendingAnchor(null); // reset after scroll
+      } else {
+        // Try again shortly if element not yet rendered
+        setTimeout(scrollToAnchor, 100);
+      }
+    };
+
+    // Start trying to scroll
+    scrollToAnchor();
+  }, [currentPage, pendingAnchor]);
 
   if (loading || !rule) return <p className="p-4 text-center">Loading...</p>;
 
@@ -142,6 +186,27 @@ const ResourceDetail = () => {
       top: document.querySelector("#sections-title")?.offsetTop - 80,
       behavior: "smooth",
     });
+  };
+
+  const handleShare = (ruleNumber, ruleTitle) => {
+    const anchorId = `section-${ruleNumber
+      .replace(/\\s+/g, "-")
+      .toLowerCase()}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}#${anchorId}`;
+    const shareText = `${ruleNumber} – ${ruleTitle}`;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: ruleTitle,
+          text: shareText,
+          url: shareUrl,
+        })
+        .catch((err) => console.warn("Share cancelled or failed", err));
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      alert("📎 Link copied to clipboard!");
+    }
   };
 
   const renderPagination = () => {
@@ -298,10 +363,13 @@ const ResourceDetail = () => {
           const wordCount = fullTextContent.trim().split(/\s+/).length;
 
           const shouldClamp = wordCount > 400;
-
+          const anchorId = `section-${section.ruleNumber
+            .replace(/\\s+/g, "-")
+            .toLowerCase()}`;
           return (
             <li
               key={startIndex + idx}
+              id={anchorId}
               className="border border-gray-50 rounded px-2 py-2 bg-white shadow-sm"
             >
               <div className="my-2">
@@ -313,9 +381,17 @@ const ResourceDetail = () => {
                       searchTerm
                     ),
                   }}
+                />
+                {/* {section.ruleNumber} – {section.ruleTitle} */}
+
+                <button
+                  onClick={() =>
+                    handleShare(section.ruleNumber, section.ruleTitle)
+                  }
+                  className="text-xs text-cyan-700 hover:underline ml-2"
                 >
-                  {/* {section.ruleNumber} – {section.ruleTitle} */}
-                </p>
+                  📤 Share
+                </button>
                 <div className="mb-2 flex items-start">
                   <p
                     className="text-sm text-cyan-700 border border-cyan-100 bg-cyan-50 px-3 py-1 rounded-md italic my-1"
@@ -355,7 +431,7 @@ const ResourceDetail = () => {
 
                   <div className="flex justify-end">
                     <button
-                      onClick={() => toggleSection(idx)}
+                      onClick={() => toggleSection(startIndex + idx)}
                       className="text-xs px-2 py-1 bg-cyan-100 text-cyan-700 hover:underline rounded"
                     >
                       Show more

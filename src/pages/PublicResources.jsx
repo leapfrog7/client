@@ -102,7 +102,7 @@ const PublicResources = () => {
               className="border py-4 shadow-sm hover:shadow-md transition-all bg-white flex flex-col justify-between rounded"
             >
               <div className="min-h-16">
-                <div className="flex items-center justify-center gap-1 md:gap-2 lg:gap-4 mb-2 bg-teal-50 w-full">
+                <div className="py-2 flex items-center justify-center gap-1 md:gap-2 lg:gap-4 mb-2 bg-teal-50 w-full">
                   <span className="text-lg lg:text-3xl ml-2">
                     {getIconForRule(rule)}
                   </span>
