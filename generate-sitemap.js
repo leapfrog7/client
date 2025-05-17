@@ -1,7 +1,6 @@
 import { createWriteStream } from "fs";
 import { SitemapStream } from "sitemap";
 
-// List your routes here
 const links = [
   { url: "/", changefreq: "daily", priority: 1.0 },
   { url: "/register", changefreq: "weekly", priority: 0.8 },
@@ -47,30 +46,37 @@ const links = [
   { url: "/about", changefreq: "weekly", priority: 0.8 },
   { url: "/FAQs", changefreq: "weekly", priority: 0.8 },
   { url: "/subscribe", changefreq: "weekly", priority: 0.8 },
-
-  // Add other routes here
+  { url: "/pages/public/cghs-units", changefreq: "weekly", priority: 0.8 },
+  { url: "/pages/public/nps-or-ups", changefreq: "monthly", priority: 0.8 },
+  {
+    url: "/pages/public/7thCPC-paymatrix",
+    changefreq: "yearly",
+    priority: 0.8,
+  },
+  { url: "/pages/public/resources", changefreq: "yearly", priority: 0.8 },
+  {
+    url: "/pages/public/resources/general-financial-rules-2017",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
 ];
 
 const sitemapStream = new SitemapStream({
-  hostname: "https://undersigned.netlify.app/",
+  hostname: "https://undersigned.in", // ✅ updated
 });
 const writeStream = createWriteStream("./public/sitemap.xml");
-// Pipe the sitemapStream to writeStream
 sitemapStream.pipe(writeStream);
 
-// Write each link to the sitemap
 links.forEach((link) => {
   sitemapStream.write(link);
 });
 
-// End the stream
 sitemapStream.end();
 
-// Log success or handle errors
 sitemapStream.on("end", () => {
-  console.log("Sitemap generated successfully!");
+  console.log("✅ Sitemap generated for https://undersigned.in!");
 });
 
 sitemapStream.on("error", (error) => {
-  console.error("Error generating sitemap", error);
+  console.error("❌ Error generating sitemap", error);
 });
