@@ -9,6 +9,7 @@ import { IoMdWifi } from "react-icons/io";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import Select from "react-select";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 const validCities = [
   "Delhi",
@@ -159,6 +160,18 @@ const CghsUnitPublic = () => {
 
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
+      <Helmet>
+        <title>CGHS Units Directory | UnderSigned</title>
+        <meta
+          name="description"
+          content="Search and explore Central Government Health Scheme (CGHS) hospitals, labs, and wellness centres by city or location."
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/cghs-units"
+        />
+      </Helmet>
+
       <div className="text-center mb-8">
         <h2 className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
           🏥CGHS Empanelled Centers

@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+// import { HelmetProvider } from "react-helmet-async";
 
 // Components and Pages
 import Login from "./components/Login";

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import payMatrixData from "../../data/payMatrixData"; //Contains the pay matrix
+import Helmet from "react-helmet-async";
 
 const PayMatrix = () => {
   const payLevels = Object.keys(payMatrixData).sort((a, b) => {
@@ -49,6 +50,20 @@ const PayMatrix = () => {
 
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
+      <Helmet>
+        <title>
+          7th CPC Pay Matrix Viewer | Central Govt Pay Scales | UnderSigned
+        </title>
+        <meta
+          name="description"
+          content="Explore pay levels and increments under the 7th Central Pay Commission (CPC) using an interactive pay matrix designed for Central Government employees."
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/7thCPC-paymatrix"
+        />
+      </Helmet>
+
       <div className="py-3">
         <h1 className="text-xl md:text-2xl font-extrabold text-center mb-4 text-blue-900">
           7th CPC Pay Matrix — Made Easy for Mobile and Desktop

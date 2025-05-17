@@ -7,6 +7,7 @@ import {
   AiOutlineArrowRight,
 } from "react-icons/ai";
 import { FaBookOpen } from "react-icons/fa";
+import Helmet from "react-helmet-async";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
 // const BASE_URL = "http://localhost:5000";
@@ -63,6 +64,18 @@ const PublicResources = () => {
 
   return (
     <div className="p-4 md:p-8 md:w-11/12  min-h-screen mx-auto">
+      <Helmet>
+        <title>Government Rules & Acts Directory | UnderSigned</title>
+        <meta
+          name="description"
+          content="Access a centralized hub of government rules, acts, circulars, and manuals including GFR, FRSR, and more. Browse rule-wise explanations and bookmark important sections."
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/resources"
+        />
+      </Helmet>
+
       <div className="py-1">
         <div className=" mx-auto ">
           <h1 className="text-2xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">

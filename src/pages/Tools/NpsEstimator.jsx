@@ -9,6 +9,7 @@ import payMatrixData from "../../data/payMatrixData";
 import NpsUpsSummary from "../../components/Tools/NPSvsUPS/NpsUpsSummary";
 import NpsTableAccordion from "../../components/Tools/NPSvsUPS/NpsTableAccordion";
 import SimulationGuide from "../../components/Tools/NPSvsUPS/SimulationGuide";
+import { Helmet } from "react-helmet-async";
 
 // import NpsCalculator from "../../components/Tools/NPSvsUPS/NpsCalculator";
 
@@ -26,6 +27,20 @@ const NpsEstimator = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-8 space-y-2">
+      <Helmet>
+        <title>
+          NPS vs UPS Estimator | Pension Comparison Tool | UnderSigned
+        </title>
+        <meta
+          name="description"
+          content="Compare retirement benefits between the National Pension Scheme (NPS) and the Old Pension Scheme (UPS) with personalized calculations and insights."
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/nps-or-ups"
+        />
+      </Helmet>
+
       <h1 className="text-xl md:text-2xl font-extrabold text-center text-blue-800">
         Compare Your Retirement Options{" "}
         <span className="block">NPS or UPS</span>
