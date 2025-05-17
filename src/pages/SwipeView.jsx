@@ -31,14 +31,14 @@ const SwipeView = ({ sections, searchTerm, startIndex = 0, nightMode }) => {
         return (
           <div
             key={idx}
-            className={`snap-start h-screen px-2 py-4 flex flex-col justify-between transition-colors duration-300 ${
+            className={`snap-start h-screen flex flex-col justify-between transition-colors duration-300 ${
               nightMode
                 ? "bg-gray-300 text-gray-700"
                 : "bg-gradient-to-b from-gray-200 to-gray-700 text-gray-800"
             }`}
           >
             <div
-              className={`max-w-2xl mx-auto w-full flex-1 flex flex-col overflow-auto rounded-lg shadow-sm border p-4 transition-colors duration-300 ${
+              className={`mx-auto w-full flex-1 flex flex-col overflow-auto rounded-lg shadow-sm  p-2 transition-colors duration-300 ${
                 nightMode
                   ? "bg-gray-800 border-gray-700 text-gray-100"
                   : "bg-white border-gray-200 text-gray-800"
@@ -75,7 +75,7 @@ const SwipeView = ({ sections, searchTerm, startIndex = 0, nightMode }) => {
 
               {/* Content Blocks */}
               <div
-                className={`flex-1 space-y-4 leading-relaxed overflow-auto transition-colors ${
+                className={`flex-1 px-2 space-y-4 leading-relaxed overflow-auto transition-colors ${
                   nightMode ? "text-gray-200" : "text-gray-700"
                 }`}
               >
@@ -186,7 +186,7 @@ const SwipeView = ({ sections, searchTerm, startIndex = 0, nightMode }) => {
           </div>
         );
       })}
-      <div className="fixed bottom-16 right-12 z-50 flex items-center gap-4">
+      <div className="fixed bottom-8 right-12 z-50 flex items-center gap-4">
         {/* Exit Swipe View */}
         <button
           onClick={() => window.dispatchEvent(new Event("exitSwipe"))}
