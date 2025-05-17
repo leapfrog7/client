@@ -4,6 +4,9 @@ import axios from "axios";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import SectionCard from "./SectionCard"; // Adjust path if needed
+import SwipeView from "./SwipeView"; // adjust path
+import { FaListUl, FaRegImages, FaArrowLeft } from "react-icons/fa";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
 // const BASE_URL = "http://localhost:5000";
@@ -18,14 +21,9 @@ const ResourceDetail = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [pendingAnchor, setPendingAnchor] = useState(null);
+  const [isSwipeView, setIsSwipeView] = useState(false);
 
   const navigate = useNavigate();
-
-  const highlightText = (text, term) => {
-    if (!term || term.length < 3) return text;
-    const regex = new RegExp(`(${term})`, "gi");
-    return text.replace(regex, `<mark class="bg-yellow-200">$1</mark>`);
-  };
 
   useEffect(() => {
     const fetchRule = async () => {
@@ -51,63 +49,6 @@ const ResourceDetail = () => {
     }));
   };
 
-  const renderBlocks = (blocks) => {
-    return blocks.map((block, idx) => {
-      if (block.type === "text" || block.type === "note") {
-        return (
-          <div
-            key={idx}
-            className="prose max-w-none text-sm text-gray-600"
-            dangerouslySetInnerHTML={{
-              __html: highlightText(block.value, searchTerm),
-            }}
-          />
-        );
-      } else if (block.type === "image") {
-        return (
-          <div key={idx} className="my-4">
-            <img
-              src={block.value}
-              alt={block.caption || "Image"}
-              className="rounded max-h-64 w-full object-contain"
-            />
-            {block.caption && (
-              <p className="text-xs text-gray-700 italic mt-1">
-                {block.caption}
-              </p>
-            )}
-          </div>
-        );
-      } else if (block.type === "table" && Array.isArray(block.value)) {
-        return (
-          <div key={idx} className="overflow-x-auto my-4">
-            <table className="table-auto border text-sm w-full">
-              <tbody>
-                {block.value.map((row, rIdx) => (
-                  <tr key={rIdx}>
-                    {row.map((cell, cIdx) => (
-                      <td key={cIdx} className="border px-2 py-1">
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        );
-      } else if (block.type === "reference") {
-        return (
-          <p key={idx} className="text-sm text-blue-600 underline">
-            <a href={block.link} target="_blank" rel="noreferrer">
-              {block.value}
-            </a>
-          </p>
-        );
-      }
-      return null;
-    });
-  };
   useEffect(() => {
     if (!loading && rule) {
       const hash = window.location.hash;
@@ -115,7 +56,7 @@ const ResourceDetail = () => {
 
       const targetIndex = rule.sections.findIndex((section) => {
         const anchorId = `section-${section.ruleNumber
-          .replace(/\\s+/g, "-")
+          .replace(/\s+/g, "-")
           .toLowerCase()}`;
         return `#${anchorId}` === hash;
       });
@@ -131,25 +72,33 @@ const ResourceDetail = () => {
   useEffect(() => {
     if (!pendingAnchor) return;
 
+    let attempts = 0;
+    const maxAttempts = 20;
+
     const scrollToAnchor = () => {
+      console.log("Trying to scroll to", pendingAnchor);
       const el = document.querySelector(pendingAnchor);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
         el.classList.add("ring-2", "ring-cyan-500", "rounded");
-        setTimeout(
-          () => el.classList.remove("ring-2", "ring-cyan-500", "rounded"),
-          2000
-        );
-        setPendingAnchor(null); // reset after scroll
-      } else {
-        // Try again shortly if element not yet rendered
-        setTimeout(scrollToAnchor, 100);
+        setTimeout(() => {
+          el.classList.remove("ring-2", "ring-cyan-500", "rounded");
+        }, 2000);
+        setPendingAnchor(null);
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        requestAnimationFrame(scrollToAnchor); // Keep retrying
       }
     };
 
-    // Start trying to scroll
     scrollToAnchor();
   }, [currentPage, pendingAnchor]);
+
+  useEffect(() => {
+    const handleExit = () => setIsSwipeView(false);
+    window.addEventListener("exitSwipe", handleExit);
+    return () => window.removeEventListener("exitSwipe", handleExit);
+  }, []);
 
   if (loading || !rule) return <p className="p-4 text-center">Loading...</p>;
 
@@ -189,9 +138,7 @@ const ResourceDetail = () => {
   };
 
   const handleShare = (ruleNumber, ruleTitle) => {
-    const anchorId = `section-${ruleNumber
-      .replace(/\\s+/g, "-")
-      .toLowerCase()}`;
+    const anchorId = `section-${ruleNumber.replace(/\s+/g, "-").toLowerCase()}`;
     const shareUrl = `${window.location.origin}${window.location.pathname}#${anchorId}`;
     const shareText = `${ruleNumber} – ${ruleTitle}`;
 
@@ -295,9 +242,11 @@ const ResourceDetail = () => {
     );
   };
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto">
-      <h1 className="text-xl md:text-2xl font-bold text-center mb-4 text-teal-700 antialiased ">
+      <h1 className="text-xl md:text-2xl font-bold text-center mb-4 text-cyan-700 antialiased ">
         {rule.title}
       </h1>
       {rule.image && (
@@ -312,6 +261,34 @@ const ResourceDetail = () => {
       <p className="text-gray-700 mb-6 text-sm md:text-base text-center font-style: italic">
         {rule.description}
       </p>
+      <div className="flex justify-around gap-3 mb-4">
+        {/* Swipe View Toggle (only on mobile) */}
+        <button
+          onClick={() => setIsSwipeView((prev) => !prev)}
+          className="md:hidden flex items-center gap-2 px-3 py-2 text-xs font-medium text-blue-700 border border-blue-200 rounded-md bg-blue-50 hover:bg-blue-100 transition-colors"
+        >
+          {isSwipeView ? (
+            <>
+              <FaListUl className="text-xs" />
+              List View
+            </>
+          ) : (
+            <>
+              <FaRegImages className="text-xs" />
+              Swipe View
+            </>
+          )}
+        </button>
+
+        {/* Back to Resources (always visible) */}
+        <button
+          onClick={() => navigate("/pages/public/resources")}
+          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-teal-700 border border-teal-300 rounded-md bg-teal-50 hover:bg-teal-100 transition-colors"
+        >
+          <FaArrowLeft className="text-xs" />
+          Back to Resources
+        </button>
+      </div>
       <div className="max-w-3xl mx-auto my-4 relative">
         <input
           type="text"
@@ -338,111 +315,32 @@ const ResourceDetail = () => {
         )}
       </div>
       {renderPagination()} {/* Render pagination at the top */}
-      <div className="flex justify-end">
-        <button
-          onClick={() => navigate("/pages/public/resources")}
-          className="text-sm text-cyan-700 hover:underline inline-flex items-center text-right"
-        >
-          ← Back to Resources
-        </button>
-      </div>
-      <ul className="space-y-2 mt-4">
-        {currentSections.map((section, idx) => {
-          const isExpanded = expandedSections[startIndex + idx]; // Adjust index for pagination
-
-          // Combine all block content for word count
-          const fullTextContent = section.contentBlocks
-            .filter((b) => b.type === "text" || b.type === "note")
-            .map((b) => {
-              const temp = document.createElement("div");
-              temp.innerHTML = b.value;
-              return temp.textContent || "";
-            })
-            .join(" ");
-
-          const wordCount = fullTextContent.trim().split(/\s+/).length;
-
-          const shouldClamp = wordCount > 400;
-          const anchorId = `section-${section.ruleNumber
-            .replace(/\\s+/g, "-")
-            .toLowerCase()}`;
-          return (
-            <li
-              key={startIndex + idx}
-              id={anchorId}
-              className="border border-gray-50 rounded px-2 py-2 bg-white shadow-sm"
-            >
-              <div className="my-2">
-                <p
-                  className="font-semibold text-gray-700 text-sm md:text-base "
-                  dangerouslySetInnerHTML={{
-                    __html: highlightText(
-                      `${section.ruleNumber} – ${section.ruleTitle}`,
-                      searchTerm
-                    ),
-                  }}
-                />
-                {/* {section.ruleNumber} – {section.ruleTitle} */}
-
-                <button
-                  onClick={() =>
-                    handleShare(section.ruleNumber, section.ruleTitle)
-                  }
-                  className="text-xs text-cyan-700 hover:underline ml-2"
-                >
-                  📤 Share
-                </button>
-                <div className="mb-2 flex items-start">
-                  <p
-                    className="text-sm text-cyan-700 border border-cyan-100 bg-cyan-50 px-3 py-1 rounded-md italic my-1"
-                    dangerouslySetInnerHTML={{
-                      __html: highlightText(section.chapterTitle, searchTerm),
-                    }}
-                  >
-                    {/* {section.chapterTitle} */}
-                  </p>
-                </div>
-              </div>
-
-              {!shouldClamp || isExpanded ? (
-                <div className="p-2 bg-teal-50 rounded-lg border border-teal-400">
-                  <div className="mb-0 ">
-                    {renderBlocks(section.contentBlocks)}
-                  </div>
-                  {shouldClamp && (
-                    <div className="flex justify-end">
-                      <button
-                        onClick={() => toggleSection(startIndex + idx)}
-                        className="text-xs px-2 py-1 bg-cyan-100 text-cyan-700 hover:underline rounded"
-                      >
-                        Show less
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-teal-50 p-2 rounded-lg border border-teal-400">
-                  <p
-                    className="text-sm text-gray-700 line-clamp-6 mb-2"
-                    dangerouslySetInnerHTML={{
-                      __html: highlightText(fullTextContent, searchTerm),
-                    }}
-                  />
-
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => toggleSection(startIndex + idx)}
-                      className="text-xs px-2 py-1 bg-cyan-100 text-cyan-700 hover:underline rounded"
-                    >
-                      Show more
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {isSwipeView && isMobile ? (
+        <SwipeView
+          sections={filteredSections}
+          searchTerm={searchTerm}
+          startIndex={startIndex}
+        />
+      ) : (
+        <>
+          <ul className="space-y-4 mt-4" id="sections-title">
+            {currentSections.map((section, idx) => (
+              <SectionCard
+                key={startIndex + idx}
+                index={startIndex + idx}
+                section={section}
+                searchTerm={searchTerm}
+                isExpanded={expandedSections[startIndex + idx] || false}
+                toggleSection={toggleSection}
+                renderAnchorId={(ruleNumber) =>
+                  `section-${ruleNumber.replace(/\s+/g, "-").toLowerCase()}`
+                }
+                handleShare={handleShare}
+              />
+            ))}
+          </ul>
+        </>
+      )}
       {renderPagination()}
     </div>
   );

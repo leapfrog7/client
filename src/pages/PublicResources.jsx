@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
+import {
+  AiOutlineSearch,
+  AiOutlineClose,
+  AiOutlineArrowRight,
+} from "react-icons/ai";
 import { FaBookOpen } from "react-icons/fa";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
@@ -33,7 +37,11 @@ const PublicResources = () => {
     const fetchResources = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/api/v1/public/resources`);
-        setResources(res.data);
+        setResources(
+          res.data.filter(
+            (rule) => rule.description && rule.description.trim().length > 0
+          )
+        );
       } catch (err) {
         console.error("Failed to fetch resources", err);
       } finally {
@@ -57,7 +65,7 @@ const PublicResources = () => {
     <div className="p-4 md:p-8 md:w-11/12  min-h-screen mx-auto">
       <div className="py-1">
         <div className=" mx-auto ">
-          <h1 className="text-xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">
+          <h1 className="text-2xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">
             <FaBookOpen className="inline-block mr-2 align-middle" /> Resources
           </h1>
           <h2 className="font-style: italic text-sm md:text-base mb-6 text-center text-gray-500">
@@ -99,37 +107,45 @@ const PublicResources = () => {
           {filteredResources.map((rule) => (
             <div
               key={rule.slug}
-              className="border py-4 shadow-sm hover:shadow-md transition-all bg-white flex flex-col justify-between rounded"
+              className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between"
             >
-              <div className="min-h-16">
-                <div className="py-2 flex items-center justify-center gap-1 md:gap-2 lg:gap-4 mb-2 bg-teal-50 w-full">
-                  <span className="text-lg lg:text-3xl ml-2">
+              {/* Title Bar */}
+              <div className="bg-gradient-to-r from-pink-50 to-cyan-50 p-3 flex items-center justify-between rounded-t-xl border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl lg:text-2xl">
                     {getIconForRule(rule)}
                   </span>
-
-                  <h2 className="text-center text-sm md:text-base lg:text-lg font-semibold text-gray-800 mr-2">
+                  <h2 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 line-clamp-2">
                     {rule.title}
                   </h2>
                 </div>
-                {rule.image && (
-                  <img
-                    src={rule.image}
-                    alt={rule.title}
-                    className="w-full h-40 object-cover rounded mb-3"
-                  />
-                )}
-                <p className="text-xs md:text-sm lg:text-base text-gray-600 line-clamp-3 px-4">
+              </div>
+
+              {/* Image Section */}
+              {rule.image && (
+                <img
+                  src={rule.image}
+                  alt={rule.title}
+                  className="w-full h-40 object-cover rounded-b-none rounded-t-none"
+                />
+              )}
+
+              {/* Description */}
+              <div className="px-4 py-3 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 line-clamp-3 leading-relaxed">
                   {rule.description}
                 </p>
               </div>
-              <div className="mx-4 mt-6 lg:mx-16">
+
+              {/* Button */}
+              <div className="px-2 pb-4 mx-auto">
                 <button
                   onClick={() =>
                     navigate(`/pages/public/resources/${rule.slug}`)
                   }
-                  className="w-full text-center px-4 py-2 text-sm font-medium bg-cyan-500 text-white rounded hover:bg-cyan-700 transition"
+                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors duration-200"
                 >
-                  Expand
+                  View Details <AiOutlineArrowRight className="text-base" />
                 </button>
               </div>
             </div>

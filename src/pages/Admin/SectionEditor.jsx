@@ -84,7 +84,7 @@ const SectionEditor = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const sectionsPerPage = 5;
 
-  //   const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
+  // const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
 
   const getPaginationButtons = () => {
     const buttons = [];
