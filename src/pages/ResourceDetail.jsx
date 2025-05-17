@@ -25,6 +25,14 @@ const ResourceDetail = () => {
 
   const navigate = useNavigate();
 
+  const [nightMode, setNightMode] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setNightMode((prev) => !prev);
+    window.addEventListener("toggleNightMode", handleToggle);
+    return () => window.removeEventListener("toggleNightMode", handleToggle);
+  }, []);
+
   useEffect(() => {
     const fetchRule = async () => {
       try {
@@ -320,6 +328,7 @@ const ResourceDetail = () => {
           sections={filteredSections}
           searchTerm={searchTerm}
           startIndex={startIndex}
+          nightMode={nightMode}
         />
       ) : (
         <>
