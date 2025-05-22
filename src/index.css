@@ -20,14 +20,18 @@
   pointer-events: none; /* Allow touches to pass through images */
 }
 
-.ql-size-small {
-  font-size: 0.75rem; /* Tailwind text-sm */
+.prose .ql-size-small {
+  font-size: 0.8rem; /* Tailwind text-sm */
 }
 
-.ql-size-large {
+.prose .ql-size-normal {
+  font-size: 1rem; /* Tailwind text-sm */
+}
+
+.prose .ql-size-large {
   font-size: 1.25rem; /* Tailwind text-lg */
 }
 
-.ql-size-huge {
+.prose .ql-size-huge {
   font-size: 1.5rem; /* Tailwind text-xl or 2xl */
 }
