@@ -7,7 +7,7 @@ import {
   AiOutlineArrowRight,
 } from "react-icons/ai";
 import { FaBookOpen } from "react-icons/fa";
-import Helmet from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
 // const BASE_URL = "http://localhost:5000";

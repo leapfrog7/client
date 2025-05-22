@@ -12,8 +12,7 @@ const ContentBlock = ({ block, searchTerm }) => {
     case "text":
       return (
         <div
-          className="prose mmax-w-prose mx-auto
-   text-sm text-gray-700  leading-relaxed"
+          className={`prose prose-sm md:prose-base prose-slate max-w-none mx-auto transition-colors duration-300 `}
           dangerouslySetInnerHTML={{
             __html: highlightText(block.value, searchTerm),
           }}
@@ -27,7 +26,7 @@ const ContentBlock = ({ block, searchTerm }) => {
             Note
           </span>
           <div
-            className="text-sm italic text-gray-700"
+            className="text-sm md:text-sm italic text-gray-700 prose prose-sm md:prose-base prose-slate"
             dangerouslySetInnerHTML={{
               __html: highlightText(block.value, searchTerm),
             }}

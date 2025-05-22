@@ -1,6 +1,6 @@
 import { useState } from "react";
 import payMatrixData from "../../data/payMatrixData"; //Contains the pay matrix
-import Helmet from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 
 const PayMatrix = () => {
   const payLevels = Object.keys(payMatrixData).sort((a, b) => {

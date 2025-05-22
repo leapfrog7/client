@@ -19,3 +19,15 @@
 .carousel img {
   pointer-events: none; /* Allow touches to pass through images */
 }
+
+.ql-size-small {
+  font-size: 0.75rem; /* Tailwind text-sm */
+}
+
+.ql-size-large {
+  font-size: 1.25rem; /* Tailwind text-lg */
+}
+
+.ql-size-huge {
+  font-size: 1.5rem; /* Tailwind text-xl or 2xl */
+}
