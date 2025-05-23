@@ -165,6 +165,12 @@ const PublicResources = () => {
           ))}
         </div>
       )}
+
+      <blockquote className="px-4 mt-16 text-xl italic font-semibold text-gray-500 dark:text-white">
+        <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+        <p className="text-center">We are in process of adding more rules...</p>
+        <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+      </blockquote>
     </div>
   );
 };

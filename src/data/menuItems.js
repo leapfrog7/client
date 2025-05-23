@@ -1,4 +1,4 @@
-import { FiUserPlus, FiBriefcase } from "react-icons/fi";
+import { FiBriefcase } from "react-icons/fi";
 import { FaGavel, FaQuestionCircle, FaBook, FaSearch } from "react-icons/fa";
 import { LuFileSearch } from "react-icons/lu";
 import { GiReceiveMoney } from "react-icons/gi";
@@ -16,6 +16,7 @@ import { BsTools } from "react-icons/bs";
 import { CiHospital1 } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { VscTable } from "react-icons/vsc";
+import { FaBookReader } from "react-icons/fa";
 
 export const navItems = [
   {
@@ -117,11 +118,11 @@ export const navItems = [
     ],
   },
 
-  {
-    label: "Register",
-    path: "/register",
-    icon: FiUserPlus,
-  },
+  // {
+  //   label: "Register",
+  //   path: "/register",
+  //   icon: FiUserPlus,
+  // },
   {
     label: "Utilities",
     path: null,
@@ -143,5 +144,10 @@ export const navItems = [
         icon: VscTable, // Matching your Economy icon style
       },
     ],
+  },
+  {
+    label: "Resources",
+    path: "/pages/public/resources",
+    icon: FaBookReader,
   },
 ];
