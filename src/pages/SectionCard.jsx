@@ -1,6 +1,8 @@
 // import React from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import ContentBlock from "./ContentBlock"; // adjust path as needed
+import { HiSpeakerWave, HiPlay, HiPause } from "react-icons/hi2";
 
 const SectionCard = ({
   section,
@@ -26,6 +28,57 @@ const SectionCard = ({
 
   const anchorId = renderAnchorId(section.ruleNumber);
 
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [hindiVoice, setHindiVoice] = useState(null);
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = speechSynthesis.getVoices();
+      const hiVoice = voices.find(
+        (v) => v.lang === "hi-IN" || v.name.toLowerCase().includes("hindi")
+      );
+      if (hiVoice) setHindiVoice(hiVoice);
+    };
+
+    // Chrome sometimes loads voices async
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    // Try initial load too
+    loadVoices();
+  }, []);
+
+  const speakSection = () => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const combinedText = `${section.ruleNumber}, ${section.ruleTitle}. ${fullTextContent}`;
+    const utterance = new SpeechSynthesisUtterance(combinedText);
+    utterance.lang = "hi-IN";
+    if (hindiVoice) {
+      utterance.voice = hindiVoice;
+    }
+    utterance.onend = () => setIsSpeaking(false);
+    speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+    setIsPaused(false);
+  };
+  const togglePauseResume = () => {
+    if (!speechSynthesis.speaking) return;
+    if (speechSynthesis.paused) {
+      speechSynthesis.resume();
+      setIsPaused(false);
+    } else {
+      speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
+
   return (
     <li
       key={index}
@@ -42,14 +95,40 @@ const SectionCard = ({
             ),
           }}
         />
-        <button
-          onClick={() => handleShare(section.ruleNumber, section.ruleTitle)}
-          className="text-sm text-cyan-600 hover:text-cyan-800 transition-colors flex items-center gap-1"
-          title="Copy shareable link"
-        >
-          <span className="text-base">🔗</span>
-          <span className="hidden sm:inline text-xs font-medium">Share</span>
-        </button>
+
+        <div className="flex gap-2 items-center">
+          {isSpeaking ? (
+            <button
+              onClick={togglePauseResume}
+              className="text-sm text-gray-600 hover:text-gray-800"
+              title={isPaused ? "Resume" : "Pause"}
+            >
+              {isPaused ? (
+                <HiPlay className="text-lg" />
+              ) : (
+                <HiPause className="text-lg" />
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={speakSection}
+              className="text-sm text-gray-600 hover:text-gray-800"
+              title="Listen to this section"
+            >
+              <HiSpeakerWave className="text-lg" />
+            </button>
+          )}
+
+          {/* ✅ Share Button using handleShare */}
+          <button
+            onClick={() => handleShare(section.ruleNumber, section.ruleTitle)}
+            className="text-sm text-cyan-600 hover:text-cyan-800 transition-colors flex items-center gap-1"
+            title="Copy shareable link"
+          >
+            <span className="text-base">🔗</span>
+            <span className="hidden sm:inline text-xs font-medium">Share</span>
+          </button>
+        </div>
       </div>
 
       {section.chapterTitle && (
