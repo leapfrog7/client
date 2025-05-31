@@ -186,6 +186,7 @@ const topicNameMap = {
   FR: "FR_SR",
   Economy: "CA_Economy",
   "Govt. Schemes": "CA_Schemes",
+  "TA Rules": "TA_Rules",
 };
 
 TopicHeading.propTypes = {

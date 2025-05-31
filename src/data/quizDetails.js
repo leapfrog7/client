@@ -10,6 +10,7 @@ import { TbReportSearch } from "react-icons/tb";
 import { LiaNetworkWiredSolid } from "react-icons/lia";
 import { TfiAgenda } from "react-icons/tfi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
+import { MdModeOfTravel } from "react-icons/md";
 
 export const paperI_Items = [
   {
@@ -81,6 +82,11 @@ export const paperII_Items = [
     icon: GiPayMoney,
     title: "CSMOP 2022",
     description: "Manual of Office Procedure (CSMOP).",
+  },
+  {
+    icon: MdModeOfTravel,
+    title: "TA Rules",
+    description: "Travelling Allowance Rules",
   },
 ];
 

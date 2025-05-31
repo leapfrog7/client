@@ -17,6 +17,7 @@ import { CiHospital1 } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { VscTable } from "react-icons/vsc";
 import { FaBookReader } from "react-icons/fa";
+import { MdModeOfTravel } from "react-icons/md";
 
 export const navItems = [
   {
@@ -114,6 +115,11 @@ export const navItems = [
         label: "Office Procedure",
         path: "/pages/quiz/paper-ii/csmop",
         icon: FiBriefcase,
+      },
+      {
+        label: "TA Rules",
+        path: "pages/quiz/paper-ii/ta-rules",
+        icon: MdModeOfTravel,
       },
     ],
   },

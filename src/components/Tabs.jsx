@@ -10,8 +10,8 @@ const Tabs = ({ userId, topicName }) => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("jwtToken");
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
-  // const BASE_URL = "http://localhost:5000/api/v1";
+  // const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  const BASE_URL = "http://localhost:5000/api/v1";
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);

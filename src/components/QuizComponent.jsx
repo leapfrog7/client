@@ -323,7 +323,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               )}
             </button>
             {/* {console.log(quizData[currentQuestionIndex]._id)} */}
-            <QuestionFeedback questionId={quizData[currentQuestionIndex]._id} />
 
             {showExplanation[currentQuestionIndex] && (
               <div className="mt-4 text-gray-700 text-sm md:text-base space-y-3">
@@ -363,6 +362,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               </button>
             </div>
           )}
+          <div className="mt-2">
+            <QuestionFeedback questionId={quizData[currentQuestionIndex]._id} />
+          </div>
         </div>
       ) : (
         <div className="bg-white p-6 rounded-lg shadow-md">

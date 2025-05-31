@@ -31,6 +31,7 @@ import CA_Schemes from "./pages/quiz/CA_Schemes";
 import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
+import TARules from "./pages/quiz/TARules";
 
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
@@ -135,6 +136,11 @@ const App = () => {
         title: "FR",
         progress: "0",
         path: "/pages/quiz/paper-ii/fr_sr",
+      },
+      {
+        title: "TA Rules",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/ta_rules",
       },
     ],
   });
@@ -341,6 +347,17 @@ const App = () => {
                   progress={userStats.paperII[5].progress}
                   quizAttempted={String(
                     userStats.paperII[5].attemptedQuestions
+                  )}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-ii/ta_rules"
+              element={
+                <TARules
+                  progress={userStats.paperII[7].progress}
+                  quizAttempted={String(
+                    userStats.paperII[7].attemptedQuestions
                   )}
                 />
               }
