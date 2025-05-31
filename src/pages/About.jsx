@@ -12,7 +12,7 @@ const About = () => {
           name="description"
           content="Learn more about Your Website Name, our vision, and how we strive to provide the best quizzes on various topics for SO LDCE."
         />
-        <link rel="canonical" href="https://undersigned.netlify.app/about" />
+        <link rel="canonical" href="https://undersigned.in/about" />
         <meta property="og:title" content="About Us - UnderSigned" />
         <meta
           property="og:description"

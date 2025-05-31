@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const FAQPage = () => {
   const [openQuestionIndex, setOpenQuestionIndex] = useState(null);
@@ -101,16 +101,13 @@ const FAQPage = () => {
           name="description"
           content="Find answers to frequently asked questions about UnderSigned. Questions like How to Register and Subscribe. How to make payment. Features or Tools available for MCQs etc."
         />
-        <link rel="canonical" href="https://undersigned.netlify.app/FAQs" />
+        <link rel="canonical" href="https://undersigned.in/FAQs" />
         <meta property="og:title" content="FAQ - UnderSigned" />
         <meta
           property="og:description"
           content="Find answers to frequently asked questions about UnderSigned."
         />
-        <meta
-          property="og:url"
-          content="https://undersigned.netlify.app/FAQs"
-        />
+        <meta property="og:url" content="https://undersigned.in/FAQs" />
         <meta property="og:type" content="website" />
       </Helmet>
       <h1 className="bg-white rounded-md text-lg md:text-xl lg:text-2xl font-bold mb-6 text-center text-gray-700 flex gap-2 items-center justify-center">

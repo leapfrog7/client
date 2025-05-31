@@ -1,6 +1,6 @@
 import "tailwindcss/tailwind.css";
 import { FaWhatsapp } from "react-icons/fa";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { MdAppRegistration, MdPayment, MdCheckCircle } from "react-icons/md";
 
 const Subscribe = () => {
@@ -11,6 +11,7 @@ const Subscribe = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-200 to-indigo-200 text-white p-6">
       <Helmet>
         <title>Subscription - UnderSigned</title>
+        <link rel="canonical" href="https://undersigned.in/subscribe" />
         <meta
           name="description"
           content="Subscribe to our platform to gain access to exclusive quizzes tailored for the SO LDCE exam. We offer MCQ-based quizzes for Paper I and Paper II, with explanations for each concept or rule."

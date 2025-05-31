@@ -6,7 +6,7 @@ import {
   AiOutlineClose,
   AiOutlineArrowRight,
 } from "react-icons/ai";
-import { FaBookOpen } from "react-icons/fa";
+// import { FaBookOpen } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
@@ -79,7 +79,8 @@ const PublicResources = () => {
       <div className="py-1">
         <div className=" mx-auto ">
           <h1 className="text-2xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">
-            <FaBookOpen className="inline-block mr-2 align-middle" /> Resources
+            {/* <FaBookOpen className="inline-block mr-2 align-middle" />{" "} */}
+            <span className="font-extrabold tracking-wider">📚 Resources</span>
           </h1>
           <h2 className="font-style: italic text-sm md:text-base mb-6 text-center text-gray-500">
             Your central hub for all essential Government Rules and Regulations.

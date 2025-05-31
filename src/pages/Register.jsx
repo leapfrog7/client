@@ -5,7 +5,7 @@ import axios from "axios";
 ///import { jwtDecode } from "jwt-decode";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import TermsAndConditions from "../components/TermsAndConditions";
 import {
   FaUser,
@@ -166,19 +166,13 @@ export default function Register() {
             name="description"
             content="Create an account on UnderSigned to start taking quizzes and tracking your progress. Registration is quick and easy."
           />
-          <link
-            rel="canonical"
-            href="https://undersigned.netlify.app/register"
-          />
+          <link rel="canonical" href="https://undersigned.in/register" />
           <meta property="og:title" content="Register - UnderSigned" />
           <meta
             property="og:description"
             content="Create an account on UnderSigned to start taking quizzes and tracking your progress. Registration is quick and easy."
           />
-          <meta
-            property="og:url"
-            content="https://undersigned.netlify.app/register"
-          />
+          <meta property="og:url" content="https://undersigned.in/register" />
           <meta property="og:type" content="website" />
         </Helmet>
         {/* {username && <div> Hi, {username}</div>} */}

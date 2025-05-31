@@ -5,7 +5,7 @@ import Dashboard from "../components/Dashboard";
 import { useEffect } from "react";
 // import FeatureCarousel from "../components/FeatureCarousel";
 import AccountActivationNotice from "../components/AccountActivationNotice";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 // import { SiTestrail } from "react-icons/si";
 // import { RiContactsBook3Line } from "react-icons/ri";
 import NewCarousel from "../components/NewCarousel";
@@ -28,7 +28,8 @@ const Home = ({
   return (
     <div className="bg-white flex flex-col w-full xl:w-4/5 mx-auto">
       <Helmet>
-        <title>Home Page - UnderSigned</title>
+        <title>Home - UnderSigned</title>
+        <link rel="canonical" href="https://undersigned.in/" />
         <meta
           name="description"
           content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC) for promotion to SO or PS grade"
