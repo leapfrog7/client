@@ -172,6 +172,36 @@ const PublicResources = () => {
         <p className="text-center">We are in process of adding more rules...</p>
         <hr className="h-px my-8 bg-gray-200 border-0 "></hr>
       </blockquote>
+
+      <div className="mt-24 bg-gradient-to-r from-cyan-50 to-blue-50 border border-blue-100 rounded-xl shadow-md p-6 my-8 max-w-4xl mx-auto">
+        <h2 className="text-sm md:text-xl font-semibold text-blue-800 mb-3 text-center">
+          Why This Matters? 🤔💭
+        </h2>
+        <p className="text-xs md:text-base text-gray-700 leading-relaxed">
+          Government rules and guidelines, frequently needed for Secretariat
+          work, are freely available but scattered across various platforms —
+          often buried in unsearchable or hard-to-navigate PDFs. At{" "}
+          <span className="font-medium text-blue-900">UnderSigned</span>, our
+          mission is to build a
+          <span className="font-semibold text-blue-700">
+            {" "}
+            unified, searchable, and free repository{" "}
+          </span>
+          of publicly available government content — from rules and circulars to
+          manuals and notifications. We believe access to such knowledge should
+          be
+          <span className="font-semibold text-pink-700">
+            {" "}
+            effortless, empowering,{" "}
+          </span>
+          and{" "}
+          <span className="font-semibold text-pink-700">
+            {" "}
+            freely available
+          </span>{" "}
+          to every government employee .
+        </p>
+      </div>
     </div>
   );
 };
