@@ -41,6 +41,7 @@ import AddMDO from "./pages/quiz/AddMDO";
 import AoBR_Full from "./pages/AoBR_Full";
 import AoBR_Lookup from "./pages/AoBR_Lookup";
 import PreviousYearQuiz from "./pages/quiz/previousYear/Exam";
+import EmailOtpReset from "./pages/EmailOtpReset";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 
@@ -280,6 +281,7 @@ const App = () => {
             />
 
             <Route path="/register" element={<Register />} />
+            <Route path="/reset-password" element={<EmailOtpReset />} />
             <Route path="/subscribe" element={<Subscribe />} />
             <Route path="/FAQs" element={<FAQPage />} />
             <Route path="/about" element={<About />} />
