@@ -121,6 +121,10 @@ const Home = ({
       <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""}`}>
         <PricingSection />
       </div>
+      <div className={`${isLoggedIn ? (isPaymentMade ? "hidden" : "") : ""} `}>
+        <QuickLinksCarousel />
+      </div>
+
       <div className="mx-auto w-full overflow-y-auto mt-2">
         {!isLoggedIn && (
           <div>
@@ -181,6 +185,7 @@ const Home = ({
 };
 
 import PropTypes from "prop-types";
+import QuickLinksCarousel from "../components/QuickLinksCarousel";
 
 // import { Carousel } from "react-responsive-carousel";
 
