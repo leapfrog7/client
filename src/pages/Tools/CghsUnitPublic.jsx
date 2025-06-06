@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet-async";
 
 const validCities = [
   "Delhi",
-  // "Gurugram",
+  "Gurugram",
   "Faridabad",
   "Ghaziabad",
   "Noida",
