@@ -527,7 +527,7 @@ const SectionEditor = () => {
 
                             {block.type === "text" || block.type === "note" ? (
                               <div
-                                className="prose max-w-none text-sm"
+                                className="prose max-w-none text-sm [&_p]:my-1"
                                 dangerouslySetInnerHTML={{
                                   __html: block.value,
                                 }}

@@ -253,7 +253,7 @@ const ResourceDetail = () => {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
-    <div className="p-4 md:p-8 md:w-11/12 mx-auto">
+    <div className="p-2 md:p-8 md:w-11/12 mx-auto">
       <h1 className="text-xl md:text-2xl font-bold text-center mb-4 text-cyan-700 antialiased ">
         {rule.title}
       </h1>

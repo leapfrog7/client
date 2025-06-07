@@ -35,3 +35,18 @@
 .prose .ql-size-huge {
   font-size: 1.5rem; /* Tailwind text-xl or 2xl */
 }
+
+.ql-indent-1 {
+  padding-left: 1rem;
+}
+.ql-indent-2 {
+  padding-left: 2rem;
+}
+.ql-indent-3 {
+  padding-left: 3rem;
+}
+.ql-indent-4 {
+  padding-left: 4rem;
+}
+
+/* Add more if needed */

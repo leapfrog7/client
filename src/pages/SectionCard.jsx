@@ -83,7 +83,7 @@ const SectionCard = ({
     <li
       key={index}
       id={anchorId}
-      className="border border-gray-100 rounded-lg bg-gray-50 shadow-sm p-4 md:p-5"
+      className="border border-gray-100 rounded-lg bg-gray-50 shadow-sm p-2 md:p-5"
     >
       <div className="mb-2 flex justify-between items-start gap-2 flex-wrap">
         <p

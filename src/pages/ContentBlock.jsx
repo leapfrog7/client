@@ -12,7 +12,7 @@ const ContentBlock = ({ block, searchTerm }) => {
     case "text":
       return (
         <div
-          className={`prose prose-sm md:prose-base prose-slate max-w-none mx-auto transition-colors duration-300 `}
+          className={`prose prose-sm md:prose-base prose-slate max-w-none mx-auto transition-colors duration-300 [&_p]:my-1 `}
           dangerouslySetInnerHTML={{
             __html: highlightText(block.value, searchTerm),
           }}
@@ -21,12 +21,12 @@ const ContentBlock = ({ block, searchTerm }) => {
 
     case "note":
       return (
-        <div className="relative bg-yellow-50 border-l-4 border-yellow-400 px-4 py-3 rounded-md shadow-sm">
+        <div className="relative bg-yellow-50 border-l-2 border-yellow-400 pl-2 py-3 rounded-md shadow-sm">
           {/* <span className="absolute -top-3 left-2 text-xs bg-yellow-400 text-white px-2 py-0.5 rounded">
             Note
           </span> */}
           <div
-            className="prose prose-sm md:prose-base leading-relaxed text-gray-700 max-w-none"
+            className="prose prose-sm md:prose-base leading-relaxed text-gray-700 max-w-none [&_p]:my-1"
             dangerouslySetInnerHTML={{
               __html: highlightText(block.value, searchTerm),
             }}
