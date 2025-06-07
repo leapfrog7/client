@@ -165,7 +165,7 @@ const SectionCard = ({
         ) : (
           <div>
             <p
-              className="text-sm text-gray-700 line-clamp-6 mb-2"
+              className="text-sm md:text-base text-gray-700 line-clamp-6 mb-2 leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: fullTextContent.replace(
                   new RegExp(`(${searchTerm})`, "gi"),
@@ -176,7 +176,7 @@ const SectionCard = ({
             <div className="flex justify-end">
               <button
                 onClick={() => toggleSection(index)}
-                className="text-xs px-2 py-1 bg-cyan-50 text-cyan-700 hover:underline rounded"
+                className="text-xs md:text-sm px-2 py-1 bg-cyan-50 text-cyan-700 hover:underline rounded"
               >
                 Show more
               </button>

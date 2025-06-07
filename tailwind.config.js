@@ -3,11 +3,11 @@ import typography from "@tailwindcss/typography";
 
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  safelist: [
-    {
-      pattern: /ql-indent-\d+/,
-    },
-  ],
+  // safelist: [
+  //   {
+  //     pattern: /ql-indent-\d+/,
+  //   },
+  // ],
   theme: {
     extend: {
       colors: {
