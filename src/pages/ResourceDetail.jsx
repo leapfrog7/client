@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
@@ -108,48 +109,88 @@ const ResourceDetail = () => {
     return () => window.removeEventListener("exitSwipe", handleExit);
   }, []);
 
+  const filteredSections = useMemo(() => {
+    if (!rule) return [];
+    if (searchTerm.length < 3) return rule.sections;
+
+    const lower = searchTerm.toLowerCase();
+
+    return rule.sections.filter((section) => {
+      const inMetadata =
+        section.ruleNumber?.toLowerCase().includes(lower) ||
+        section.ruleTitle?.toLowerCase().includes(lower) ||
+        section.chapterTitle?.toLowerCase().includes(lower);
+
+      const inContentBlock = section.contentBlocks.some((b) => {
+        if (
+          (b.type === "text" || b.type === "note") &&
+          typeof b.value === "string"
+        ) {
+          return b.value.toLowerCase().includes(lower);
+        }
+
+        if (b.type === "table" && Array.isArray(b.value)) {
+          return b.value.some((row) =>
+            row.some(
+              (cell) =>
+                typeof cell === "string" && cell.toLowerCase().includes(lower)
+            )
+          );
+        }
+
+        return false;
+      });
+
+      return inMetadata || inContentBlock;
+    });
+  }, [rule, searchTerm]);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentSections = useMemo(() => {
+    return filteredSections.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredSections, startIndex]);
+
   if (loading || !rule) return <p className="p-4 text-center">Loading...</p>;
 
-  const filteredSections =
-    searchTerm.length >= 3
-      ? rule.sections.filter((section) => {
-          const lower = searchTerm.toLowerCase();
+  // const filteredSections =
+  //   searchTerm.length >= 3
+  //     ? rule.sections.filter((section) => {
+  //         const lower = searchTerm.toLowerCase();
 
-          const inMetadata =
-            section.ruleNumber?.toLowerCase().includes(lower) ||
-            section.ruleTitle?.toLowerCase().includes(lower) ||
-            section.chapterTitle?.toLowerCase().includes(lower);
+  //         const inMetadata =
+  //           section.ruleNumber?.toLowerCase().includes(lower) ||
+  //           section.ruleTitle?.toLowerCase().includes(lower) ||
+  //           section.chapterTitle?.toLowerCase().includes(lower);
 
-          const inContentBlock = section.contentBlocks.some((b) => {
-            if (
-              (b.type === "text" || b.type === "note") &&
-              typeof b.value === "string"
-            ) {
-              return b.value.toLowerCase().includes(lower);
-            }
+  //         const inContentBlock = section.contentBlocks.some((b) => {
+  //           if (
+  //             (b.type === "text" || b.type === "note") &&
+  //             typeof b.value === "string"
+  //           ) {
+  //             return b.value.toLowerCase().includes(lower);
+  //           }
 
-            if (b.type === "table" && Array.isArray(b.value)) {
-              return b.value.some((row) =>
-                row.some(
-                  (cell) =>
-                    typeof cell === "string" &&
-                    cell.toLowerCase().includes(lower)
-                )
-              );
-            }
+  //           if (b.type === "table" && Array.isArray(b.value)) {
+  //             return b.value.some((row) =>
+  //               row.some(
+  //                 (cell) =>
+  //                   typeof cell === "string" &&
+  //                   cell.toLowerCase().includes(lower)
+  //               )
+  //             );
+  //           }
 
-            return false;
-          });
+  //           return false;
+  //         });
 
-          return inMetadata || inContentBlock;
-        })
-      : rule.sections;
+  //         return inMetadata || inContentBlock;
+  //       })
+  //     : rule.sections;
 
   const totalSections = filteredSections.length;
   const totalPages = Math.ceil(totalSections / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentSections = filteredSections.slice(startIndex, endIndex);
+
+  // const endIndex = startIndex + itemsPerPage;
+  // const currentSections = filteredSections.slice(startIndex, endIndex);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

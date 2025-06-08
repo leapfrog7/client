@@ -66,7 +66,8 @@ const ContentBlock = ({ block, searchTerm }) => {
           <img
             src={block.value}
             alt={block.caption || "Image"}
-            className="rounded border max-h-64 object-contain mx-auto"
+            // className="rounded border max-h-64 object-contain mx-auto"
+            className="w-full max-w-2xl md:max-w-3xl object-contain rounded border mx-auto"
           />
           {block.caption && (
             <figcaption className="text-xs text-gray-600 italic mt-1">

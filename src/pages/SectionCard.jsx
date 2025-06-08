@@ -24,7 +24,7 @@ const SectionCard = ({
     .join(" ");
 
   const wordCount = fullTextContent.trim().split(/\s+/).length;
-  const shouldClamp = wordCount > 400;
+  const shouldClamp = wordCount > 250;
 
   const anchorId = renderAnchorId(section.ruleNumber);
 
