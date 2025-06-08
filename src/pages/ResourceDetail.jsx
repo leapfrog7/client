@@ -120,11 +120,26 @@ const ResourceDetail = () => {
             section.ruleTitle?.toLowerCase().includes(lower) ||
             section.chapterTitle?.toLowerCase().includes(lower);
 
-          const inContentBlock = section.contentBlocks.some(
-            (b) =>
+          const inContentBlock = section.contentBlocks.some((b) => {
+            if (
               (b.type === "text" || b.type === "note") &&
-              b.value?.toLowerCase().includes(lower)
-          );
+              typeof b.value === "string"
+            ) {
+              return b.value.toLowerCase().includes(lower);
+            }
+
+            if (b.type === "table" && Array.isArray(b.value)) {
+              return b.value.some((row) =>
+                row.some(
+                  (cell) =>
+                    typeof cell === "string" &&
+                    cell.toLowerCase().includes(lower)
+                )
+              );
+            }
+
+            return false;
+          });
 
           return inMetadata || inContentBlock;
         })

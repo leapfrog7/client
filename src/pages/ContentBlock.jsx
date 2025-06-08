@@ -42,9 +42,16 @@ const ContentBlock = ({ block, searchTerm }) => {
               {block.value.map((row, rIdx) => (
                 <tr key={rIdx} className="even:bg-gray-50">
                   {row.map((cell, cIdx) => (
-                    <td key={cIdx} className="border px-3 py-2">
-                      {cell}
-                    </td>
+                    <td
+                      key={cIdx}
+                      className="border px-3 py-2"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          typeof cell === "string"
+                            ? highlightText(cell, searchTerm)
+                            : cell,
+                      }}
+                    />
                   ))}
                 </tr>
               ))}
