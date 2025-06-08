@@ -81,11 +81,7 @@ const ResourceDetail = () => {
   useEffect(() => {
     if (!pendingAnchor) return;
 
-    let attempts = 0;
-    const maxAttempts = 20;
-
-    const scrollToAnchor = () => {
-      console.log("Trying to scroll to", pendingAnchor);
+    const timeout = setTimeout(() => {
       const el = document.querySelector(pendingAnchor);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -93,14 +89,11 @@ const ResourceDetail = () => {
         setTimeout(() => {
           el.classList.remove("ring-2", "ring-cyan-500", "rounded");
         }, 2000);
-        setPendingAnchor(null);
-      } else if (attempts < maxAttempts) {
-        attempts++;
-        requestAnimationFrame(scrollToAnchor); // Keep retrying
       }
-    };
+      setPendingAnchor(null);
+    }, 300); // Delay to wait for DOM to update
 
-    scrollToAnchor();
+    return () => clearTimeout(timeout);
   }, [currentPage, pendingAnchor]);
 
   useEffect(() => {
@@ -144,6 +137,9 @@ const ResourceDetail = () => {
       return inMetadata || inContentBlock;
     });
   }, [rule, searchTerm]);
+
+  const totalSections = filteredSections.length;
+  const totalPages = Math.ceil(totalSections / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentSections = useMemo(() => {
     return filteredSections.slice(startIndex, startIndex + itemsPerPage);
@@ -185,9 +181,6 @@ const ResourceDetail = () => {
   //         return inMetadata || inContentBlock;
   //       })
   //     : rule.sections;
-
-  const totalSections = filteredSections.length;
-  const totalPages = Math.ceil(totalSections / itemsPerPage);
 
   // const endIndex = startIndex + itemsPerPage;
   // const currentSections = filteredSections.slice(startIndex, endIndex);
