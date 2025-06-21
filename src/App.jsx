@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 // import { HelmetProvider } from "react-helmet-async";
 
 // Components and Pages
@@ -232,7 +235,7 @@ const App = () => {
             </button>
           </div>
         </nav>
-
+        <ToastContainer position="bottom-center" />;
         <div
           className={`${
             isLoggedIn
@@ -258,10 +261,8 @@ const App = () => {
             </>
           )}
         </div>
-
         {/* Share Popup */}
         {/* <SharePopup /> */}
-
         <div className="flex-grow min-h-screen">
           <Routes>
             {/* Admin Routes */}
@@ -516,7 +517,6 @@ const App = () => {
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
         </div>
-
         <Footer />
       </div>
 

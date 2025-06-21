@@ -9,9 +9,10 @@ import Loading from "./Loading";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { IoIosPhonePortrait } from "react-icons/io";
-import { RiLockPasswordLine } from "react-icons/ri";
+// import { RiLockPasswordLine } from "react-icons/ri";
 import { FaUserPlus } from "react-icons/fa";
 import { FaSignInAlt } from "react-icons/fa";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 
 Login.propTypes = {
   verifyToken: PropTypes.func,
@@ -25,6 +26,7 @@ export default function Login({ verifyToken }) {
   const [passwordInput, setPasswordInput] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   //function to check credentials when sing In button is clicked
   const handleCredentialCheck = async () => {
@@ -101,15 +103,26 @@ export default function Login({ verifyToken }) {
               <Label labelText="Mobile" />
               <IoIosPhonePortrait className="text-2xl absolute right-2 text-gray-400 peer-focus:text-blue-500" />
             </div>
-            <div className="relative h-11 w-full min-w-[200px] flex gap-1 items-center">
+            <div className="relative h-11 w-full min-w-[200px] flex items-center gap-1">
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 onChange={handlePasswordInput}
                 value={passwordInput}
               />
               <Label labelText="Password" />
-              <RiLockPasswordLine className="text-xl absolute right-2 text-gray-400 peer-focus:text-blue-500" />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-3 text-gray-400 hover:text-blue-500"
+              >
+                {showPassword ? (
+                  <AiFillEyeInvisible className="text-xl" />
+                ) : (
+                  <AiFillEye className="text-xl" />
+                )}
+              </button>
             </div>
+
             <div className="w-full text-right text-sm text-blue-700 hover:underline hover:text-blue-800">
               <Link to="/reset-password">Reset your password</Link>
             </div>

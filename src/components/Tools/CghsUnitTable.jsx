@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
+import { FaShareAlt } from "react-icons/fa";
+import { toast } from "react-toastify"; // if using react-toastify
 
 const CghsUnitTable = ({
   units,
@@ -14,6 +16,42 @@ const CghsUnitTable = ({
 
   const toggleExpand = (id) => {
     setExpandedRow((prev) => (prev === id ? null : id));
+  };
+
+  const handleShare = (unit) => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const fullAddress = [
+      unit.address?.line1,
+      unit.address?.line2,
+      unit.address?.pincode,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const empanelled = unit.empanelledFor?.join(", ") || "N/A";
+
+    const shareText = `🏥 *${
+      unit.name
+    }*\n📍 ${fullAddress}\n🩺 Empanelled For: ${empanelled}${
+      unit.googleMapsUrl ? `\n🧭 Location: ${unit.googleMapsUrl}` : ""
+    }`;
+
+    if (isMobile) {
+      const encoded = encodeURIComponent(shareText);
+      window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    } else {
+      navigator.clipboard
+        .writeText(shareText)
+        .then(() =>
+          toast.success(" Copied to clipboard", {
+            className:
+              "bg-indigo-200 text-indigo-700 px-4 py-2 rounded shadow-md",
+            bodyClassName: "text-sm",
+            progressClassName: "bg-white",
+          })
+        )
+        .catch(() => toast.error("❌ Failed to copy"));
+    }
   };
 
   return (
@@ -150,6 +188,13 @@ const CghsUnitTable = ({
                           More Details
                           <FaArrowRight className="text-xs md:text-sm " />
                         </button>
+                        <button
+                          onClick={() => handleShare(unit)}
+                          className="flex items-center gap-1 bg-indigo-100 text-indigo-700 px-3 py-2 rounded hover:bg-indigo-200 transition text-xs md:text-sm"
+                          title="Share"
+                        >
+                          <FaShareAlt />
+                        </button>
                       </div>
                     </div>
                   </td>
@@ -225,6 +270,7 @@ CghsUnitTable.propTypes = {
   units: PropTypes.array.isRequired,
   onMoreOptions: PropTypes.func.isRequired,
   showDistance: PropTypes.bool,
+  totalCount: PropTypes.number,
 };
 
 export default CghsUnitTable;
