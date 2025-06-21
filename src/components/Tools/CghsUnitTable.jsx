@@ -36,16 +36,31 @@ const CghsUnitTable = ({
       unit.googleMapsUrl ? `\n🧭 Location: ${unit.googleMapsUrl}` : ""
     }`;
 
-    if (isMobile) {
+    // ✅ Use native share sheet if available
+    if (isMobile && navigator.share) {
+      navigator
+        .share({
+          title: unit.name,
+          text: shareText,
+          url: unit.googleMapsUrl || "",
+        })
+        .catch((err) => {
+          console.error("Share failed:", err);
+        });
+    }
+    // 📱 Fallback to WhatsApp on mobile
+    else if (isMobile) {
       const encoded = encodeURIComponent(shareText);
       window.open(`https://wa.me/?text=${encoded}`, "_blank");
-    } else {
+    }
+    // 💻 Fallback to clipboard on desktop
+    else {
       navigator.clipboard
         .writeText(shareText)
         .then(() =>
-          toast.success(" Copied to clipboard", {
+          toast("✅ Copied hospital details!", {
             className:
-              "bg-indigo-200 text-indigo-700 px-4 py-2 rounded shadow-md",
+              "bg-indigo-100 text-indigo-700 px-4 py-2 rounded shadow-md",
             bodyClassName: "text-sm",
             progressClassName: "bg-white",
           })
