@@ -235,7 +235,7 @@ const App = () => {
             </button>
           </div>
         </nav>
-        <ToastContainer position="bottom-center" />;
+        <ToastContainer position="bottom-center" />
         <div
           className={`${
             isLoggedIn
