@@ -354,7 +354,7 @@ const CghsRateManagement = () => {
               <input
                 name="cghsCode"
                 placeholder="CGHS Code (optional)"
-                value={formData.cghsCode}
+                value={formData.cghsCode - 1}
                 onChange={handleInputChange}
                 className="w-full border p-2 rounded"
               />

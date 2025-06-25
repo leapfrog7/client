@@ -182,20 +182,20 @@ const CghsUnitPublic = () => {
         </p> */}
 
         <div className="mt-2 text-center bg-gray-100 py-2 rounded-lg">
-          <p className="text-base text-gray-600 mb-2 font-bold">
+          <p className="text-sm md:text-base text-gray-600 mb-2 font-semibold">
             All in One Place
           </p>
           <div className="flex flex-wrap justify-center gap-2 text-xs md:text-sm lg:text-base">
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full flex items-center gap-1 font-light">
               🔍 Search & Explore
             </span>
-            <span className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full flex items-center gap-1 font-light">
               🏥 Find Nearby Units
             </span>
-            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full flex items-center gap-1 font-light">
               ✅ See Empanelled facilities
             </span>
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full flex items-center gap-1 font-light">
               🧭 Get Directions
             </span>
           </div>

@@ -32,7 +32,7 @@ const FAQPage = () => {
     {
       question: "When can I expect Discounts?",
       answer:
-        "Our subscription is already offered at a discounted rate of ₹1,199/-. Given this competitive pricing, we are unable to provide any further discounts.",
+        "Our subscription is already offered at a discounted rate of ₹999/-. Given this competitive pricing, we are unable to provide any further discounts.",
     },
     {
       question: "Is there any discounts for renewal of subscription?",
@@ -118,7 +118,7 @@ const FAQPage = () => {
         <div key={index} className="mb-4">
           <div
             onClick={() => toggleQuestion(index)}
-            className="cursor-pointer bg-gradient-to-r from-red-100 to-yellow-100 p-4 rounded-lg shadow-md hover:bg-blue-300 transition duration-300 text-red-800"
+            className="cursor-pointer bg-gradient-to-r from-red-50 to-yellow-50 p-4 rounded-lg shadow-md hover:bg-blue-300 transition duration-300 text-red-800"
           >
             <h2 className="text-sm md:text-base xl:text-lg font-semibold">
               {faq.question}

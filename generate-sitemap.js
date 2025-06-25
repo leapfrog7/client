@@ -59,6 +59,21 @@ const links = [
     changefreq: "weekly",
     priority: 0.8,
   },
+  {
+    url: "/pages/public/resources/rti-act,-2005",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
+  {
+    url: "/pages/public/resources/ccs-(cca)-rules-1965",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
+  {
+    url: "/pages/public/resources/ccs-(conduct)-rules-1964",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
 ];
 
 const sitemapStream = new SitemapStream({
