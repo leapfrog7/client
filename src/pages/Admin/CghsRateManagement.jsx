@@ -191,7 +191,7 @@ const CghsRateManagement = () => {
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           onClick={() => {
-            const nextCghsCode = rates.length + 1;
+            const nextCghsCode = rates.length;
             setFormData({
               ...formData,
               name: "",
@@ -354,7 +354,7 @@ const CghsRateManagement = () => {
               <input
                 name="cghsCode"
                 placeholder="CGHS Code (optional)"
-                value={formData.cghsCode - 1}
+                value={formData.cghsCode}
                 onChange={handleInputChange}
                 className="w-full border p-2 rounded"
               />
