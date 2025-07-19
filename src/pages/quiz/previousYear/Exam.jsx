@@ -215,6 +215,7 @@ const Exam = () => {
       // Hide the toast after 2 seconds
       setTimeout(() => {
         setIsSaved(false);
+        window.location.reload();
       }, 800); // 1 second
     } catch (error) {
       console.error("Error saving exam session:", error);
@@ -459,6 +460,17 @@ const Exam = () => {
                     button. There is no limit to how many times you can take
                     this exam.
                   </li>
+                  <li>
+                    For the best experience, we recommend using a desktop to
+                    attempt this module.
+                  </li>
+                  <li className="text-xs md:text-sm">
+                    <span className="font-semibold">Please note:</span> On
+                    mobile devices, the timer display may not update in real
+                    time, but the actual timing is accurately tracked in the
+                    background. When you save and exit, the system will store
+                    the correct time elapsed.
+                  </li>
                 </ul>
               </div>
             </div>
@@ -485,101 +497,121 @@ const Exam = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-8 whitespace-pre-line w-full lg:w-2/3 mx-auto">
-                <Question
-                  question={
-                    questions[currentPaper.currentQuestionIndex].questionText
-                  }
-                  options={questions[currentPaper.currentQuestionIndex].options}
-                  onSelectOption={handleOptionSelect}
-                  selectedOption={answers[currentPaper.currentQuestionIndex]} // Pass selected option
-                />
-                {showCorrectAnswer && (
-                  <p className="text-green-600 mt-2">
-                    Correct Answer:{" "}
-                    {questions[currentPaper.currentQuestionIndex].correctAnswer}
-                  </p>
-                )}
-              </div>
-
-              <div className="mt-4 flex flex-col gap-2 ">
-                <div className="flex justify-between lg:w-2/3 lg:mx-auto lg:justify-around my-4 ">
-                  <button
-                    className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
-                    onClick={handlePreviousQuestion}
-                    disabled={currentPaper.currentQuestionIndex === 0}
-                  >
-                    <FaArrowLeft className="mr-2" />
-                    Previous
-                  </button>
-                  <button
-                    className="flex-1 flex items-center justify-center ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
-                    onClick={handleNextQuestion}
-                    disabled={
-                      currentPaper.currentQuestionIndex === questions.length - 1
-                    }
-                  >
-                    Next
-                    <FaArrowRight className="ml-2" />
-                  </button>
-                </div>
-
-                <div className="mt-4 flex flex-col gap-2 lg:gap-4 lg:flex-row lg:justify-around lg:w-2/3 lg:mx-auto  p-4 shadow-xl rounded-lg ring-2 ring-gray-100">
-                  <div className="text-sm md:text-base flex gap-6 lg:gap-4 flex-row lg:justify-between lg:w-2/3 mx-auto">
-                    <button
-                      className="flex items-center justify-center px-4 py-2 lg:py-6 bg-yellow-400 text-gray-700  rounded-lg hover:bg-yellow-700 transition-colors duration-200 lg:flex-1"
-                      onClick={() => setShowCorrectAnswer(!showCorrectAnswer)}
-                    >
-                      <FaEye className="mr-2" />
-                      {showCorrectAnswer ? "Hide Answer" : "Show Answer"}
-                    </button>
-
-                    <button
-                      className="flex items-center justify-center px-4 py-2 lg:py-6 bg-emerald-600 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 lg:flex-1 lg:mt-0"
-                      onClick={handleSave}
-                    >
-                      <FaSave className="mr-2" />
-                      Save and Exit
-                    </button>
+              <div className="2xl:flex gap-6">
+                {/* Quiz side */}
+                <div className="w-11/12 2xl:w-2/3 mx-auto">
+                  <div className="mt-8 whitespace-pre-line w-full mx-auto">
+                    <Question
+                      question={
+                        questions[currentPaper.currentQuestionIndex]
+                          .questionText
+                      }
+                      options={
+                        questions[currentPaper.currentQuestionIndex].options
+                      }
+                      onSelectOption={handleOptionSelect}
+                      selectedOption={
+                        answers[currentPaper.currentQuestionIndex]
+                      } // Pass selected option
+                    />
+                    {showCorrectAnswer && (
+                      <p className="text-green-600 mt-2">
+                        Correct Answer:{" "}
+                        {
+                          questions[currentPaper.currentQuestionIndex]
+                            .correctAnswer
+                        }
+                      </p>
+                    )}
                   </div>
 
-                  <button
-                    className="flex items-center justify-center px-4 py-2 lg:py-6 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors duration-200 lg:flex-1 mt-6 lg:mt-0"
-                    onClick={handleSubmitQuiz}
-                  >
-                    <FaCheckCircle className="mr-2" />
-                    Submit Quiz
-                  </button>
+                  <div className="mt-4 flex flex-col gap-2 ">
+                    <div className="flex justify-between lg:w-2/3 lg:mx-auto lg:justify-around my-4 ">
+                      <button
+                        className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                        onClick={handlePreviousQuestion}
+                        disabled={currentPaper.currentQuestionIndex === 0}
+                      >
+                        <FaArrowLeft className="mr-2" />
+                        Previous
+                      </button>
+                      <button
+                        className="flex-1 flex items-center justify-center ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+                        onClick={handleNextQuestion}
+                        disabled={
+                          currentPaper.currentQuestionIndex ===
+                          questions.length - 1
+                        }
+                      >
+                        Next
+                        <FaArrowRight className="ml-2" />
+                      </button>
+                    </div>
+
+                    <div className="mt-4 flex flex-col gap-2 lg:gap-4 lg:flex-row lg:justify-around lg:w-2/3 lg:mx-auto  p-4 shadow-xl rounded-lg ring-2 ring-gray-100">
+                      <div className="text-sm md:text-base flex gap-6 lg:gap-4 flex-row lg:justify-between lg:w-2/3 mx-auto">
+                        <button
+                          className="flex items-center justify-center px-4 py-2 lg:py-6 bg-yellow-400 text-gray-700  rounded-lg hover:bg-yellow-500 lg:flex-1"
+                          onClick={() =>
+                            setShowCorrectAnswer(!showCorrectAnswer)
+                          }
+                        >
+                          <FaEye className="mr-2" />
+                          {showCorrectAnswer ? "Hide Answer" : "Show Answer"}
+                        </button>
+
+                        <button
+                          className="flex items-center justify-center px-4 py-2 lg:py-6 bg-emerald-600 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 lg:flex-1 lg:mt-0"
+                          onClick={handleSave}
+                        >
+                          <FaSave className="mr-2" />
+                          Save and Exit
+                        </button>
+                      </div>
+
+                      <button
+                        className="flex items-center justify-center px-4 py-2 lg:py-6 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors duration-200 lg:flex-1 mt-6 lg:mt-0"
+                        onClick={handleSubmitQuiz}
+                      >
+                        <FaCheckCircle className="mr-2" />
+                        Submit Quiz
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+                <hr className="hidden 2xl:visible"></hr>
 
-              <p className="mt-8 text-base font-bold text-center text-white bg-gradient-to-r from-blue-600 to-blue-800 p-2 rounded-lg shadow-md">
-                Question Grid
-              </p>
-              <div className="mt-4 text-center">
-                <p className="text-sm md:text-base font-semibold">
-                  Questions Attempted: {Object.keys(answers).length} /{" "}
-                  {questions.length}{" "}
-                </p>
-              </div>
+                {/* Grid Side */}
+                <div className="w-11/12 2xl:w-1/3 mx-auto 2xl:border-l 2xl:border-gray-300 2xl:pl-6">
+                  <p className="mt-8 text-base font-bold text-center text-white bg-gradient-to-r from-blue-600 to-blue-800 p-2 rounded-lg shadow-md">
+                    Question Grid
+                  </p>
+                  <div className="mt-4 text-center">
+                    <p className="text-sm md:text-base font-semibold">
+                      Questions Attempted: {Object.keys(answers).length} /{" "}
+                      {questions.length}{" "}
+                    </p>
+                  </div>
 
-              <div className="mt-4 max-h-64 overflow-y-auto border-t pt-4 text-xs md:text-sm">
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 lg:gap-4">
-                  {questions.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`p-1 md:p-2 border rounded ${
-                        answers[index]
-                          ? "bg-yellow-400 text-yellow-800" // Color for attempted questions
-                          : index === currentPaper.currentQuestionIndex
-                          ? "bg-blue-200"
-                          : "bg-white"
-                      } hover:bg-blue-50`}
-                      onClick={() => handleQuestionSelect(index)}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
+                  <div className="mt-4 max-h-96 overflow-y-auto border-t pt-4 text-xs md:text-sm">
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 2xl:grid-cols-8 gap-2 lg:gap-4">
+                      {questions.map((_, index) => (
+                        <button
+                          key={index}
+                          className={`p-1 md:p-2 border rounded ${
+                            answers[index]
+                              ? "bg-yellow-400 text-yellow-800" // Color for attempted questions
+                              : index === currentPaper.currentQuestionIndex
+                              ? "bg-blue-200"
+                              : "bg-white"
+                          } hover:bg-blue-50`}
+                          onClick={() => handleQuestionSelect(index)}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
