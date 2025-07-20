@@ -148,7 +148,10 @@ const Home = ({
               <p className="text-base lg:text-lg font-medium">
                 Access{" "}
                 <span className="font-bold">Previous Year Questions</span> for
-                SO LDCE
+                SO LDCE{" "}
+                <span className="animate-pulse text-[10px] md:text-xs text-white bg-gradient-to-r from-pink-500 to-rose-500 px-2 py-1 rounded-full font-semibold shadow-sm">
+                  2024 PYQ added
+                </span>
               </p>
             </div>
 
@@ -157,7 +160,7 @@ const Home = ({
               to="/pages/quiz/previousYear/Exam"
               className="text-blue-800 font-bold hover:text-blue-600 transition duration-200 ease-in-out bg-yellow-300 px-4 py-2 md: rounded-md text-sm md:text-base text-center"
             >
-              Click Here →
+              Click Here
             </Link>
           </div>
         </div>

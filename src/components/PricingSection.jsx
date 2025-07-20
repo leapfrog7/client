@@ -69,6 +69,9 @@ const PricingSection = () => {
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
               <span>Previous Year Questions</span>
+              <span className="ml-2 animate-pulse text-[10px] md:text-xs text-white bg-gradient-to-r from-pink-500 to-rose-500 px-2 py-1 rounded-full font-semibold shadow-sm">
+                2024 included
+              </span>
             </motion.div>
           </div>
         </div>

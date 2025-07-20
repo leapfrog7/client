@@ -70,6 +70,12 @@ export default function Login({ verifyToken }) {
     setPasswordInput(event.target.value);
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleCredentialCheck();
+    }
+  };
+
   return (
     <div
       className="bg-cover bg-center min-h-screen"
@@ -99,7 +105,11 @@ export default function Login({ verifyToken }) {
               Log in to your account
             </h2>
             <div className="relative h-11 w-full min-w-[200px] flex items-center gap-2">
-              <Input onChange={handleUserInput} value={userInput} />
+              <Input
+                onChange={handleUserInput}
+                value={userInput}
+                onKeyDown={handleKeyDown}
+              />
               <Label labelText="Mobile" />
               <IoIosPhonePortrait className="text-2xl absolute right-2 text-gray-400 peer-focus:text-blue-500" />
             </div>
@@ -108,6 +118,7 @@ export default function Login({ verifyToken }) {
                 type={showPassword ? "text" : "password"}
                 onChange={handlePasswordInput}
                 value={passwordInput}
+                onKeyDown={handleKeyDown}
               />
               <Label labelText="Password" />
               <button
