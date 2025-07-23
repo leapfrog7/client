@@ -125,16 +125,15 @@ const CghsRatePublic = () => {
 
   return (
     <div className="p-2 max-w-7xl mx-auto animate-fade-in">
-      <h1>This Page is under Development</h1>
-      <h1 className="hidden text-xl md:text-2xl font-bold text-center text-blue-900 mb-3">
+      <h1 className=" text-xl md:text-2xl font-bold text-center text-blue-900 mb-3">
         Find CGHS Approved Rates
       </h1>
-      <p className="hidden text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto">
+      <p className=" text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto">
         Browse through the latest CGHS-approved rates for tests, procedures, and
         implants - all at one place.
       </p>
 
-      <div className="hidden flex flex-col md:flex-row md:justify-between items-center mb-6 gap-4">
+      <div className=" flex flex-col md:flex-row md:justify-between items-center mb-6 gap-4">
         {/* City Selector */}
         <Select
           value={cityOptions.find((option) => option.value === selectedCity)}
@@ -152,7 +151,7 @@ const CghsRatePublic = () => {
         <div className="relative w-full md:w-1/3">
           <input
             type="text"
-            placeholder="🔍 Search by name, category, CGHS code, or rate..."
+            placeholder="Search by name, category, CGHS code, or rate...🔍"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="border border-gray-300 rounded-md px-4 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10 md:text-sm"
@@ -170,7 +169,7 @@ const CghsRatePublic = () => {
           )}
         </div>
         {/* Stats */}
-        <div className=" hidden flex justify-center mb-4">
+        <div className="  flex justify-center mb-4">
           <div className="bg-blue-50 shadow-md rounded-lg px-12 md:px-4 py-2 flex items-center gap-2 ">
             <span className="text-gray-500 text-sm lg:text-base">
               🧮 Total Listed Tests/Procedures
@@ -182,7 +181,7 @@ const CghsRatePublic = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto hidden">
+      <div className="overflow-x-auto ">
         <table className="min-w-full text-sm rounded-md overflow-hidden">
           <thead className="bg-gray-50 text-gray-500">
             <tr>

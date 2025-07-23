@@ -145,6 +145,11 @@ export const navItems = [
         icon: CiHospital1, // Matching your Economy icon style
       },
       {
+        label: "CGHS Rates",
+        path: "/pages/public/cghs-rates",
+        icon: CiHospital1, // Matching your Economy icon style
+      },
+      {
         label: "Pay Matrix",
         path: "/pages/public/7thCPC-paymatrix",
         icon: VscTable, // Matching your Economy icon style
