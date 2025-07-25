@@ -124,7 +124,7 @@ const CghsRatePublic = () => {
   const totalPages = Math.ceil(filteredRates.length / ratesPerPage);
 
   return (
-    <div className="p-2 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-2 max-w-6xl xlg:max-w-7xl mx-auto animate-fade-in">
       <h1 className=" text-xl md:text-2xl font-bold text-center text-blue-900 mb-3">
         Find CGHS Approved Rates
       </h1>
@@ -133,51 +133,53 @@ const CghsRatePublic = () => {
         implants - all at one place.
       </p>
 
-      <div className=" flex flex-col md:flex-row md:justify-between items-center mb-6 gap-4">
-        {/* City Selector */}
-        <Select
-          value={cityOptions.find((option) => option.value === selectedCity)}
-          onChange={(option) => {
-            setSelectedCity(option.value);
-            setCurrentPage(1);
-          }}
-          options={cityOptions}
-          placeholder="Select City"
-          className="w-full md:w-1/3 text-sm md:text-base"
-          isSearchable={true}
-        />
-
-        {/* Search Bar */}
-        <div className="relative w-full md:w-1/3">
-          <input
-            type="text"
-            placeholder="Search by name, category, CGHS code, or rate...🔍"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border border-gray-300 rounded-md px-4 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10 md:text-sm"
+      <div className="flex flex-col items-center gap-6 mb-6 px-4">
+        {/* Top Row: Selector + Stats */}
+        <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4">
+          {/* City Selector */}
+          <Select
+            value={cityOptions.find((option) => option.value === selectedCity)}
+            onChange={(option) => {
+              setSelectedCity(option.value);
+              setCurrentPage(1);
+            }}
+            options={cityOptions}
+            placeholder="Select City"
+            className="w-full md:w-2/3 lg:w-1/3 text-sm md:text-base"
+            isSearchable={true}
           />
 
-          {/* Cancel Button */}
+          {/* Stats Box */}
+          <div className="bg-blue-50 shadow-sm border border-blue-100 rounded-lg px-6 py-2 flex items-center gap-2">
+            <span className="text-gray-600 text-sm md:text-base">
+              🧮 Total entries
+            </span>
+            <span className="text-blue-700 font-semibold text-base">
+              {filteredRates.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative w-full md:w-1/2 ">
+          <input
+            type="text"
+            placeholder="Search by name, category, CGHS code, or rate... 🔍"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+
+          {/* Clear Search */}
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
               title="Clear search"
             >
               <MdCancel size={20} />
             </button>
           )}
-        </div>
-        {/* Stats */}
-        <div className="  flex justify-center mb-4">
-          <div className="bg-blue-50 shadow-md rounded-lg px-12 md:px-4 py-2 flex items-center gap-2 ">
-            <span className="text-gray-500 text-sm lg:text-base">
-              🧮 Total Listed Tests/Procedures
-            </span>
-            <span className="text-blue-800 font-semibold text-base">
-              {filteredRates.length}
-            </span>
-          </div>
         </div>
       </div>
 
@@ -221,7 +223,7 @@ const CghsRatePublic = () => {
 
                       {/* CGHS Code */}
                       {rate.cghsCode && (
-                        <span className="inline-block bg-blue-50 text-blue-600 text-xs font-light px-2 py-1 rounded-lg max-w-max shadow-sm">
+                        <span className="inline-block bg-blue-50 text-blue-600 text-sm font-light px-2 py-1 rounded-lg max-w-max shadow-sm">
                           CGHS Code: {rate.cghsCode}
                         </span>
                       )}
@@ -229,7 +231,7 @@ const CghsRatePublic = () => {
                       {/* Note */}
                       {rate.note && (
                         <div className="inline-block px-1 md:px-2 py-1 rounded-md ">
-                          <p className="text-xs font-light text-amber-700">
+                          <p className="text-xs md:text-sm font-thin text-amber-700">
                             {rate.note
                               .toLowerCase()
                               .split(" ")
@@ -259,7 +261,7 @@ const CghsRatePublic = () => {
                   </td>
 
                   {/* Non-NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-sm md:text-sm  text-gray-600 rounded-r-lg">
+                  <td className="px-4 py-4 text-center align-top text-sm md:text-base  text-gray-600 rounded-r-lg">
                     {rate.rates?.[selectedCity]?.nabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nabhRate}`
                       : rate.rates?.Delhi?.nabhRate !== undefined
@@ -267,7 +269,7 @@ const CghsRatePublic = () => {
                       : "N/A"}
                   </td>
                   {/* NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-sm md:text-sm text-gray-600 ">
+                  <td className="px-4 py-4 text-center align-top text-sm md:text-base text-gray-600 ">
                     {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nonNabhRate}`
                       : rate.rates?.Delhi?.nonNabhRate !== undefined

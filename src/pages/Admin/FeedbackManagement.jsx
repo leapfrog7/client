@@ -79,10 +79,9 @@ const FeedbackManagement = () => {
       return;
 
     try {
-      const response = await fetch(
+      const response = await axios.delete(
         `${BASE_URL}/feedbackManagement/questionFeedback/${feedbackId}`,
         {
-          method: "DELETE",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
           },
@@ -166,6 +165,8 @@ const FeedbackManagement = () => {
               <th className="border px-4 py-2">Feedback Types</th>
               <th className="border px-4 py-2">Total Feedback</th>
               <th className="border px-4 py-2">Date Submitted</th>
+              <th className="border px-4 py-2">User</th>
+
               <th className="border px-4 py-2">Error Reports</th>
               <th className="border px-4 py-2">Actions</th>
             </tr>
@@ -219,6 +220,15 @@ const FeedbackManagement = () => {
                       ? new Date(item.createdAt).toLocaleDateString()
                       : "N/A"}
                   </td>
+                  <td className="border px-4 py-2">
+                    <div className="font-semibold text-gray-800">
+                      {item.userName}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {item.userEmail}
+                    </div>
+                  </td>
+
                   <td className="border px-4 py-2">
                     {item.errorReports && item.errorReports.length > 0 ? (
                       <ul className="list-disc list-inside">
