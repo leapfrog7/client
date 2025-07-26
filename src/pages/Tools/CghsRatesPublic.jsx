@@ -125,16 +125,17 @@ const CghsRatePublic = () => {
   const totalPages = Math.ceil(filteredRates.length / ratesPerPage);
 
   return (
-    <div className="p-2 max-w-6xl xlg:max-w-7xl mx-auto animate-fade-in">
-      <h1 className=" text-xl md:text-2xl font-bold text-center text-blue-900 mb-3">
-        Find CGHS Approved Rates
+    <div className="p-2 max-w-6xl mx-auto animate-fade-in">
+      <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2">
+        CGHS Rate Finder🧾
       </h1>
-      <p className=" text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto">
-        Browse through the latest CGHS-approved rates for tests, procedures, and
-        implants - all at one place.
+
+      <p className="text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto leading-relaxed">
+        Discover CGHS-approved rates for lab tests, medical procedures, and
+        implants — neatly organized by city and searchable at your fingertips.
       </p>
 
-      <div className="flex flex-col items-center gap-6 mb-6 px-4">
+      <div className="flex flex-col items-center gap-6 mb-8 px-4">
         {/* Top Row: Selector + Stats */}
         <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4">
           {/* City Selector */}
@@ -145,33 +146,31 @@ const CghsRatePublic = () => {
               setCurrentPage(1);
             }}
             options={cityOptions}
-            placeholder="Select City"
-            className="w-full md:w-2/3 lg:w-1/3 text-sm md:text-base"
+            placeholder="Select a City"
+            className="w-full md:w-2/3 lg:w-1/3 text-sm md:text-base shadow-sm"
             isSearchable={true}
           />
 
           {/* Stats Box */}
-          <div className="bg-blue-50 shadow-sm border border-blue-100 rounded-lg px-6 py-2 flex items-center gap-2">
+          <div className="bg-white border border-gray-200 rounded-md px-6 py-2 shadow-sm flex items-center gap-2">
             <span className="text-gray-600 text-sm md:text-base">
-              🧮 Total entries
+              🧮 Total Entries:
             </span>
-            <span className="text-blue-700 font-semibold text-base">
+            <span className="text-blue-700 font-bold text-base">
               {filteredRates.length}
             </span>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div className="relative w-full md:w-1/2 ">
+        <div className="relative w-full md:w-2/3 lg:w-1/2">
           <input
             type="text"
-            placeholder="Search by name, category, CGHS code, or rate... 🔍"
+            placeholder="Search .... by name, category, code, or rate 🔍︎ "
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
           />
-
-          {/* Clear Search */}
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
@@ -208,73 +207,62 @@ const CghsRatePublic = () => {
                 </td>
               </tr>
             ) : (
-              currentRates.map((rate, idx) => (
+              currentRates.map((rate) => (
                 <tr
                   key={rate._id}
-                  className={`${
-                    idx % 2 === 0 ? "bg-white" : "bg-white"
-                  } hover:bg-gray-50 transition border-b border-indigo-50`}
+                  className="bg-white hover:shadow-md  transition-all duration-200 rounded-xl overflow-hidden border-b border-gray-300"
                 >
-                  {/* Merged Name + CGHS Code + Note */}
-                  <td className="px-0 md:px-2 py-0 align-top">
-                    <div className="flex flex-col gap-1 p-2 rounded-l-lg">
-                      <p className="text-blue-700 text-sm font-semibold md:text-base">
-                        {rate.name}
+                  {/* First Column */}
+                  <td className="p-4 align-top w-full md:w-1/2">
+                    <div className="space-y-1">
+                      <p className="text-blue-800 font-semibold flex items-center gap-1 text-sm md:text-base">
+                        🧪 {rate.name}
                       </p>
-
-                      {/* CGHS Code */}
                       {rate.cghsCode && (
-                        <span className="inline-block bg-blue-50 text-blue-600 text-sm font-light px-2 py-1 rounded-lg max-w-max shadow-sm">
-                          CGHS Code: {rate.cghsCode}
-                        </span>
+                        <p className="text-blue-600 text-xs flex items-center gap-1">
+                          #️⃣ CGHS Code: {rate.cghsCode}
+                        </p>
                       )}
-
-                      {/* Note */}
                       {rate.note && (
-                        <div className="inline-block px-1 md:px-2 py-1 rounded-md ">
-                          <p className="text-xs md:text-sm font-thin text-amber-700">
-                            {rate.note
-                              .toLowerCase()
-                              .split(" ")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
-                              .join(" ")}
-                          </p>
-                        </div>
+                        <p
+                          className="text-amber-700 text-xs truncate"
+                          title={rate.note}
+                        >
+                          🏷️ {rate.note}
+                        </p>
                       )}
-
-                      {/* Reference */}
                       {rate.reference && (
-                        <p className="text-[10px] text-gray-400">
-                          {rate.reference
-                            .toLowerCase()
-                            .split(" ")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ")}
+                        <p
+                          className="text-gray-400 text-[10px] truncate"
+                          title={rate.reference}
+                        >
+                          📄 {rate.reference}
                         </p>
                       )}
                     </div>
                   </td>
 
                   {/* Non-NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-sm md:text-base  text-gray-600 rounded-r-lg">
-                    {rate.rates?.[selectedCity]?.nabhRate !== undefined
-                      ? `₹${rate.rates[selectedCity].nabhRate}`
-                      : rate.rates?.Delhi?.nabhRate !== undefined
-                      ? `₹${rate.rates.Delhi.nabhRate}`
+                  <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
+                    {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
+                      ? `₹${rate.rates[selectedCity].nonNabhRate.toLocaleString(
+                          "en-IN"
+                        )}`
+                      : rate.rates?.Delhi?.nonNabhRate !== undefined
+                      ? `₹${rate.rates.Delhi.nonNabhRate.toLocaleString(
+                          "en-IN"
+                        )}`
                       : "N/A"}
                   </td>
+
                   {/* NABH Rate */}
-                  <td className="px-4 py-4 text-center align-top text-sm md:text-base text-gray-600 ">
-                    {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
-                      ? `₹${rate.rates[selectedCity].nonNabhRate}`
-                      : rate.rates?.Delhi?.nonNabhRate !== undefined
-                      ? `₹${rate.rates.Delhi.nonNabhRate}`
+                  <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
+                    {rate.rates?.[selectedCity]?.nabhRate !== undefined
+                      ? `₹${rate.rates[selectedCity].nabhRate.toLocaleString(
+                          "en-IN"
+                        )}`
+                      : rate.rates?.Delhi?.nabhRate !== undefined
+                      ? `₹${rate.rates.Delhi.nabhRate.toLocaleString("en-IN")}`
                       : "N/A"}
                   </td>
                 </tr>

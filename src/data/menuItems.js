@@ -12,12 +12,13 @@ import { IoNewspaperOutline, IoFolderOpenOutline } from "react-icons/io5";
 import { TfiAgenda } from "react-icons/tfi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { LiaHandsHelpingSolid } from "react-icons/lia";
-import { BsTools } from "react-icons/bs";
+import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { CiHospital1 } from "react-icons/ci";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { VscTable } from "react-icons/vsc";
-import { FaBookReader } from "react-icons/fa";
+import { LuNotebookText } from "react-icons/lu";
 import { MdModeOfTravel } from "react-icons/md";
+import { TbInvoice } from "react-icons/tb";
 
 export const navItems = [
   {
@@ -132,7 +133,7 @@ export const navItems = [
   {
     label: "Utilities",
     path: null,
-    icon: BsTools, // You can change the icon to something else if you'd like
+    icon: AiOutlineAppstoreAdd, // You can change the icon to something else if you'd like
     submenu: [
       {
         label: "NPS or UPS",
@@ -147,7 +148,7 @@ export const navItems = [
       {
         label: "CGHS Rates",
         path: "/pages/public/cghs-rates",
-        icon: CiHospital1, // Matching your Economy icon style
+        icon: TbInvoice, // Matching your Economy icon style
       },
       {
         label: "Pay Matrix",
@@ -159,6 +160,6 @@ export const navItems = [
   {
     label: "Resources",
     path: "/pages/public/resources",
-    icon: FaBookReader,
+    icon: LuNotebookText,
   },
 ];

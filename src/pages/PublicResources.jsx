@@ -142,7 +142,7 @@ const PublicResources = () => {
                   </h2>
                 </div>
                 {/* Type Badge */}
-                <span className="hidden md:visible ml-2 text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                <span className=" hidden md:inline-block ml-2 text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                   {rule.type || "Rule"}
                 </span>
               </div>
