@@ -182,19 +182,18 @@ const CghsRatePublic = () => {
           )}
         </div>
       </div>
-
-      <div className="overflow-x-auto ">
-        <table className="min-w-full text-sm rounded-md overflow-hidden">
-          <thead className="bg-gray-50 text-gray-500">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-full table-auto text-sm rounded-md overflow-hidden">
+          <thead className="bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-3 py-2 text-left text-sm md:text-sm lg:text-base">
+              <th className="px-3 py-2 text-left text-sm md:text-base w-[65%]">
                 Tests / Procedure
               </th>
-              <th className="px-3 py-2 text-center text-sm md:text-sm lg:text-base">
-                Non-NABH Rate (₹)
+              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] whitespace-nowrap">
+                Non-NABH (₹)
               </th>
-              <th className="px-3 py-2 text-center text-sm md:text-sm lg:text-base">
-                NABH Rate (₹)
+              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] whitespace-nowrap">
+                NABH (₹)
               </th>
             </tr>
           </thead>
@@ -210,10 +209,10 @@ const CghsRatePublic = () => {
               currentRates.map((rate) => (
                 <tr
                   key={rate._id}
-                  className="bg-white hover:shadow-md  transition-all duration-200 rounded-xl overflow-hidden border-b border-gray-300"
+                  className="bg-white hover:bg-gray-50 border-b border-gray-200 transition-colors"
                 >
-                  {/* First Column */}
-                  <td className="p-4 align-top w-full md:w-1/2">
+                  {/* Name, CGHS Code, Note, Reference */}
+                  <td className="p-4 align-top break-words">
                     <div className="space-y-1">
                       <p className="text-blue-800 font-semibold flex items-center gap-1 text-sm md:text-base">
                         🧪 {rate.name}
@@ -225,7 +224,7 @@ const CghsRatePublic = () => {
                       )}
                       {rate.note && (
                         <p
-                          className="text-amber-700 text-xs truncate"
+                          className="text-amber-700 text-xs break-words"
                           title={rate.note}
                         >
                           🏷️ {rate.note}
@@ -233,7 +232,7 @@ const CghsRatePublic = () => {
                       )}
                       {rate.reference && (
                         <p
-                          className="text-gray-400 text-[10px] truncate"
+                          className="text-gray-400 text-[10px] break-words"
                           title={rate.reference}
                         >
                           📄 {rate.reference}
@@ -242,7 +241,7 @@ const CghsRatePublic = () => {
                     </div>
                   </td>
 
-                  {/* Non-NABH Rate */}
+                  {/* Non-NABH */}
                   <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
                     {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nonNabhRate.toLocaleString(
@@ -255,7 +254,7 @@ const CghsRatePublic = () => {
                       : "N/A"}
                   </td>
 
-                  {/* NABH Rate */}
+                  {/* NABH */}
                   <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
                     {rate.rates?.[selectedCity]?.nabhRate !== undefined
                       ? `₹${rate.rates[selectedCity].nabhRate.toLocaleString(
