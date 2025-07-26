@@ -1,6 +1,7 @@
 import { useState } from "react";
 import payMatrixData from "../../data/payMatrixData"; //Contains the pay matrix
 import { Helmet } from "react-helmet-async";
+import PageFeedback from "../../components/PageFeedback";
 
 const PayMatrix = () => {
   const payLevels = Object.keys(payMatrixData).sort((a, b) => {
@@ -119,6 +120,7 @@ const PayMatrix = () => {
           </tbody>
         </table>
       </div>
+      <PageFeedback pageSlug="/pay-matrix" />
       {tooltip && (
         <div
           className="fixed bg-gray-600 text-white text-xs px-4 py-2 rounded-lg shadow-lg z-50 pointer-events-none"

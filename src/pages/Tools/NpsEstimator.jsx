@@ -10,6 +10,7 @@ import NpsUpsSummary from "../../components/Tools/NPSvsUPS/NpsUpsSummary";
 import NpsTableAccordion from "../../components/Tools/NPSvsUPS/NpsTableAccordion";
 import SimulationGuide from "../../components/Tools/NPSvsUPS/SimulationGuide";
 import { Helmet } from "react-helmet-async";
+import PageFeedback from "../../components/PageFeedback";
 
 // import NpsCalculator from "../../components/Tools/NPSvsUPS/NpsCalculator";
 
@@ -68,6 +69,8 @@ const NpsEstimator = () => {
           />
         </div>
       )}
+
+      <PageFeedback pageSlug="/NPS vs UPS" />
 
       {/* Toggle Table Button */}
       {results.length > 0 && (

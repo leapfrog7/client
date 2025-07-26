@@ -8,6 +8,7 @@ import {
 } from "react-icons/ai";
 // import { FaBookOpen } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
+import PageFeedback from "../components/PageFeedback";
 
 const BASE_URL = "https://server-v4dy.onrender.com";
 // const BASE_URL = "http://localhost:5000";
@@ -202,6 +203,7 @@ const PublicResources = () => {
           to every government employee .
         </p>
       </div>
+      <PageFeedback pageSlug="/main_resource page" />
     </div>
   );
 };

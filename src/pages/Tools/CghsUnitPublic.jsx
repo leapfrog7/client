@@ -10,6 +10,7 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import PageFeedback from "../../components/PageFeedback";
 
 const validCities = [
   "Delhi",
@@ -349,6 +350,8 @@ const CghsUnitPublic = () => {
           error={nearbyError}
         />
       )}
+
+      <PageFeedback pageSlug="/cghs-units" />
 
       <div className="bg-indigo-50 rounded-lg p-6 my-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
         <div className="text-center md:text-left">

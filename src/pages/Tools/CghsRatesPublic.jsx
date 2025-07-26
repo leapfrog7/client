@@ -6,6 +6,7 @@ import Select from "react-select";
 import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { MdCancel } from "react-icons/md";
 import { Link } from "react-router-dom";
+import PageFeedback from "../../components/PageFeedback";
 
 const CghsRatePublic = () => {
   const [rates, setRates] = useState([]);
@@ -328,6 +329,8 @@ const CghsRatePublic = () => {
           </button>
         </div>
       )}
+
+      <PageFeedback pageSlug="/cghs-rates" />
 
       <div className="bg-indigo-50 rounded-lg p-6 my-8 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
         <div className="text-center md:text-left">
