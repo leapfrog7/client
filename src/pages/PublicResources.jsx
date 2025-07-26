@@ -78,38 +78,45 @@ const PublicResources = () => {
       </Helmet>
 
       <div className="py-1">
-        <div className=" mx-auto ">
-          <h1 className="text-2xl text-cyan-600 font-semibold text-center  tracking-wide mb-1 sm:text-2xl md:text-3xl">
-            {/* <FaBookOpen className="inline-block mr-2 align-middle" />{" "} */}
-            <span className="font-extrabold tracking-wider">📚 Resources</span>
+        <div className="mx-auto max-w-4xl text-center mb-10">
+          {/* Title */}
+          <h1 className="text-3xl md:text-4xl font-bold tracking-normal text-gray-800 mb-2">
+            <span role="img" aria-label="resources" className="mr-2">
+              📑
+            </span>
+            Resources
           </h1>
-          <h2 className="font-style: italic text-sm md:text-base mb-6 text-center text-gray-500">
+
+          {/* Subtitle */}
+          <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-6">
             Your central hub for all essential Government Rules and Regulations.
             Easily navigate and stay informed.
-          </h2>
-          <div className="mb-6 sm:mb-8">
-            <div className="relative rounded-md shadow-sm">
-              <input
-                type="text"
-                placeholder="Search titles, summaries..."
-                className="w-full border border-gray-300 rounded-md py-2 px-3 pr-8 focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 text-sm sm:text-base"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none sm:pr-3">
-                {!searchTerm && (
-                  <AiOutlineSearch className="h-4 w-4 text-gray-400 sm:h-5 sm:w-5" />
-                )}
-              </div>
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute top-1/2 right-1.5 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none sm:right-2"
-                >
-                  <AiOutlineClose className="h-4 w-4 sm:h-5 sm:w-5" />
-                </button>
-              )}
+          </p>
+
+          {/* Search Input */}
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search titles, summaries..."
+              className="w-full pl-10 pr-10 py-2.5 md:py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 shadow-sm text-sm sm:text-base transition-all"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {/* Search Icon (left) */}
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+              <AiOutlineSearch className="h-5 w-5" />
             </div>
+
+            {/* Clear Button (right) */}
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                <AiOutlineClose className="h-5 w-5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -122,47 +129,37 @@ const PublicResources = () => {
           {filteredResources.map((rule) => (
             <div
               key={rule.slug}
-              className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between"
+              className="rounded-2xl ring-1 ring-blue-100 bg-white p-4 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 flex flex-col justify-between"
             >
-              {/* Title Bar */}
-              <div className="bg-gradient-to-r from-pink-50 to-cyan-50 p-3 flex items-center justify-between rounded-t-xl border-b border-gray-100">
+              {/* Title Section */}
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl lg:text-2xl">
+                  <span className="text-lg sm:text-2xl">
                     {getIconForRule(rule)}
                   </span>
-                  <h2 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 line-clamp-2">
+                  <h2 className="text-sm sm:text-lg font-semibold text-gray-700 line-clamp-2">
                     {rule.title}
                   </h2>
                 </div>
+                {/* Type Badge */}
+                <span className="hidden md:visible ml-2 text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                  {rule.type || "Rule"}
+                </span>
               </div>
-
-              {/* Image Section */}
-              {rule.image && (
-                <img
-                  src={rule.image}
-                  alt={rule.title}
-                  className="w-full h-40 object-cover rounded-b-none rounded-t-none"
-                />
-              )}
 
               {/* Description */}
-              <div className="px-4 py-3 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 line-clamp-3 leading-relaxed">
-                  {rule.description}
-                </p>
-              </div>
+              <p className="text-xs md:text-sm text-gray-600 line-clamp-4 md:line-clamp-3 mb-4 leading-snug">
+                {rule.description}
+              </p>
 
               {/* Button */}
-              <div className="px-2 pb-4 mx-auto">
-                <button
-                  onClick={() =>
-                    navigate(`/pages/public/resources/${rule.slug}`)
-                  }
-                  className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors duration-200"
-                >
-                  View Details <AiOutlineArrowRight className="text-base" />
-                </button>
-              </div>
+              <button
+                onClick={() => navigate(`/pages/public/resources/${rule.slug}`)}
+                className="text-xs md:text-base group inline-flex items-center justify-center gap-2 font-medium px-2 md:px-4 py-2 rounded-md border border-cyan-600 text-cyan-700 bg-white hover:bg-cyan-50 transition-colors duration-200"
+              >
+                See Complete
+                <AiOutlineArrowRight className="text-sm md:text-base group-hover:translate-x-1 transition-transform" />
+              </button>
             </div>
           ))}
         </div>
