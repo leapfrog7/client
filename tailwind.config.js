@@ -37,9 +37,14 @@ export default {
           "0%": { opacity: 0 },
           "100%": { opacity: 1 },
         },
+        scrollX: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" }, // Adjust based on how many items you show
+        },
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-out",
+        "scroll-x": "scrollX 60s linear infinite", // adjust speed as needed
       },
     },
   },

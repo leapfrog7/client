@@ -139,13 +139,14 @@ const CghsRatePublic = () => {
 
   return (
     <div className="p-2 max-w-6xl mx-auto animate-fade-in">
-      <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2">
-        CGHS Rate Finder🧾
+      <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2 mt-4">
+        Find CGHS Rates 📋
       </h1>
 
       <p className="text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto leading-relaxed">
         Discover CGHS-approved rates for lab tests, medical procedures, and
-        implants — neatly organized by city and searchable at your fingertips.
+        implants — neatly organized by city (Delhi NCR for now) and prepare
+        estimates before lab visits.
       </p>
 
       <div className="flex flex-col items-center gap-6 mb-8 px-4">
@@ -176,13 +177,13 @@ const CghsRatePublic = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="relative w-full md:w-2/3 lg:w-1/2">
+        <div className="relative w-full md:w-2/3 lg:w-1/2  ring-2">
           <input
             type="text"
             placeholder="Search .... by name, category, code, or rate 🔍︎ "
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
+            className="w-full  border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
           />
           {searchTerm && (
             <button
@@ -202,7 +203,7 @@ const CghsRatePublic = () => {
               <th className="px-3 py-2 text-left text-sm md:text-base w-[65%]">
                 Tests / Procedure
               </th>
-              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] whitespace-nowrap">
+              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] ">
                 Non-NABH (₹)
               </th>
               <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] whitespace-nowrap">

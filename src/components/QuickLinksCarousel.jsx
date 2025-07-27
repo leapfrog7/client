@@ -9,6 +9,7 @@ import {
   FaHospitalSymbol,
   FaBook,
 } from "react-icons/fa";
+import { GiMedicalDrip } from "react-icons/gi";
 
 const QuickLinksCarousel = ({
   title = "Quick and Free Links",
@@ -33,7 +34,13 @@ const QuickLinksCarousel = ({
       icon: FaHospitalSymbol,
     },
     {
-      title: "Govt Rules",
+      title: "Find CGHS Rate",
+      subtitle: "Find CGHS Rates and Prepare Estimate",
+      url: "/pages/public/cghs-rates",
+      icon: GiMedicalDrip,
+    },
+    {
+      title: "Resources",
       subtitle: "Search Important Rules and Regulations at one place.",
       url: "/pages/public/resources",
       icon: FaBook,
@@ -60,8 +67,8 @@ const QuickLinksCarousel = ({
             </h2>
 
             <div className="overflow-x-auto">
-              <div className="flex space-x-4 pb-4">
-                {linksData.map((link, idx) => (
+              <div className="flex space-x-4 pb-4 animate-scroll-x">
+                {[...linksData, ...linksData, ...linksData].map((link, idx) => (
                   <Link
                     to={link.url}
                     key={idx}
