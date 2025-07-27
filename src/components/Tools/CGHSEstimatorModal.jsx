@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
 import { MdClose, MdDelete, MdEdit } from "react-icons/md";
+import PageFeedback from "../PageFeedback";
 //import { useReactToPrint } from "react-to-print";
 
 const CGHSEstimatorModal = ({ onClose, rates, selectedCity }) => {
@@ -24,6 +25,7 @@ const CGHSEstimatorModal = ({ onClose, rates, selectedCity }) => {
       ...prev,
       {
         _id: item._id + "-" + Date.now(),
+        cghsCode: item.cghsCode || "",
         name: item.name,
         baseNabh,
         baseNonNabh,
@@ -226,7 +228,10 @@ const CGHSEstimatorModal = ({ onClose, rates, selectedCity }) => {
                     {/* Name + Delete */}
                     <td className="px-3 py-2">
                       <div className="flex justify-between items-center">
-                        <span>{item.name}</span>
+                        <span className="font-medium text-gray-800">
+                          {item.name}
+                        </span>
+
                         <button
                           onClick={() => handleRemoveItem(item._id)}
                           className="text-red-500 hover:text-red-700 ml-2"
@@ -235,6 +240,11 @@ const CGHSEstimatorModal = ({ onClose, rates, selectedCity }) => {
                           <MdDelete size={16} />
                         </button>
                       </div>
+                      {item.cghsCode && (
+                        <span className="text-xs text-blue-600 mt-1">
+                          code -({item.cghsCode})
+                        </span>
+                      )}
                     </td>
 
                     {/* Non-NABH Rate */}
@@ -343,6 +353,8 @@ const CGHSEstimatorModal = ({ onClose, rates, selectedCity }) => {
             </button>
           )}
         </div>
+
+        <PageFeedback pageSlug="/cghs-estimator" />
 
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md mb-4 text-sm text-gray-800 shadow-sm mt-8">
           <p className="font-semibold mb-1">ℹ️ How to Use This Estimator:</p>

@@ -66,9 +66,19 @@ const PrintEstimate = () => {
           <tbody>
             {estimate.map((item, idx) => (
               <tr key={item._id} className="border-t text-gray-800">
-                <td className="border px-3 py-2">
-                  {idx + 1}. {item.name}
+                <td className="border px-3 py-2 align-top">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-gray-800">
+                      {idx + 1}. {item.name}
+                    </span>
+                    {item.cghsCode && (
+                      <span className="text-xs text-blue-600 mt-1">
+                        CGHS Code: {item.cghsCode}
+                      </span>
+                    )}
+                  </div>
                 </td>
+
                 <td className="border px-3 py-2 text-center">
                   ₹{item.nonNabhRate.toLocaleString("en-IN")}
                 </td>
