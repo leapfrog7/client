@@ -49,4 +49,31 @@
   padding-left: 4rem;
 }
 
+/* Add this to your main CSS file (e.g., src/index.css) */
+.highlighted-term {
+  /* Remove any default padding/margin */
+  padding: 0;
+  margin: 0;
+
+  /* Ensure perfect vertical alignment with surrounding text */
+  vertical-align: baseline;
+
+  /* Prevent the highlight from affecting line height */
+  line-height: inherit;
+
+  /* Ensure it behaves strictly as an inline element */
+  display: inline;
+
+  /* If you had rounded corners (e.g., from 'rounded-sm') that caused issues,
+     explicitly set this to 0 to remove any potential visual 'gaps'.
+     If you want very subtle rounding, you can try a small value like 0.05rem,
+     but test thoroughly. */
+  border-radius: 0;
+
+  /* Just in case, ensure no other styles are adding unexpected space */
+  box-shadow: none;
+  outline: none;
+  border: none;
+  /* background-color: inherit; /* This isn't strictly necessary if Tailwind's bg-yellow-200 works */
+}
 /* Add more if needed */

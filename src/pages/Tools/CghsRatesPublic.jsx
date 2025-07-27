@@ -135,6 +135,8 @@ const CghsRatePublic = () => {
   const currentRates = filteredRates.slice(indexOfFirstRate, indexOfLastRate);
   const totalPages = Math.ceil(filteredRates.length / ratesPerPage);
 
+  // Inside src/pages/public/CghsRatePublic.jsx, find this function and replace it
+
   if (loading) return <Loading />;
 
   return (
@@ -231,6 +233,7 @@ const CghsRatePublic = () => {
                       <p className="text-blue-800 font-semibold flex items-center gap-1 text-sm md:text-base">
                         🧪 {rate.name}
                       </p>
+
                       {rate.cghsCode && (
                         <p className="text-blue-600 text-xs flex items-center gap-1">
                           #️⃣ CGHS Code: {rate.cghsCode}
