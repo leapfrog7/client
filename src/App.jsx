@@ -65,6 +65,7 @@ import PayMatrix from "./pages/Tools/PayMatrix";
 import NpsEstimator from "./pages/Tools/NpsEstimator";
 import PublicResources from "./pages/PublicResources";
 import ResourceDetail from "./pages/ResourceDetail";
+import PrintEstimate from "./pages/Tools/PrintEstimate";
 
 const App = () => {
   //States
@@ -514,6 +515,8 @@ const App = () => {
               path="/pages/public/resources/:slug"
               element={<ResourceDetail />}
             />
+
+            <Route path="/print-estimate" element={<PrintEstimate />} />
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
         </div>

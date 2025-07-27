@@ -11,6 +11,7 @@ import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PageFeedback from "../../components/PageFeedback";
+import Loading from "../../components/Loading";
 
 const validCities = [
   "Delhi",
@@ -38,6 +39,7 @@ const CghsUnitPublic = () => {
   const [viewMode, setViewMode] = useState("city"); // 'city' | 'nearby'
   const [userLocation, setUserLocation] = useState(null);
   const [nearbyError, setNearbyError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const cityOptions = validCities.map((city) => ({
@@ -116,11 +118,14 @@ const CghsUnitPublic = () => {
 
   const fetchUnits = async () => {
     try {
+      setLoading(true); // Start loading
       const response = await axios.get(BASE_URL);
       setUnits(response.data || []);
     } catch (error) {
       console.error("Error fetching CGHS units:", error);
-    }
+    } finally {
+      setLoading(false);
+    } // Done loading
   };
 
   const indexOfLast = currentPage * itemsPerPage;
@@ -158,6 +163,8 @@ const CghsUnitPublic = () => {
 
     return pages;
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">

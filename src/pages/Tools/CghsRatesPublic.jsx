@@ -7,14 +7,22 @@ import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
 import { MdCancel } from "react-icons/md";
 import { Link } from "react-router-dom";
 import PageFeedback from "../../components/PageFeedback";
+import Loading from "../../components/Loading"; // adjust path if needed
+import CGHSEstimatorModal from "../../components/Tools/CGHSEstimatorModal";
 
 const CghsRatePublic = () => {
   const [rates, setRates] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("Delhi");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [showEstimator, setShowEstimator] = useState(false);
 
   const ratesPerPage = 10;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   //   const BASE_URL = "http://localhost:5000/api/v1/public"; // Replace with your live URL
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public";
@@ -36,11 +44,14 @@ const CghsRatePublic = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
+        setLoading(true); // Start loading
         const response = await axios.get(`${BASE_URL}/cghsRates`);
         setRates(response.data);
       } catch (error) {
         console.error("Error fetching CGHS Rates:", error);
-      }
+      } finally {
+        setLoading(false);
+      } // Done loading
     };
 
     fetchRates();
@@ -123,6 +134,8 @@ const CghsRatePublic = () => {
   const indexOfFirstRate = indexOfLastRate - ratesPerPage;
   const currentRates = filteredRates.slice(indexOfFirstRate, indexOfLastRate);
   const totalPages = Math.ceil(filteredRates.length / ratesPerPage);
+
+  if (loading) return <Loading />;
 
   return (
     <div className="p-2 max-w-6xl mx-auto animate-fade-in">
@@ -315,6 +328,28 @@ const CghsRatePublic = () => {
             <MdNavigateNext size={20} />
           </button>
         </div>
+      )}
+
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4 md:p-6 text-center shadow-sm mt-8">
+        <p className="text-gray-700 text-sm md:text-base mb-3">
+          🧾 <strong>Be informed.</strong> Get an estimate before your next lab
+          test or procedure — no surprises, no confusion. Know exactly what
+          you’ll pay as per CGHS.
+        </p>
+        <button
+          onClick={() => setShowEstimator(true)}
+          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white text-sm md:text-base font-semibold px-6 py-3 rounded-full transition shadow-md"
+        >
+          💡 Prepare CGHS Estimate Instantly
+        </button>
+      </div>
+
+      {showEstimator && (
+        <CGHSEstimatorModal
+          onClose={() => setShowEstimator(false)}
+          rates={rates}
+          selectedCity={selectedCity}
+        />
       )}
 
       <PageFeedback pageSlug="/cghs-rates" />
