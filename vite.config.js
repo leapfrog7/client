@@ -14,6 +14,8 @@ export default defineConfig({
         description:
           "MCQs, quiz tools, and Govt rules – prepare smartly for LDCE exams",
         start_url: "/",
+        id: "/",
+        scope: "/",
         display: "standalone",
         background_color: "#ffffff",
         theme_color: "#1e40af",
