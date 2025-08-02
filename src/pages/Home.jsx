@@ -38,7 +38,7 @@ const Home = ({
           name="keywords"
           content="UnderSigned, LDCE, Limited Departmental, Section Officer, Test Series, CCS CCA, Pension, Conduct, Leave Rules"
         />
-        <meta property="og:title" content="Home Page - Your React App" />
+        <meta property="og:title" content="UnderSigned| Prepare Smartly" />
         <meta
           property="og:description"
           content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC)"

@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import InstallAppButton from "./components/InstallAppButton";
 
 // import { HelmetProvider } from "react-helmet-async";
 
@@ -520,6 +521,7 @@ const App = () => {
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
         </div>
+        <InstallAppButton />
         <Footer />
       </div>
 
