@@ -77,6 +77,7 @@ export default function CTA() {
           src="/newHome.png"
           alt="Homepage Background"
           className="w-full h-auto object-cover rounded-2xl"
+          loading="lazy"
         />
         <div className="mt-6 text-center w-full max-w-sm">
           <p className="text-gray-500 text-sm tracking-wide uppercase">

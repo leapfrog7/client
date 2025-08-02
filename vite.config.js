@@ -9,27 +9,28 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg", "robots.txt", "apple-touch-icon.png"],
       manifest: {
-        name: "Undersigned",
+        name: "Undersigned - LDCE Exam Prep",
         short_name: "Undersigned",
-        description:
-          "MCQs, quiz tools, and Govt rules – prepare smartly for LDCE exams",
+        description: "MCQs, tools & rules for LDCE exams",
         start_url: "/",
         id: "/",
         scope: "/",
         display: "standalone",
-        background_color: "#ffffff",
-        theme_color: "#1e40af",
+        background_color: "#f9fafb", // soft off-white or light yellow
+        theme_color: "#1e40af", // your primary color
         orientation: "portrait",
         icons: [
           {
             src: "/icons/icon-192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any maskable",
           },
           {
             src: "/icons/icon-512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
           },
         ],
       },
