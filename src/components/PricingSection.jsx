@@ -46,7 +46,7 @@ const PricingSection = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
               className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
@@ -55,7 +55,7 @@ const PricingSection = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={{ duration: 0.2, delay: 0.15 }}
               className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
@@ -64,7 +64,7 @@ const PricingSection = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.6 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
               className="flex items-center text-gray-700 "
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-500 mr-3" />
