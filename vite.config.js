@@ -1,11 +1,10 @@
-import { defineConfig, splitVendorChunkPlugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin(), // quick vendor code-splitting
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg", "robots.txt", "apple-touch-icon.png"],
@@ -36,18 +35,16 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Unblock precache for your ~3.46 MB main chunk
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
-
-        // Don’t precache sourcemaps (keeps manifest clean)
+        // Allow precaching of your ~3.46 MB main chunk
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Keep sourcemaps out of the precache
         manifestTransforms: [
           async (entries) => {
             const manifest = entries.filter((e) => !e.url.endsWith(".map"));
             return { manifest };
           },
         ],
-
-        // (Optional) Runtime-cache the main app chunk pattern as well
+        // Optional: runtime cache the big app chunk too
         runtimeCaching: [
           {
             urlPattern: /assets\/index-.*\.js$/,
@@ -63,18 +60,19 @@ export default defineConfig({
   ],
 
   build: {
-    sourcemap: true, // keep as you had it
+    sourcemap: true,
     rollupOptions: {
       output: {
-        // Gentle, explicit chunking to reduce the size of index-*.js
+        // Your explicit chunking (safe + predictable)
         manualChunks: {
           react: ["react", "react-dom"],
-          pdf: ["pdfjs-dist"], // adjust/remove if not used
-          utils: ["lodash", "dayjs"].filter(Boolean), // keep only libs you actually use
+          // Remove lines for libs you don't use
+          pdf: ["pdfjs-dist"],
+          utils: ["lodash", "dayjs"],
         },
       },
     },
-    // Optional: quiet the 500 kB warning without affecting Workbox
+    // Optional: just silences Vite’s 500k warning (not related to Workbox)
     // chunkSizeWarningLimit: 2000,
   },
 });
