@@ -36,22 +36,22 @@ export default function PDFUtility() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-xl sm:text-2xl font-bold text-center mb-2 text-slate-700 dark:text-white">
+      <h1 className="text-xl sm:text-2xl font-bold text-center mb-2 text-slate-700 ">
         🛠️ Secure & Private PDF Tools
       </h1>
-      <p className="text-center text-sm md:text-base text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+      <p className="text-center text-sm md:text-base text-gray-600  mb-6 max-w-2xl mx-auto">
         Developed with the unique needs of{" "}
         <span className="font-medium">Government Employees</span> in mind, by
         processing everything entirely on your device — with{" "}
         <span className="font-medium">no data ever uploaded</span> to our
         servers.
       </p>
-      <p className="text-center text-sm sm:text-base font-medium text-gray-400 dark:text-gray-300 mb-3">
+      <p className="text-center text-sm sm:text-base font-medium text-gray-400  mb-3">
         --- Select a PDF Tool to Get Started ---
       </p>
 
       {/* --- MODIFIED: Tabs Container with Wrapping --- */}
-      <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+      <div className="border-b border-gray-200  pb-4">
         <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 sm:gap-x-4">
           {tabs.map((tab) => (
             <button
@@ -60,8 +60,8 @@ export default function PDFUtility() {
               // flex-shrink-0 is no longer needed as we WANT items to wrap
               className={`px-3 sm:px-4 py-2 text-sm sm:text-base font-medium rounded-lg border-2 transition-colors duration-200 ease-in-out focus:outline-none ${
                 activeTab === tab.id
-                  ? "border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-500"
-                  : "border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                  ? "border-blue-600 bg-blue-50 text-blue-700 "
+                  : "border-transparent bg-gray-100 text-gray-500 hover:bg-gray-200 "
               }`}
             >
               {tab.label}
@@ -71,7 +71,7 @@ export default function PDFUtility() {
       </div>
 
       {/* --- Content Area --- */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+      <div className="bg-white  rounded-lg shadow-md p-4 sm:p-6">
         {renderActiveComponent()}
       </div>
 
