@@ -155,6 +155,11 @@ export const navItems = [
         path: "/pages/public/7thCPC-paymatrix",
         icon: VscTable, // Matching your Economy icon style
       },
+      {
+        label: "PDF Tools",
+        path: "/pages/public/pdf-utility", // 👈 NEW ENTRY
+        icon: LuFileSearch, // You can change this to any relevant icon
+      },
     ],
   },
   {

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import PageFeedback from "../../components/PageFeedback";
 import Loading from "../../components/Loading"; // adjust path if needed
 import CGHSEstimatorModal from "../../components/Tools/CGHSEstimatorModal";
+import { Helmet } from "react-helmet-async";
 
 const CghsRatePublic = () => {
   const [rates, setRates] = useState([]);
@@ -141,6 +142,17 @@ const CghsRatePublic = () => {
 
   return (
     <div className="p-2 max-w-6xl mx-auto animate-fade-in">
+      <Helmet>
+        <title>Find CGHS Rates | UnderSigned</title>
+        <meta
+          name="description"
+          content="Search and explore Central Government Health Scheme (CGHS) prescribed rates. Prepare Estimate of expenditure as per CGHS rates"
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/cghs-rates"
+        />
+      </Helmet>
       <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2 mt-4">
         Find CGHS Rates 📋
       </h1>

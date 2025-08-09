@@ -47,6 +47,7 @@ const links = [
   { url: "/FAQs", changefreq: "weekly", priority: 0.8 },
   { url: "/subscribe", changefreq: "weekly", priority: 0.8 },
   { url: "/pages/public/cghs-units", changefreq: "weekly", priority: 0.8 },
+  { url: "/pages/public/cghs-rates", changefreq: "weekly", priority: 0.8 },
   { url: "/pages/public/nps-or-ups", changefreq: "monthly", priority: 0.8 },
   {
     url: "/pages/public/7thCPC-paymatrix",

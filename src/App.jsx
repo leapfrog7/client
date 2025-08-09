@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { Link } from "react-router-dom";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InstallAppButton from "./components/InstallAppButton";
@@ -51,6 +53,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
+import { FaHome } from "react-icons/fa";
+
 import AdminPage from "./pages/Admin";
 import Unauthorized from "./pages/Unauthorized";
 import NotLoggedIn from "./pages/NotLoggedIn";
@@ -67,6 +71,7 @@ import NpsEstimator from "./pages/Tools/NpsEstimator";
 import PublicResources from "./pages/PublicResources";
 import ResourceDetail from "./pages/ResourceDetail";
 import PrintEstimate from "./pages/Tools/PrintEstimate";
+import PDFUtility from "./pages/Tools/PDFUtility";
 
 const App = () => {
   //States
@@ -248,7 +253,12 @@ const App = () => {
           {isLoggedIn ? (
             <>
               <span className="text-yellow-700 text-sm md:text-xl font-semibold">{`Welcome, ${username}`}</span>
-              <div>
+              <div className="flex items-center gap-3">
+                <div className="px-3 py-2 rounded-md bg-yellow-600 hover:bg-yellow-500 text-yellow-100 hover:text-yellow-800">
+                  <Link to="/" title="Go to Home">
+                    <FaHome className="text-lg   " />{" "}
+                  </Link>
+                </div>
                 <SignOutButton
                   verifyToken={verifyClientToken}
                   isLoggedIn={isLoggedIn}
@@ -518,6 +528,8 @@ const App = () => {
             />
 
             <Route path="/print-estimate" element={<PrintEstimate />} />
+            <Route path="/pages/public/pdf-utility" element={<PDFUtility />} />
+
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
         </div>
