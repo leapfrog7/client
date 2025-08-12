@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { PDFDocument, degrees } from "pdf-lib";
-import * as pdfjsLib from "pdfjs-dist/build/pdf.mjs";
+// import * as pdfjsLib from "pdfjs-dist/build/pdf.mjs";
 
-// Keep worker pattern consistent with your project:
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// // Keep worker pattern consistent with your project:
+// pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+//   "pdfjs-dist/build/pdf.worker.min.mjs",
+//   import.meta.url
+// ).toString();
+import { pdfjsLib } from "./pdfjsSetup";
 
 export default function PDFRotator() {
   const [file, setFile] = useState(null); // { file: File, bytes: ArrayBuffer }
@@ -244,7 +245,7 @@ export default function PDFRotator() {
           {isRendering ? (
             <div className="text-xs text-gray-500">Generating previews…</div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {thumbs.map(({ page, url }, i) => (
                 <div
                   key={page}

@@ -351,7 +351,7 @@ export default function ImageToPDF() {
             {items.length} image{items.length > 1 ? "s" : ""} selected. Use ▲/▼
             to reorder.
           </div>
-          <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {items.map((it, idx) => (
               <div
                 key={it.id}

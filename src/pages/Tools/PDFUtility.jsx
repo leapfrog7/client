@@ -5,6 +5,7 @@ import PDFRotator from "../../components/pdfTools/PDFRotator";
 import PDFToolsCTA from "../../components/pdfTools/PDFToolsCTA";
 import AddPageNo from "../../components/pdfTools/AddPageNo";
 import ImageToPDF from "../../components/pdfTools/ImageToPDF";
+import PageFeedback from "../../components/PageFeedback";
 
 const tabs = [
   { label: "Merge PDFs", id: "merge" },
@@ -74,7 +75,7 @@ export default function PDFUtility() {
       <div className="bg-white  rounded-lg shadow-md p-4 sm:p-6">
         {renderActiveComponent()}
       </div>
-
+      <PageFeedback pageSlug="/pdfTools" />
       {/* --- CTA Section --- */}
       <div className="max-w-5xl mx-auto py-8 sm:py-12 space-y-6">
         <PDFToolsCTA />

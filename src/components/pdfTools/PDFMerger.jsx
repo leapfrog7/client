@@ -225,7 +225,7 @@ export default function PDFMerger() {
               strategy={verticalListSortingStrategy} // ← keep if you haven't imported rectSortingStrategy
             >
               {/* GRID: swap to a column list if sticking with verticalListSortingStrategy */}
-              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3  lg:grid-cols-4 gap-3">
                 {pdfItems.map((item, idx) => (
                   <div key={item.id} className="group relative">
                     {/* order badge */}

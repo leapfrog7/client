@@ -2,13 +2,15 @@
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 // Keep your current import style
-import * as pdfjsLib from "pdfjs-dist/build/pdf.mjs";
+// import * as pdfjsLib from "pdfjs-dist/build/pdf.mjs";
 
-// Keep your current worker setup (unchanged)
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// // Keep your current worker setup (unchanged)
+// pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+//   "pdfjs-dist/build/pdf.worker.min.mjs",
+//   import.meta.url
+// ).toString();
+
+import { pdfjsLib } from "./pdfjsSetup";
 
 export default function PDFSplitter() {
   const [file, setFile] = useState(null); // { file: File, bytes: ArrayBuffer }
