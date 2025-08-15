@@ -5,6 +5,7 @@ import PDFRotator from "../../components/pdfTools/PDFRotator";
 import PDFToolsCTA from "../../components/pdfTools/PDFToolsCTA";
 import AddPageNo from "../../components/pdfTools/AddPageNo";
 import ImageToPDF from "../../components/pdfTools/ImageToPDF";
+import PDFCompressor from "../../components/pdfTools/PDFCompressor";
 import PageFeedback from "../../components/PageFeedback";
 
 const tabs = [
@@ -13,6 +14,7 @@ const tabs = [
   { label: "Rotate Pages", id: "rotate" },
   { label: "Add Page No.", id: "addPage" },
   { label: "Image to PDF", id: "ImageToPDF" },
+  { label: "Compress PDF", id: "compressPDF" },
 ];
 
 export default function PDFUtility() {
@@ -30,6 +32,8 @@ export default function PDFUtility() {
         return <AddPageNo />;
       case "ImageToPDF":
         return <ImageToPDF />;
+      case "compressPDF":
+        return <PDFCompressor />;
       default:
         return null;
     }
