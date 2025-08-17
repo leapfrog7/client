@@ -7,6 +7,7 @@ import AddPageNo from "../../components/pdfTools/AddPageNo";
 import ImageToPDF from "../../components/pdfTools/ImageToPDF";
 import PDFCompressor from "../../components/pdfTools/PDFCompressor";
 import PageFeedback from "../../components/PageFeedback";
+import { Helmet } from "react-helmet-async";
 
 const tabs = [
   { label: "Merge PDFs", id: "merge" },
@@ -41,6 +42,21 @@ export default function PDFUtility() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <Helmet>
+        <title>
+          PDF Tools — Split, Merge, Compress, Rotate, Image to PDF (20 MB
+          eOffice Ready) | UnderSigned
+        </title>
+        <meta
+          name="description"
+          content="Free client-side PDF tools for Central & State Govt. users: split PDFs by custom page ranges or automatically into 20 MB parts for eOffice, merge multiple files, compress large documents with rasterize & rebuild, and rotate pages. Convert Images to PDF and Nothing is uploaded — all processing happens securely in your browser for complete privacy. Your file stays where it should - with YOU"
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/public/pdf-utility"
+        />
+      </Helmet>
+
       <h1 className="text-xl sm:text-2xl font-bold text-center mb-2 text-slate-700 ">
         🛠️ Secure & Private PDF Tools
       </h1>
