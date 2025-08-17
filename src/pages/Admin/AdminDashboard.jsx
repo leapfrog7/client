@@ -1,229 +1,216 @@
-import { useState, useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import { Outlet } from "react-router-dom";
-
-import { jwtDecode } from "jwt-decode";
-import UserManagement from "./UserManagement";
-import MCQManagement from "./MCQ_Management";
-import RevenueManagement from "./RevenueManagement";
-import AobrManagement from "./AobrManagement";
-import FeedbackManagement from "./FeedbackManagement";
-import CghsUnitManagement from "./CghsUnitManagement";
-import CghsRateManagement from "./CghsRateManagement";
-import ResourceManagement from "./ResourceManagement";
-import SectionEditor from "./SectionEditor";
-// import VisitorManagement from "./VisitorManagement";
-import { VscFeedback } from "react-icons/vsc";
-import { FaHospital, FaRupeeSign } from "react-icons/fa";
-
-import PrevYear from "./PrevYear";
+import { useEffect, useState } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+// Icons
 import {
   FaUsers,
   FaQuestionCircle,
   FaChartBar,
   FaBook,
   FaHistory,
-} from "react-icons/fa"; // ✅ Import icons
+  FaHospital,
+  FaRupeeSign,
+  FaCommentDots,
+} from "react-icons/fa";
+import { VscFeedback } from "react-icons/vsc";
+
+// -------- Module registry (single source of truth) --------
+const MODULES = [
+  {
+    to: "users",
+    title: "User Management",
+    desc: "Manage registered users, update profiles, and track subscriptions.",
+    Icon: FaUsers,
+    color: "text-blue-500",
+  },
+  {
+    to: "mcqs",
+    title: "MCQ Management",
+    desc: "Create, edit, and organize multiple-choice questions.",
+    Icon: FaQuestionCircle,
+    color: "text-green-500",
+  },
+  {
+    to: "revenue",
+    title: "Revenue Management",
+    desc: "Track user payments, subscriptions, and financial insights.",
+    Icon: FaChartBar,
+    color: "text-yellow-500",
+  },
+  {
+    to: "aobr",
+    title: "AoBR Management",
+    desc: "Manage AoBR topics and study materials.",
+    Icon: FaBook,
+    color: "text-purple-500",
+  },
+  {
+    to: "prevYear",
+    title: "Previous Years",
+    desc: "Access previous year questions and answer sets.",
+    Icon: FaHistory,
+    color: "text-red-500",
+  },
+  {
+    to: "feedbackMgmt",
+    title: "Question Feedback",
+    desc: "Review and resolve question-specific feedback.",
+    Icon: VscFeedback,
+    color: "text-purple-500",
+  },
+  {
+    to: "generalFeedback",
+    title: "General Feedback",
+    desc: "View app/site feedback not tied to any question.",
+    Icon: FaCommentDots,
+    color: "text-fuchsia-600",
+  },
+  {
+    to: "cghs",
+    title: "CGHS Unit Management",
+    desc: "Add and manage CGHS empanelled hospitals and labs.",
+    Icon: FaHospital,
+    color: "text-cyan-500",
+  },
+  {
+    to: "cghs-rates",
+    title: "CGHS Rates Management",
+    desc: "Add and manage CGHS rates for procedures, tests, and implants.",
+    Icon: FaRupeeSign,
+    color: "text-green-500",
+  },
+  {
+    to: "resourceMgmt",
+    title: "Resource Management",
+    desc: "Add and manage Rules, Acts, Manuals, and Circulars.",
+    Icon: FaBook,
+    color: "text-indigo-600",
+  },
+];
+
+// -------- Small header component --------
+function AdminHeader() {
+  let name = "Admin";
+  try {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      const payload = JSON.parse(atob(token.split(".")[1] || ""));
+      name = payload?.name || name;
+    }
+  } catch {
+    // ignore
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm mb-4 px-4 py-3 flex items-center justify-between">
+      <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
+        Admin Dashboard
+      </h1>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-600">
+          Signed in as <strong>{name}</strong>
+        </span>
+        <Link
+          to="/"
+          className="text-sm text-teal-700 underline hover:no-underline"
+        >
+          View Site
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 const AdminDashboard = () => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const location = useLocation();
 
+  // Robust + case-insensitive + expiry-aware admin check
   useEffect(() => {
-    const checkAdminStatus = () => {
+    try {
       const token = localStorage.getItem("jwtToken");
-      if (token) {
-        const decodedToken = jwtDecode(token);
-        setIsAdmin(decodedToken.userType === "Admin");
-      } else {
-        setIsAdmin(false);
+      if (!token) return setIsAdmin(false);
+
+      const payload = JSON.parse(atob(token.split(".")[1] || ""));
+      const expOk = payload?.exp ? Date.now() < payload.exp * 1000 : true;
+      const isRoleAdmin =
+        String(payload?.userType || "").toLowerCase() === "admin";
+
+      if (!expOk) {
+        localStorage.removeItem("jwtToken");
+        return setIsAdmin(false);
       }
-    };
-    checkAdminStatus();
+      setIsAdmin(Boolean(isRoleAdmin));
+    } catch {
+      setIsAdmin(false);
+    }
   }, []);
 
   if (!isAdmin) {
     return (
       <div className="p-8 mx-auto flex flex-col text-center gap-4">
-        <span className="text-3xl bg-red-100 text-red-800 py-6">
+        <span className="text-3xl bg-red-100 text-red-800 py-6 px-4 rounded-lg">
           Unauthorized Access
         </span>
-        <a href="/" className="text-blue-500 text-xl">
+        <Link to="/" className="text-blue-600 text-xl underline">
           Go Home
-        </a>
+        </Link>
       </div>
     );
   }
 
+  const isAtAdminRoot = /\/admin\/?$/.test(location.pathname);
+
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
+      {/* Optional gradient banner (keep if you like the color) */}
       <div className="bg-gradient-to-r from-green-200 to-teal-500 rounded-lg shadow-md my-4 p-4">
-        <h1 className="text-xl lg:text-2xl font-bold text-center text-gray-800 tracking-wider">
-          Admin Dashboard
-        </h1>
+        <h2 className="text-lg lg:text-xl font-semibold text-center text-gray-800 tracking-wider">
+          Welcome to the control center
+        </h2>
       </div>
 
-      {/* Dashboard Navigation as Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 w-11/12 mx-auto">
-        {/* User Management */}
-        <Link
-          to="users"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-blue-50 transition-all duration-300 ease-in-out"
-        >
-          <FaUsers className="text-4xl text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            User Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Manage registered users, update profiles, and track subscriptions.
-          </p>
-        </Link>
+      {/* Clean header with context & quick links */}
+      <AdminHeader />
 
-        {/* MCQ Management */}
-        <Link
-          to="mcqs"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-green-50 transition-all duration-300 ease-in-out"
-        >
-          <FaQuestionCircle className="text-4xl text-green-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            MCQ Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Create, edit, and organize multiple-choice questions.
-          </p>
-        </Link>
+      {/* Modules grid */}
+      <section aria-label="Admin modules">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 w-11/12 mx-auto">
+          {MODULES.map(({ to, title, desc, Icon, color }) => (
+            <NavLink
+              key={to}
+              to={to}
+              aria-label={title}
+              className={({ isActive }) =>
+                [
+                  "group bg-white shadow-lg rounded-lg p-6 text-center transition",
+                  "hover:shadow-xl hover:-translate-y-0.5 focus:outline-none",
+                  "focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2",
+                  isActive ? "ring-2 ring-teal-500 ring-offset-2" : "",
+                ].join(" ")
+              }
+            >
+              <Icon
+                className={`text-4xl ${color} mx-auto mb-2 group-hover:scale-110 transition-transform`}
+              />
+              <h3 className="text-base lg:text-xl font-semibold text-gray-800">
+                {title}
+              </h3>
+              <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
+                {desc}
+              </p>
+            </NavLink>
+          ))}
+        </div>
+      </section>
 
-        {/* Revenue Management */}
-        <Link
-          to="revenue"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-yellow-50 transition-all duration-300 ease-in-out"
-        >
-          <FaChartBar className="text-4xl text-yellow-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            Revenue Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Track user payments, subscriptions, and financial insights.
-          </p>
-        </Link>
-
-        {/* AoBR Management */}
-        <Link
-          to="aobr"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-purple-50 transition-all duration-300 ease-in-out"
-        >
-          <FaBook className="text-4xl text-purple-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            AoBR Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Manage AoBR topics and study materials.
-          </p>
-        </Link>
-
-        {/* Previous Years */}
-        <Link
-          to="prevYear"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-red-50 transition-all duration-300 ease-in-out"
-        >
-          <FaHistory className="text-4xl text-red-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            Previous Years
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Access previous year questions and answer sets.
-          </p>
-        </Link>
-
-        {/* Feedback management  */}
-        <Link
-          to="feedbackMgmt"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-purple-50 transition-all duration-300 ease-in-out"
-        >
-          <VscFeedback className="text-4xl text-purple-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            Feedback Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Manage all your feedbacks.
-          </p>
-        </Link>
-        {/* CGHS management */}
-        <Link
-          to="cghs"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-cyan-50 transition-all duration-300 ease-in-out"
-        >
-          <FaHospital className="text-4xl text-cyan-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            CGHS Unit Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Add and manage CGHS empanelled hospitals and labs.
-          </p>
-        </Link>
-
-        {/* CGHS Rates Management */}
-        <Link
-          to="cghs-rates"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-green-50 transition-all duration-300 ease-in-out"
-        >
-          <FaRupeeSign className="text-4xl text-green-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            CGHS Rates Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Add and manage CGHS rates for procedures, tests, and implants.
-          </p>
-        </Link>
-        {/* Resource Management */}
-        <Link
-          to="resourceMgmt"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-indigo-50 transition-all duration-300 ease-in-out"
-        >
-          <FaBook className="text-4xl text-indigo-600 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            Resource Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            Add and manage Rules, Acts, Manuals, and Circulars.
-          </p>
-        </Link>
-
-        {/* Visitor management  */}
-        {/* <Link
-          to="visitorManagement"
-          className="group bg-white shadow-lg rounded-lg p-6 text-center hover:bg-indigo-50 transition-all duration-300 ease-in-out"
-        >
-          <FaEye className="text-4xl text-indigo-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-          <h2 className="text-base lg:text-xl font-semibold text-gray-800">
-            Visitor Management
-          </h2>
-          <p className="text-gray-500 text-xs md:text-sm lg:text-base mt-2">
-            View and analyze visitor activity.
-          </p>
-        </Link> */}
-      </div>
-      <div className="text-5xl text-black mx-auto text-center border border-gray-400 w-11/12 mt-8">
-        <h2></h2>
-      </div>
-      {/* Routes Section */}
-      <div className="mt-8">
-        <Routes>
-          <Route path="users" element={<UserManagement />} />
-          <Route path="mcqs" element={<MCQManagement />} />
-          <Route path="revenue" element={<RevenueManagement />} />
-          <Route path="aobr" element={<AobrManagement />} />
-          <Route path="prevYear" element={<PrevYear />} />
-          <Route path="feedbackMgmt" element={<FeedbackManagement />} />
-          <Route path="cghs" element={<CghsUnitManagement />} />
-          <Route path="cghs-rates" element={<CghsRateManagement />} />
-          <Route path="resourceMgmt" element={<ResourceManagement />} />
-          <Route
-            path="resourceMgmt/:slug/sections"
-            element={<SectionEditor />}
-          />
-          {/* <Route path="visitorManagement" element={<VisitorManagement />} /> */}
-        </Routes>
-        <Outlet /> {/* ✅ Add this to render nested routes */}
+      {/* Child route outlet + helpful placeholder */}
+      <div className="mt-8 w-11/12 mx-auto">
+        <Outlet />
+        {isAtAdminRoot && (
+          <div className="bg-white rounded-lg p-8 text-center text-gray-600 border">
+            Select a module above to get started.
+          </div>
+        )}
       </div>
     </div>
   );

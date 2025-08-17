@@ -1,7 +1,7 @@
 import "./App.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -50,6 +50,27 @@ import PreviousYearQuiz from "./pages/quiz/previousYear/Exam";
 import EmailOtpReset from "./pages/EmailOtpReset";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+const UserManagement = lazy(() => import("./pages/Admin/UserManagement"));
+const MCQManagement = lazy(() => import("./pages/Admin/MCQ_Management"));
+const RevenueManagement = lazy(() => import("./pages/Admin/RevenueManagement"));
+const AobrManagement = lazy(() => import("./pages/Admin/AobrManagement"));
+const FeedbackManagement = lazy(() =>
+  import("./pages/Admin/QuestionFeedbackManagement")
+);
+const CghsUnitManagement = lazy(() =>
+  import("./pages/Admin/CghsUnitManagement")
+);
+const CghsRateManagement = lazy(() =>
+  import("./pages/Admin/CghsRateManagement")
+);
+const ResourceManagement = lazy(() =>
+  import("./pages/Admin/ResourceManagement")
+);
+const GeneralFeedbackManagement = lazy(() =>
+  import("./pages/Admin/GeneralFeedbackManagement")
+); // <-- add this
+const SectionEditor = lazy(() => import("./pages/Admin/SectionEditor"));
+const PrevYear = lazy(() => import("./pages/Admin/PrevYear"));
 
 //Icons
 import { FiMenu } from "react-icons/fi"; // For the hamburger menu icon
@@ -493,7 +514,97 @@ const App = () => {
             />
 
             {/* Admin Routes */}
-            <Route path="/AdminDashboard/*" element={<AdminDashboard />} />
+            <Route path="/adminDashboard" element={<AdminDashboard />}>
+              <Route
+                path="users"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <UserManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="mcqs"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <MCQManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="revenue"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <RevenueManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="aobr"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <AobrManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="prevYear"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <PrevYear />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="feedbackMgmt"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <FeedbackManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="generalFeedback"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <GeneralFeedbackManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="cghs"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <CghsUnitManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="cghs-rates"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <CghsRateManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="resourceMgmt"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <ResourceManagement />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="resourceMgmt/:slug/sections"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <SectionEditor />
+                  </Suspense>
+                }
+              />
+            </Route>
+
             {/* <Route
               path="/AdminDashboard/userManagement"
               element={<UserManagement />}
