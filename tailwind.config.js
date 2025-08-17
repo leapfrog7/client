@@ -44,7 +44,7 @@ export default {
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-out",
-        "scroll-x": "scrollX 60s linear infinite", // adjust speed as needed
+        "scroll-x": "scrollX 20s linear infinite", // adjust speed as needed
       },
     },
   },

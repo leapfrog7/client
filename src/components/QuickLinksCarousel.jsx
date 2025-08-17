@@ -10,6 +10,7 @@ import {
   FaBook,
 } from "react-icons/fa";
 import { GiMedicalDrip } from "react-icons/gi";
+import { BsFiletypePdf } from "react-icons/bs";
 
 const QuickLinksCarousel = ({
   title = "Quick and Free Links",
@@ -40,6 +41,12 @@ const QuickLinksCarousel = ({
       icon: GiMedicalDrip,
     },
     {
+      title: "PDF Tools",
+      subtitle: "Merge, Split, Rotate, Compress and Convert JPG to PDF",
+      url: "/pages/public/pdf-utility",
+      icon: BsFiletypePdf,
+    },
+    {
       title: "Resources",
       subtitle: "Search Important Rules and Regulations at one place.",
       url: "/pages/public/resources",
@@ -68,7 +75,7 @@ const QuickLinksCarousel = ({
 
             <div className="overflow-x-auto">
               <div className="flex space-x-4 pb-4 animate-scroll-x">
-                {[...linksData, ...linksData, ...linksData].map((link, idx) => (
+                {[...linksData, ...linksData].map((link, idx) => (
                   <Link
                     to={link.url}
                     key={idx}

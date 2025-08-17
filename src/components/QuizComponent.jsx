@@ -862,7 +862,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     } finally {
       if (thisReq === bookmarkReqId.current) setLoadingBM(false);
     }
-  }, [bookmarkedQuestions, currentQuestion, topicName, userId]);
+  }, [bookmarkedQuestions, currentQuestion, topicId, topicName, userId]);
 
   const handleSubmit = useCallback(async () => {
     // if (submittedOnce.current) return; // double-submit guard

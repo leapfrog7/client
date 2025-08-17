@@ -32,7 +32,7 @@ export default function QuizDetails() {
       {/* Stats Section */}
       <div className="w-full bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-lg shadow-lg text-gray-700 text-center">
         <h1 className="text-xl lg:text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-          Stats of Our 7700+ Question Bank
+          Stats of Our 8000+ Question Bank
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4">
@@ -40,7 +40,7 @@ export default function QuizDetails() {
             icon={FaDatabase}
             color="text-blue-600"
             title="Total Questions"
-            count="4,129"
+            count="4,400+"
             description="Explore a vast collection of questions covering various topics."
             footnote="(excluding AoBR)"
           />
@@ -48,7 +48,7 @@ export default function QuizDetails() {
             icon={FaQuestionCircle}
             color="text-green-600"
             title="AoBR Exclusive"
-            count="2,204"
+            count="2,200+"
             description="Dive deep into AoBR with exclusive quizzes."
           />
           <StatCard
