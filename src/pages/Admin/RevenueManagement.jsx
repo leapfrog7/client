@@ -297,7 +297,7 @@ export default function RevenueManagement() {
       </div>
 
       {/* Table */}
-      <div className="relative bg-white border rounded-lg overflow-hidden">
+      <div className="relative bg-white border rounded-lg overflow-x-auto overflow-hidden">
         {loading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
             Loading…
