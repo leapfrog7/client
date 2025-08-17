@@ -1552,6 +1552,22 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
           </div>
         </div>
       )}
+
+      {/* What's New (simple collapsible, no state) */}
+      <details className="my-4 rounded-lg border border-blue-200 bg-blue-50 text-blue-900">
+        <summary className="cursor-pointer select-none px-3 py-2 font-semibold">
+          What’s new in Quiz
+        </summary>
+        <div className="px-3 pb-3 text-sm leading-relaxed">
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Swipe left/right on mobile to change questions.</li>
+            <li>One-row question pills for easier navigation.</li>
+
+            <li>Clear selection button for the current question.</li>
+            <li>Option to flag questions for later review and tracking.</li>
+          </ul>
+        </div>
+      </details>
     </div>
   );
 };
