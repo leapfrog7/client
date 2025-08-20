@@ -85,6 +85,13 @@ const MODULES = [
     Icon: FaBook,
     color: "text-indigo-600",
   },
+  {
+    to: "ideasMgmt",
+    title: "Ideas & Roadmap",
+    desc: "Capture ideas, slice them, and track progress.",
+    Icon: FaBook,
+    color: "text-teal-600",
+  },
 ];
 
 // -------- Small header component --------

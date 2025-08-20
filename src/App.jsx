@@ -69,6 +69,7 @@ const ResourceManagement = lazy(() =>
 const GeneralFeedbackManagement = lazy(() =>
   import("./pages/Admin/GeneralFeedbackManagement")
 ); // <-- add this
+const IdeaManagement = lazy(() => import("./pages/Admin/IdeaManagement"));
 const SectionEditor = lazy(() => import("./pages/Admin/SectionEditor"));
 const PrevYear = lazy(() => import("./pages/Admin/PrevYear"));
 
@@ -600,6 +601,14 @@ const App = () => {
                 element={
                   <Suspense fallback={<div className="p-6">Loading…</div>}>
                     <SectionEditor />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="ideasMgmt"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <IdeaManagement />
                   </Suspense>
                 }
               />
