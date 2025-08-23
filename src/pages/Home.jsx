@@ -154,9 +154,9 @@ import CTA from "../components/CTA";
 import QuickLinksCarousel from "../components/QuickLinksCarousel";
 
 // Prefer env, fallback to your prod base
-// const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
 // Local (toggle when needed)
-const BASE_URL = "http://localhost:5000/api/v1";
+// const BASE_URL = "http://localhost:5000/api/v1";
 
 const authHeaders = () => {
   const t = localStorage.getItem("jwtToken");
