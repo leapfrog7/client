@@ -478,7 +478,18 @@ import QuestionFeedback from "./QuestionFeedback";
 // ✅ Drop-in: single-file component with client-only upgrades (no backend changes)
 
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; // keep your existing
+// const BASE_URL = "http://localhost:5000/api/v1";
+
 const TOKEN = () => localStorage.getItem("jwtToken");
+
+// tiny uuid (no extra dep)
+const uuid = () =>
+  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+    (
+      c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+    ).toString(16)
+  );
 
 // Local storage helpers
 const storageKey = (userId, topicId) => `quiz:${userId}:${topicId}`;
@@ -533,6 +544,9 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const [loadingBM, setLoadingBM] = useState(false);
   const [error, setError] = useState(null);
   const [showAllQuestions, setShowAllQuestions] = useState(false);
+  // Server-computed results (from /quiz/submitQuiz)
+  const [serverResult, setServerResult] = useState(null); // { correct, total, percent }
+  const [serverComparison, setServerComparison] = useState(null); // { avgBefore, deltaFromAvgBefore, attemptsBefore }
 
   // Enhancements
   const [flagged, setFlagged] = useState(new Set()); // client-only flagging
@@ -864,27 +878,74 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     }
   }, [bookmarkedQuestions, currentQuestion, topicId, topicName, userId]);
 
+  // const handleSubmit = useCallback(async () => {
+  //   // if (submittedOnce.current) return; // double-submit guard
+  //   setIsSubmitting(true);
+  //   setError(null);
+  //   try {
+  //     await axios.post(
+  //       `${BASE_URL}/quiz/submitQuiz`,
+  //       {
+  //         userId,
+  //         topicName,
+  //         attemptedQuestions: quizData.map((q) => q._id),
+  //       },
+  //       { headers: { Authorization: `Bearer ${TOKEN()}` } }
+  //     );
+  //     submittedOnce.current = true;
+
+  //     // Compute score once
+  //     const score = quizData.reduce((acc, q, idx) => {
+  //       return acc + (selectedAnswers[idx] === q.correctAnswer ? 1 : 0);
+  //     }, 0);
+  //     setFinalScore(score);
+  //     setIsSubmitted(true);
+  //   } catch (err) {
+  //     console.error("Failed to submit quiz:", err);
+  //     setError("Failed to submit quiz");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // }, [quizData, selectedAnswers, topicName, userId]);
+
   const handleSubmit = useCallback(async () => {
-    // if (submittedOnce.current) return; // double-submit guard
     setIsSubmitting(true);
     setError(null);
     try {
-      await axios.post(
-        `${BASE_URL}/quiz/submitQuiz`,
-        {
-          userId,
-          topicName,
-          attemptedQuestions: quizData.map((q) => q._id),
-        },
-        { headers: { Authorization: `Bearer ${TOKEN()}` } }
-      );
+      // Build responses array expected by backend
+      const responses = quizData.map((q, idx) => ({
+        questionId: q._id,
+        selected: selectedAnswers[idx] ?? null, // null if unanswered
+      }));
+
+      const submissionId = uuid(); // idempotency
+
+      await axios
+        .post(
+          `${BASE_URL}/quiz/submitQuiz`,
+          {
+            userId,
+            topicName,
+            // still sending attemptedQuestions (legacy) is harmless,
+            attemptedQuestions: quizData.map((q) => q._id),
+            responses,
+            startedAt: new Date().toISOString(), // optional
+            timeTakenSec: undefined, // plug in if you track
+            submissionId,
+          },
+          { headers: { Authorization: `Bearer ${TOKEN()}` } }
+        )
+        .then(({ data }) => {
+          // trust server for authoritative scoring + comparison
+          setServerResult(data?.result || null);
+          setServerComparison(data?.comparison || null);
+          // keep your local finalScore for existing UI that shows X / N
+          setFinalScore(data?.result?.correct ?? 0);
+        });
+
       submittedOnce.current = true;
 
-      // Compute score once
-      const score = quizData.reduce((acc, q, idx) => {
-        return acc + (selectedAnswers[idx] === q.correctAnswer ? 1 : 0);
-      }, 0);
-      setFinalScore(score);
+      // Compute score once (client-side)
       setIsSubmitted(true);
     } catch (err) {
       console.error("Failed to submit quiz:", err);
@@ -1072,44 +1133,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const isFlagged = flagged.has(qIdStr);
   const userAnswer = selectedAnswers[currentQuestionIndex];
 
-  // Question palette with states
-  // const renderPalette = () => (
-  //   <div className="flex flex-wrap gap-2 mb-4">
-  //     {quizData.map((q, idx) => {
-  //       const id = String(q._id);
-  //       const answered =
-  //         selectedAnswers[idx] !== undefined && selectedAnswers[idx] !== null;
-  //       const bookmarked = bookmarkedQuestions.includes(id);
-  //       const flg = flagged.has(id);
-  //       const isCurrent = idx === currentQuestionIndex;
-
-  //       const base =
-  //         "w-8 h-8 flex items-center justify-center rounded-full border text-xs font-semibold cursor-pointer";
-  //       const bg = isCurrent
-  //         ? "bg-blue-600 text-white border-blue-600"
-  //         : answered
-  //         ? "bg-emerald-100 text-emerald-800 border-emerald-300"
-  //         : "bg-gray-100 text-gray-800 border-gray-300";
-  //       const ring = bookmarked
-  //         ? "ring-2 ring-yellow-400"
-  //         : flg
-  //         ? "ring-2 ring-pink-400"
-  //         : "";
-
-  //       return (
-  //         <button
-  //           key={id}
-  //           onClick={() => handleNavigation(idx)}
-  //           className={`${base} ${bg} ${ring}`}
-  //           aria-label={`Jump to question ${idx + 1}`}
-  //         >
-  //           {idx + 1}
-  //         </button>
-  //       );
-  //     })}
-  //   </div>
-  // );
-
   return (
     <div className="min-h-screen">
       {/* Random toggle */}
@@ -1276,8 +1299,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               </button>
             </div>
 
-            {/* Collapsible Question Map (below options & controls) */}
-            {/* One-row Question Row: horizontally scrollable on mobile */}
             {/* Question Pills — centered on desktop, scrollable on mobile */}
             <div className="mt-4 -mx-2 px-2">
               <div className="relative">
@@ -1439,6 +1460,109 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
           >
             🎯 Your Score: {finalScore} / {quizData.length}
           </p>
+
+          {/* Server comparison card */}
+          {serverResult && (
+            <div className="mb-3 grid gap-2 grid-cols-1 sm:grid-cols-3">
+              {/* This attempt */}
+              <div
+                className="p-2 sm:p-3 rounded-lg border bg-white shadow-sm"
+                title="Percentage score in this submission"
+                aria-label="This attempt percentage"
+              >
+                <div className="text-[10px] sm:text-xs text-gray-500">
+                  This attempt
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <div className="text-base lg:text-xl font-semibold">
+                    {serverResult.percent}%
+                  </div>
+                  <div className="text-[11px] sm:text-xs text-gray-500">
+                    ({serverResult.correct}/{serverResult.total})
+                  </div>
+                </div>
+              </div>
+
+              {/* Your average (previous attempts) */}
+              <div
+                className="p-2 sm:p-3 rounded-lg border bg-white shadow-sm"
+                title="Average of your previous attempts on this topic"
+                aria-label="Your average percentage from previous attempts"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] sm:text-xs text-gray-500">
+                    Your average
+                    <span className="ml-1 hidden sm:inline">(previous)</span>
+                  </div>
+                  <span
+                    className="ml-2 inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] sm:text-[11px] text-gray-600"
+                    title="Number of previous attempts counted in the average"
+                  >
+                    {serverComparison?.attemptsBefore ?? 0}×
+                  </span>
+                </div>
+
+                <div className="text-base lg:text-xl font-semibold mt-0.5">
+                  {serverComparison?.avgBefore == null
+                    ? "—"
+                    : `${Number(serverComparison.avgBefore).toFixed(1)}%`}
+                </div>
+
+                {serverComparison?.avgBefore == null && (
+                  <div className="mt-1 text-[11px] sm:text-xs text-gray-500">
+                    Your average will appear after your next attempt.
+                  </div>
+                )}
+              </div>
+
+              {/* Change vs average */}
+              <div
+                className={`p-2 sm:p-3 rounded-lg border shadow-sm ${
+                  serverComparison?.avgBefore == null
+                    ? "bg-gray-50 border-gray-200"
+                    : serverComparison?.deltaFromAvgBefore > 0
+                    ? "bg-green-50 border-green-200"
+                    : serverComparison?.deltaFromAvgBefore < 0
+                    ? "bg-rose-50 border-rose-200"
+                    : "bg-gray-50 border-gray-200"
+                }`}
+                title="How this attempt compares to your previous average"
+                aria-label="Change versus average"
+              >
+                <div className="text-[10px] sm:text-xs text-gray-500">
+                  Change vs average
+                </div>
+
+                <div className="text-base lg:text-xl font-semibold mt-0.5">
+                  {serverComparison?.avgBefore == null ? (
+                    <span className="text-gray-700">No past data</span>
+                  ) : (
+                    <>
+                      {serverComparison.deltaFromAvgBefore > 0
+                        ? "▲"
+                        : serverComparison.deltaFromAvgBefore < 0
+                        ? "▼"
+                        : "—"}{" "}
+                      {Math.abs(
+                        Number(serverComparison.deltaFromAvgBefore || 0)
+                      ).toFixed(1)}
+                      %
+                    </>
+                  )}
+                </div>
+
+                {serverComparison?.avgBefore != null && (
+                  <div className="mt-1 text-[11px] sm:text-xs text-gray-600">
+                    {serverComparison.deltaFromAvgBefore > 0
+                      ? "Up from your average"
+                      : serverComparison.deltaFromAvgBefore < 0
+                      ? "Down from your average"
+                      : "Same as your average"}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Results filter */}
           <div className="flex flex-wrap gap-2 mb-4">

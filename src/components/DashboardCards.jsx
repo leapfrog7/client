@@ -23,10 +23,46 @@ const DashboardCard = ({
   }, [progress, attemptedQuestions]);
 
   const [loading, setLoading] = useState(false);
+  const [avgLoading, setAvgLoading] = useState(true);
+  const [avgPercent, setAvgPercent] = useState(null); // null = no attempts
+  const [avgAttempts, setAvgAttempts] = useState(0);
   const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1";
   // ✅ Ensure progress is a valid number
   const progressValue = parseFloat(progress) || 0;
+
+  // Fetch average score for this topic (per user)
+  useEffect(() => {
+    if (!userId || !topicId) return;
+    const token = localStorage.getItem("jwtToken");
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setAvgLoading(true);
+        const { data } = await axios.get(
+          `${BASE_URL}/quiz/topicAverage/${userId}/${topicId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (cancelled) return;
+        setAvgPercent(
+          typeof data?.avgPercent === "number" ? data.avgPercent : null
+        );
+        setAvgAttempts(data?.attempts || 0);
+      } catch (e) {
+        if (!cancelled) {
+          setAvgPercent(null);
+          setAvgAttempts(0);
+        }
+      } finally {
+        if (!cancelled) setAvgLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, topicId]);
 
   // ✅ Define colors based on progress percentage
   const getProgressColor = () => {
@@ -102,6 +138,10 @@ const DashboardCard = ({
           {attemptedQuestions} <IoMdDoneAll />
         </span>
       </p>
+
+      {/* Average Score chip */}
+      {/* Average Score meter */}
+
       <div className="flex flex-col 2xl:flex-row gap-3 my-4">
         {/* Reset Progress Button */}
         <button
@@ -121,6 +161,87 @@ const DashboardCard = ({
         >
           Take Quiz <FaRegClipboard className="ml-1" />
         </Link>
+      </div>
+      {/* Average Score meter */}
+      <div className="mt-2 w-full">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] md:text-xs text-gray-600">
+            Average score
+          </span>
+          <span className="text-[11px] md:text-xs text-gray-700">
+            {avgLoading
+              ? "…"
+              : avgPercent == null
+              ? "—"
+              : `${Number(avgPercent).toFixed(1)}%`}
+            <span className="ml-1 text-[10px] text-gray-500">
+              {avgLoading ? "" : `(${avgAttempts}×)`}
+            </span>
+          </span>
+        </div>
+
+        {(() => {
+          // ✅ robust numeric handling
+          const val =
+            avgPercent == null
+              ? null
+              : Math.max(0, Math.min(100, Number(avgPercent))); // clamp 0–100
+
+          // ✅ discrete color by thresholds
+          const color =
+            val == null
+              ? "bg-gray-300"
+              : val > 60
+              ? "bg-green-500"
+              : val > 40
+              ? "bg-yellow-400"
+              : "bg-red-400";
+
+          const width = val == null ? "0%" : `${val}%`;
+
+          return (
+            <div
+              role="img"
+              aria-label={
+                avgLoading
+                  ? "Loading average score"
+                  : val == null
+                  ? "No attempts yet"
+                  : `Average score ${val}% based on ${avgAttempts} attempts`
+              }
+              title={
+                val == null
+                  ? "Your average will appear after your first attempt"
+                  : `Average score: ${val}%`
+              }
+              className="relative h-2.5 rounded-full bg-gray-200 overflow-hidden"
+            >
+              {/* fill */}
+              <div
+                className={`h-full transition-[width] duration-500 ${color}`}
+                style={{ width }}
+              />
+
+              {/* goal zone from 60% */}
+              <div
+                className="pointer-events-none absolute inset-y-0 right-0 bg-green-100/30"
+                style={{ left: "60%" }}
+                aria-hidden
+              />
+
+              {/* tick at 60% */}
+              <div className="pointer-events-none absolute inset-0">
+                <span className="absolute top-0 bottom-0 left-[60%] w-px bg-gray-400/40" />
+              </div>
+            </div>
+          );
+        })()}
+
+        {!avgLoading && avgPercent == null && (
+          <div className="mt-1 text-[10px] md:text-xs text-gray-500">
+            Take a quiz to start seeing your average.
+          </div>
+        )}
       </div>
     </div>
   );
