@@ -28,17 +28,18 @@ export default function Login({ verifyToken }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+  // Local (toggle when needed)
+  const BASE_URL = "http://localhost:5000/api/v1";
+
   //function to check credentials when sing In button is clicked
   const handleCredentialCheck = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "https://server-v4dy.onrender.com/api/v1/login",
-        {
-          mobile: userInput,
-          password: passwordInput,
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/login`, {
+        mobile: userInput,
+        password: passwordInput,
+      });
       setData(response);
       // Store the token in local storage
       localStorage.setItem("jwtToken", response.data.token);
