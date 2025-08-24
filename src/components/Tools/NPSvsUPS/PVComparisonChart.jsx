@@ -23,7 +23,7 @@ ChartJS.register(
 
 const PVComparisonChart = ({ nps, upsFull, upsReduced }) => {
   const data = {
-    labels: ["NPS", "UPS (100% payout)", "UPS (40% payout )"],
+    labels: ["NPS", "UPS (100% payout)", "UPS (partial payout )"],
     datasets: [
       {
         label: "PV (₹ Cr)",

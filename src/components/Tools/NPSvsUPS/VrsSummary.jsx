@@ -22,6 +22,7 @@ const VrsSummary = ({ data, joiningDate, dob }) => {
   const [drIncreaseRate, setDrIncreaseRate] = useState(2); // % every 6 months (UPS DR)
   const [annuityRate, setAnnuityRate] = useState(6); // % annual (NPS annuity)
   const [vrsServiceYears, setVrsServiceYears] = useState(25); // slider (UPS VRS needs 25y; NPS min is 20y)
+  const [upsPensionPercent, setUpsPensionPercent] = useState(40); // 40–100%
 
   // ------------------------------ inputs & validity ------------------------------
   const hasData = Array.isArray(data) && data.length > 0;
@@ -197,6 +198,54 @@ const VrsSummary = ({ data, joiningDate, dob }) => {
     vrsMonthsService,
     basicAtVRS,
     daAtVRS,
+  ]);
+
+  const pvUpsVrsReduced = useMemo(() => {
+    // Base monthly pension is proportionally reduced
+    const pct = Math.min(Math.max(upsPensionPercent, 40), 100) / 100; // clamp 40–100
+    const reducedBase = assuredPensionUPS * pct;
+
+    // DR path starts at DA% at 60 and steps every 6 months after 60
+    let pvStream = 0;
+    let dr = daPctAt60;
+    for (let m = 1; m <= monthsOfPayoutUPS; m++) {
+      if (m > 1 && m % 6 === 1) dr += drIncreaseRate / 100;
+      const monthlyPay = reducedBase * (1 + dr);
+      pvStream += monthlyPay / Math.pow(1 + monthlyDisc, monthsDelay + m); // discount to VRS
+    }
+
+    // 6-month block gratuity — paid at 60 → discount to VRS
+    const blocks = Math.floor(vrsMonthsService / 6);
+    const lastPayAtVRS = basicAtVRS + daAtVRS;
+    const upsGratuityAt60 = blocks * (lastPayAtVRS / 10);
+    const upsGratuityPVtoVRS =
+      upsGratuityAt60 / Math.pow(1 + monthlyDisc, monthsDelay);
+
+    // Optional corpus withdrawal at 60: assume proportion of "UPS corpus" equals (1 - pct)
+    // (Mirrors your earlier reduced-payout logic: lower pension ↔ higher one-time withdrawal.)
+    const withdrawShare = 1 - pct; // 60% withdrawal when pct=40%
+    const upsCorpusWithdrawAt60 = corpusUpsAtVRS * withdrawShare;
+    const upsCorpusWithdrawPVtoVRS =
+      upsCorpusWithdrawAt60 / Math.pow(1 + monthlyDisc, monthsDelay);
+
+    return {
+      pv: Math.round(pvStream + upsGratuityPVtoVRS + upsCorpusWithdrawPVtoVRS),
+      reducedBase: Math.round(reducedBase),
+      gratuityAt60: Math.round(upsGratuityAt60),
+      corpusWithdrawAt60: Math.round(upsCorpusWithdrawAt60),
+    };
+  }, [
+    upsPensionPercent,
+    assuredPensionUPS,
+    daPctAt60,
+    monthsOfPayoutUPS,
+    drIncreaseRate,
+    monthlyDisc,
+    monthsDelay,
+    vrsMonthsService,
+    basicAtVRS,
+    daAtVRS,
+    corpusUpsAtVRS,
   ]);
 
   // NPS premature exit (at VRS)
@@ -440,6 +489,7 @@ const VrsSummary = ({ data, joiningDate, dob }) => {
               </div>
               <div className="bg-white p-3 rounded shadow">
                 <div className="text-gray-600">Total PV (at VRS)</div>
+
                 <div className="font-bold text-blue-800">
                   {inrShort(npsPV.pv)}
                 </div>
@@ -499,13 +549,63 @@ const VrsSummary = ({ data, joiningDate, dob }) => {
                 </div>
               </div>
             </div>
+            <div className="bg-white p-3 rounded shadow mt-3">
+              <div className="text-sm font-medium text-gray-700">
+                Reduced UPS payout (% of assured pension)
+              </div>
+              <div className="text-green-800 font-semibold">
+                {upsPensionPercent}%
+              </div>
+              <SafeSlider
+                name="upsPensionPercent"
+                min={40}
+                max={100}
+                step={1}
+                value={upsPensionPercent}
+                onChange={(v) => setUpsPensionPercent(Number(v))}
+                className="mt-2"
+              />
+              <div className="text-xs text-gray-600 mt-1">
+                Lower monthly payout means a higher one‑time withdrawal at age
+                60.
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-4 gap-3 mt-3 text-sm sm:text-base">
+              <div className="bg-white p-3 rounded shadow">
+                <div className="text-gray-600">
+                  Reduced base pension (pre‑DR)
+                </div>
+                <div className="font-semibold">
+                  {inrShort(pvUpsVrsReduced.reducedBase)} /mo
+                </div>
+              </div>
+              <div className="bg-white p-3 rounded shadow">
+                <div className="text-gray-600">Block (paid at 60)</div>
+                <div className="font-semibold">
+                  {inrShort(pvUpsVrsReduced.gratuityAt60)}
+                </div>
+              </div>
+              <div className="bg-white p-3 rounded shadow">
+                <div className="text-gray-600">Corpus withdrawal at 60</div>
+                <div className="font-semibold">
+                  {inrShort(pvUpsVrsReduced.corpusWithdrawAt60)}
+                </div>
+              </div>
+              <div className="bg-white p-3 rounded shadow">
+                <div className="text-gray-600">Total PV at VRS (reduced)</div>
+                <div className="font-bold text-green-800">
+                  {inrShort(pvUpsVrsReduced.pv)}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* comparison */}
           <PVComparisonChart
             nps={npsPV.pv}
             upsFull={pvUpsVrs.pv}
-            upsReduced={null}
+            upsReduced={pvUpsVrsReduced.pv}
           />
         </>
       )}

@@ -105,12 +105,12 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
 
   // UPS Present Value Calculation
   const initialDrRate = lastEntry.da / basic; // From simulation data (DA %)
-  const basePensionRaw =
-    months >= 300
-      ? 0.5 * basic
-      : months >= 120
-      ? 0.5 * basic * (months / 300)
-      : 0;
+  const basePensionRaw = (() => {
+    const base = averageBasicLastYear || basic; // fall back if average not available
+    if (months >= 300) return 0.5 * base;
+    if (months >= 120) return 0.5 * base * (months / 300);
+    return 0;
+  })();
   const basePension = Math.max(10000, Math.round(basePensionRaw));
 
   let presentValueUps = 0;
@@ -127,34 +127,55 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
     presentValueUps += monthlyPayout / discountFactor;
   }
 
+  presentValueUps += upsLumpsum;
   presentValueUps = Math.round(presentValueUps);
-  const reducedBasePension = basePension * 0.4;
-
+  // const reducedBasePension = basePension * 0.4;
+  const reducedBasePension = basePension * (upsPensionPercent / 100);
   let pvReducedPension = 0;
   let drRateReduced = initialDrRate;
   const monthlyDiscRate = discountRate / 100 / 12;
 
-  for (let i = 0; i < lifeExpectancy * 12; i++) {
-    if (i > 0 && i % 6 === 0) {
+  // for (let i = 0; i < lifeExpectancy * 12; i++) {
+  //   if (i > 0 && i % 6 === 0) {
+  //     drRateReduced += drIncreaseRate / 100;
+  //   }
+
+  //   const monthlyPayout = reducedBasePension * (1 + drRateReduced);
+  //   const discountFactor = 1 / Math.pow(1 + monthlyDiscRate, i);
+  //   pvReducedPension += monthlyPayout * discountFactor;
+  // }
+
+  for (let month = 1; month <= monthsOfUpsPension; month++) {
+    if (month > 1 && month % 6 === 1) {
       drRateReduced += drIncreaseRate / 100;
     }
-
     const monthlyPayout = reducedBasePension * (1 + drRateReduced);
-    const discountFactor = 1 / Math.pow(1 + monthlyDiscRate, i);
-    pvReducedPension += monthlyPayout * discountFactor;
+    const discountFactor = Math.pow(1 + monthlyDiscRate, month);
+    pvReducedPension += monthlyPayout / discountFactor;
   }
 
   const presentValueUpsReduced = Math.round(pvReducedPension);
-  const upsCorpusLumpsum = Math.round(corpusUps * 0.6); // 60% corpus withdrawal
+  // const upsCorpusLumpsum = Math.round(corpusUps * 0.6); // 60% corpus withdrawal
+  // const upsCorpusLumpsum = Math.round(
+  //   corpusUps * ((100 - upsPensionPercent) / 100)
+  // );
+
+  const withdrawPct = Math.min(60, 100 - upsPensionPercent); // slider-driven, capped at 60%
+  const upsCorpusLumpsum = Math.round(corpusUps * (withdrawPct / 100));
+
   const totalPvUpsReduced =
     presentValueUpsReduced + upsCorpusLumpsum + upsLumpsum;
 
-  const upsLumpsumWithdraw = Math.round(
-    corpusUps * ((100 - upsPensionPercent) / 100)
-  );
+  // const upsLumpsumWithdraw = Math.round(
+  //   corpusUps * ((100 - upsPensionPercent) / 100)
+  // );
+  const upsLumpsumWithdraw = upsCorpusLumpsum;
   const reducedPensionWithDR = Math.round(
     totalPensionWithDR * (upsPensionPercent / 100)
   );
+  // const reducedPensionWithDR = Math.round(
+  //   reducedBasePension * (1 + initialDrRate)
+  // );
 
   // Utility function (place it outside your component or in a utils file)
   const formatIndianCurrencyShort = (value) => {
@@ -724,7 +745,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
             {/* Scenario 2: Reduced Pension + Lumpsum */}
             <div className="bg-blue-100 border border-blue-300 p-3 rounded">
               <h4 className="font-semibold text-blue-800 mb-2">
-                Scenario 2: Reduced Payout (40%) + Lumpsum
+                Scenario 2: Reduced Payout ({upsPensionPercent}%) + Lumpsum
                 <span className="relative group cursor-pointer text-blue-600 ml-1">
                   ℹ️
                   <div className="absolute bottom-full mb-1 left-1 z-10 hidden group-hover:block bg-white border text-xs text-gray-700 px-2 py-1 rounded shadow-md w-40 md:w-48 font-normal">
@@ -738,11 +759,16 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
                   <tr className="border-b border-b-gray-100">
                     <td className="py-2 font-medium">Reduced Payout</td>
                     <td className="py-2 text-right font-semibold">
-                      {formatIndianCurrencyShort(Math.round(basePension * 0.4))}
+                      {formatIndianCurrencyShort(
+                        Math.round(basePension * (upsPensionPercent / 100))
+                      )}
                     </td>
                   </tr>
                   <tr className="border-b border-b-gray-100">
-                    <td className="py-2 font-medium">60% UPS Corpus Lumpsum</td>
+                    {/* <td className="py-2 font-medium">60% UPS Corpus Lumpsum</td> */}
+                    <td className="py-2 font-medium">{`${
+                      100 - upsPensionPercent
+                    }% UPS Corpus Lumpsum`}</td>
                     <td className="py-2 text-right font-semibold">
                       {formatIndianCurrencyShort(upsCorpusLumpsum)}
                     </td>
