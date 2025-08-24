@@ -11,6 +11,7 @@ import NpsTableAccordion from "../../components/Tools/NPSvsUPS/NpsTableAccordion
 import SimulationGuide from "../../components/Tools/NPSvsUPS/SimulationGuide";
 import { Helmet } from "react-helmet-async";
 import PageFeedback from "../../components/PageFeedback";
+import VrsSummary from "../../components/Tools/NPSvsUPS/VrsSummary";
 
 // import NpsCalculator from "../../components/Tools/NPSvsUPS/NpsCalculator";
 
@@ -67,8 +68,18 @@ const NpsEstimator = () => {
             data={results}
             joiningDate={submittedFormData?.joiningDate}
           />
+          {/* NEW: VRS-focused summary */}
+          <div className="mt-6">
+            <VrsSummary
+              data={results}
+              joiningDate={submittedFormData?.joiningDate}
+              dob={submittedFormData?.dob} // ensure your form provides this
+            />
+          </div>
         </div>
       )}
+
+      {/* <VrsSummary /> */}
 
       <PageFeedback pageSlug="/NPS vs UPS" />
 
@@ -99,29 +110,6 @@ const NpsEstimator = () => {
       <div>
         <SimulationGuide />
       </div>
-
-      {/* <div className="text-xs md:text-sm bg-red-50 border-l-4 border-red-400 p-4 mt-8 rounded">
-        <h4 className="text-red-700 font-semibold mb-2">📌 Disclaimer</h4>
-        <p className="text-gray-800 text-xs md:text-sm leading-relaxed">
-          The above analysis is a simulation tool intended to provide a general
-          idea of how retirement benefits under NPS and UPS might evolve over
-          time, based on a set of assumed variables. This should{" "}
-          <span className="font-semibold">not</span> be construed as financial
-          planning advice or a recommendation to opt for either scheme.
-        </p>
-        <p className="text-gray-800 text-xs md:text-sm leading-relaxed mt-2">
-          While every effort has been made to ensure accuracy, the calculations
-          are based on user inputs, average assumptions, and simplifications of
-          applicable rules. The actual benefits may vary significantly due to
-          changes in government policy, market behavior, or individual
-          circumstances.
-        </p>
-        <p className="text-gray-800 text-xs md:text-sm leading-relaxed mt-2">
-          We accept no liability for decisions made based on this tool. Users
-          are encouraged to consult qualified financial advisors or official
-          government sources for detailed guidance.
-        </p>
-      </div> */}
     </div>
   );
 };

@@ -169,7 +169,7 @@ const NpsUpsSummary = ({ data, joiningDate }) => {
         Summary of Estimates
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
+      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 text-gray-800">
         <div className="bg-gradient-to-r from-[#fde68a]  to-[#f59e0b] p-4 rounded">
           <p>
             <strong>Date of Retirement:</strong>{" "}
@@ -845,3 +845,5 @@ NpsUpsSummary.propTypes = {
 };
 
 export default NpsUpsSummary;
+
+// components/Tools/NPSvsUPS/NpsUpsSummary.jsx

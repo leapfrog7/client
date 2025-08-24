@@ -224,14 +224,14 @@ const DashboardCard = ({
 
               {/* goal zone from 60% */}
               <div
-                className="pointer-events-none absolute inset-y-0 right-0 bg-green-100/30"
+                className="pointer-events-none absolute inset-y-0 right-0 bg-gray-100/30"
                 style={{ left: "60%" }}
                 aria-hidden
               />
 
               {/* tick at 60% */}
               <div className="pointer-events-none absolute inset-0">
-                <span className="absolute top-0 bottom-0 left-[60%] w-px bg-gray-400/40" />
+                <span className="absolute top-0 bottom-0 left-[60%] w-px bg-gray-100/30" />
               </div>
             </div>
           );
