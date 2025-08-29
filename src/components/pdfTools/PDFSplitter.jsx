@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 import { pdfjsLib } from "./pdfjsSetup";
+import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFSplitter() {
   const [file, setFile] = useState(null); // { file: File, bytes: ArrayBuffer }
@@ -34,8 +35,8 @@ export default function PDFSplitter() {
     return `${n.toFixed(i === 0 ? 0 : 2)} ${units[i]}`;
   };
 
-  const handleFileChange = async (e) => {
-    const selectedFile = e.target.files?.[0];
+  // add inside component
+  const loadSelectedFile = async (selectedFile) => {
     if (!selectedFile) return;
 
     setError(null);
@@ -46,18 +47,13 @@ export default function PDFSplitter() {
     setIsRendering(true);
 
     try {
-      // Read bytes ONCE and keep them for pdf-lib
       const bytes = await selectedFile.arrayBuffer();
 
-      // Load metadata with pdf-lib
       const loaded = await PDFDocument.load(bytes);
       setFile({ file: selectedFile, bytes });
       setTotalPages(loaded.getPageCount());
 
-      // IMPORTANT: give PDF.js its own copy to avoid detachment
       const previewBytes = bytes.slice(0);
-
-      // Load using PDF.js for page previews
       const loadingTask = pdfjsLib.getDocument({ data: previewBytes });
       const pdfLoaded = await loadingTask.promise;
       setPdf(pdfLoaded);
@@ -67,6 +63,17 @@ export default function PDFSplitter() {
       setIsRendering(false);
     }
   };
+
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files?.[0];
+    await loadSelectedFile(selectedFile);
+  };
+
+  // inside component
+  const { handleDrop, handleDragOver } = useFileDrop((fileList) => {
+    const first = fileList?.[0];
+    if (first) loadSelectedFile(first);
+  });
 
   const renderPreviews = async () => {
     if (!pdf || !canvasContainer.current) return;
@@ -313,6 +320,8 @@ export default function PDFSplitter() {
       {/* File input */}
       <label
         htmlFor="splitter-input"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
         className="mt-3 block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 p-5 text-center transition
                    hover:border-blue-400 hover:bg-blue-50/50"
       >

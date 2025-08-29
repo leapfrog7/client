@@ -2,6 +2,8 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { PDFDocument } from "pdf-lib";
 import PDFThumbnail from "./PDFThumbnail";
+import useFileDrop from "../../assets/useFileDrop";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 import {
   DndContext,
@@ -20,14 +22,18 @@ import { CSS } from "@dnd-kit/utilities";
 import { VscMerge } from "react-icons/vsc";
 
 // 🔹 Sortable file card
-function SortableItem({ item }) {
+function SortableItem({ item, onRemove }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  // const handleRemoveClick = (e) => {
+  //   // prevent triggering drag on click
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   onRemove?.(item.id);
+  // };
 
   return (
     <div
@@ -35,9 +41,31 @@ function SortableItem({ item }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="border p-3 rounded mb-3 shadow bg-white cursor-move"
+      className="relative border p-3 rounded mb-3 shadow bg-white cursor-move"
     >
-      <p className="text-sm font-medium text-gray-700 truncate">
+      {/* remove button */}
+      <button
+        type="button"
+        aria-label={`Remove ${item.file.name}`}
+        title="Remove"
+        onPointerDown={(e) => {
+          // ← key fix: cancel pointerdown for dnd-kit
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onRemove?.(item.id);
+        }}
+        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center
+             rounded-full border border-gray-300 bg-white text-gray-600 
+             hover:bg-red-50 hover:text-red-700"
+      >
+        <XMarkIcon className="h-4 w-4" />
+      </button>
+
+      <p className="pr-6 text-sm font-medium text-gray-700 truncate">
         {item.file.name}
       </p>
       <PDFThumbnail file={item.file} buffer={item.buffer} />
@@ -51,6 +79,7 @@ SortableItem.propTypes = {
     file: PropTypes.instanceOf(File).isRequired,
     buffer: PropTypes.instanceOf(ArrayBuffer).isRequired,
   }).isRequired,
+  onRemove: PropTypes.func, // ← add this
 };
 
 export default function PDFMerger() {
@@ -62,9 +91,8 @@ export default function PDFMerger() {
   const [error, setError] = useState(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
-
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
+  const onFiles = async (filesLike) => {
+    const files = Array.from(filesLike);
     const processed = await Promise.all(
       files.map(async (file, index) => {
         const buffer = await file.arrayBuffer();
@@ -77,6 +105,16 @@ export default function PDFMerger() {
     );
     setPdfItems((prev) => [...prev, ...processed]);
     setMergedBlob(null);
+  };
+
+  const { handleDrop, handleDragOver } = useFileDrop(onFiles);
+
+  const handleFileChange = async (e) => {
+    if (e.target.files?.length) {
+      await onFiles(e.target.files);
+      // allow choosing the same file again
+      e.target.value = "";
+    }
   };
 
   const handleDragEnd = (event) => {
@@ -113,6 +151,11 @@ export default function PDFMerger() {
       </svg>
     );
   }
+
+  const removeItem = (id) => {
+    setPdfItems((prev) => prev.filter((it) => it.id !== id));
+    setMergedBlob(null);
+  };
 
   const mergePDFs = async () => {
     if (!pdfItems.length) return;
@@ -184,8 +227,10 @@ export default function PDFMerger() {
       {/* Upload area */}
       <label
         htmlFor="pdf-input"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
         className="mt-4 block cursor-pointer rounded-xl border-2 border-dashed border-blue-300 p-6 text-center transition
-                 hover:border-blue-400 hover:bg-blue-50/50"
+                hover:border-blue-400 hover:bg-blue-50/50"
       >
         <div className="text-base font-medium">Click to select PDFs</div>
         <div className="mt-1 text-xs text-gray-500">
@@ -237,7 +282,11 @@ export default function PDFMerger() {
                     </span>
 
                     {/* draggable card */}
-                    <SortableItem item={item} />
+                    <SortableItem
+                      key={item.id}
+                      item={item}
+                      onRemove={removeItem}
+                    />
                   </div>
                 ))}
               </div>

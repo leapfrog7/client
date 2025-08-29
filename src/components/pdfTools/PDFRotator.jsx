@@ -8,6 +8,7 @@ import { PDFDocument, degrees } from "pdf-lib";
 //   import.meta.url
 // ).toString();
 import { pdfjsLib } from "./pdfjsSetup";
+import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFRotator() {
   const [file, setFile] = useState(null); // { file: File, bytes: ArrayBuffer }
@@ -23,9 +24,8 @@ export default function PDFRotator() {
   // UI angle chooser for “rotate all” action
   const [bulkAngle, setBulkAngle] = useState(90);
 
-  // ---- File handling & preview generation ----
-  const handleFileChange = async (e) => {
-    const selected = e.target.files?.[0];
+  // inside component, above handleFileChange
+  const loadSelectedFile = async (selected) => {
     if (!selected) return;
 
     reset();
@@ -42,7 +42,7 @@ export default function PDFRotator() {
       setTotalPages(count);
       setRotations(Array.from({ length: count }, () => 0));
 
-      // PDF.js thumbnails (use a COPY to avoid ArrayBuffer detachment)
+      // PDF.js thumbnails (use a COPY to avoid detachment)
       const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(0) });
       const doc = await loadingTask.promise;
 
@@ -74,6 +74,16 @@ export default function PDFRotator() {
     }
   };
 
+  // ---- File handling & preview generation ----
+  const handleFileChange = async (e) => {
+    const selected = e.target.files?.[0];
+    await loadSelectedFile(selected);
+  };
+
+  const { handleDrop, handleDragOver } = useFileDrop((fileList) => {
+    const first = fileList?.[0];
+    if (first) loadSelectedFile(first);
+  });
   // ---- Live preview rotation helpers ----
   const rotateOne = (idx, delta) => {
     setRotations((prev) => {
@@ -165,6 +175,8 @@ export default function PDFRotator() {
       {/* File input */}
       <label
         htmlFor="rotator-input"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
         className="mt-3 block cursor-pointer rounded-xl border-2 border-dashed border-blue-300 p-5 text-center transition
                    hover:border-blue-400 hover:bg-blue-50/50"
       >

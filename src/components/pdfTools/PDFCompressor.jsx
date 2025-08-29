@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PDFDocument } from "pdf-lib";
 import { pdfjsLib } from "./pdfjsSetup";
+import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFCompressor() {
   const [file, setFile] = useState(null); // { file: File, bytes: ArrayBuffer }
@@ -45,9 +46,7 @@ export default function PDFCompressor() {
       setQuality(0.5);
     }
   }, [preset]);
-
-  const handleFileChange = async (e) => {
-    const f = e.target.files?.[0];
+  const loadSelectedFile = async (f) => {
     if (!f) return;
 
     setError(null);
@@ -57,15 +56,26 @@ export default function PDFCompressor() {
 
     try {
       const bytes = await f.arrayBuffer();
-      // Use pdf-lib to get count quickly (cheap)
-      const doc = await PDFDocument.load(bytes);
+      const doc = await PDFDocument.load(bytes); // cheap page count
       setTotalPages(doc.getPageCount());
       setFile({ file: f, bytes });
     } catch (err) {
       console.error(err);
       setError("Unable to load the PDF. Please try a different file.");
+      setFile(null);
+      setTotalPages(null);
     }
   };
+
+  const handleFileChange = async (e) => {
+    const f = e.target.files?.[0];
+    await loadSelectedFile(f);
+  };
+
+  const { handleDrop, handleDragOver } = useFileDrop((fileList) => {
+    const first = fileList?.[0];
+    if (first && !isCompressing) loadSelectedFile(first);
+  });
 
   const dataURLToUint8 = (dataUrl) => {
     const base64 = dataUrl.split(",")[1] || "";
@@ -282,7 +292,17 @@ export default function PDFCompressor() {
       {/* File input */}
       <label
         htmlFor="compressor-input"
-        className="mt-3 block cursor-pointer rounded-xl border-2 border-dashed border-gray-300 p-5 text-center transition hover:border-blue-400 hover:bg-blue-50/50"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className={`mt-3 block cursor-pointer rounded-xl border-2 border-dashed p-5 text-center transition ${
+          isCompressing
+            ? "opacity-60 pointer-events-none"
+            : "hover:border-blue-400 hover:bg-blue-50/50 border-gray-300"
+        }`}
       >
         <div className="text-sm font-medium">Click to select a PDF</div>
         <div className="mt-1 text-xs text-gray-500">
