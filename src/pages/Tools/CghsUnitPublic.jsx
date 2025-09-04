@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import PageFeedback from "../../components/PageFeedback";
 import Loading from "../../components/Loading";
+import PropTypes from "prop-types";
 
 const validCities = [
   "Delhi",
@@ -30,6 +31,109 @@ const validCities = [
 
 // const BASE_URL = "http://localhost:5000/api/v1/public/cghsUnits"; // Replace with your live URL
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
+
+function CitySelect({
+  cityOptions,
+  selectedCity,
+  setSelectedCity,
+  viewMode, // so we can disable when not in "city" mode
+  instanceId = "city-select",
+}) {
+  return (
+    <div className="w-full md:w-auto rounded-2xl border border-indigo-100 bg-indigo-50/60 p-3 md:p-4">
+      <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] items-center gap-2 md:gap-3">
+        {/* Label */}
+        <label
+          htmlFor={instanceId}
+          className="flex items-center gap-2 text-sm md:text-base font-medium text-gray-700"
+        >
+          <FaTreeCity className="text-indigo-600" aria-hidden />
+          <span>Select City</span>
+        </label>
+
+        {/* Select */}
+        <div className="w-full md:w-96">
+          <Select
+            instanceId={instanceId}
+            inputId={instanceId}
+            options={cityOptions}
+            value={
+              selectedCity ? { label: selectedCity, value: selectedCity } : null
+            }
+            onChange={(opt) => setSelectedCity(opt?.value || "")}
+            isSearchable
+            isClearable
+            isDisabled={viewMode !== "city"}
+            placeholder="Type to search cities…"
+            menuPortalTarget={
+              typeof document !== "undefined" ? document.body : null
+            }
+            className="text-sm"
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                minHeight: 40,
+                borderRadius: 8,
+                padding: "0 4px",
+                fontSize: "0.875rem",
+                borderColor: state.isFocused ? "#6366f1" : "#e5e7eb",
+                boxShadow: "none",
+                "&:hover": {
+                  borderColor: state.isFocused ? "#6366f1" : "#d1d5db",
+                },
+                backgroundColor: viewMode !== "city" ? "#f9fafb" : "white",
+              }),
+              valueContainer: (base) => ({ ...base, padding: "0 4px" }),
+              indicatorsContainer: (base) => ({ ...base, gap: 2 }),
+              placeholder: (base) => ({ ...base, color: "#9ca3af" }),
+              menuPortal: (base) => ({ ...base, zIndex: 50 }),
+              menu: (base) => ({
+                ...base,
+                borderRadius: 8,
+                overflow: "hidden",
+              }),
+              option: (base, state) => ({
+                ...base,
+                fontSize: "0.9rem",
+                backgroundColor: state.isSelected
+                  ? "#e0e7ff"
+                  : state.isFocused
+                  ? "#eef2ff"
+                  : "white",
+                color: state.isSelected ? "#3730a3" : "#111827",
+                cursor: "pointer",
+              }),
+            }}
+            theme={(theme) => ({
+              ...theme,
+              colors: {
+                ...theme.colors,
+                primary25: "#eef2ff",
+                primary: "#6366f1",
+              },
+            })}
+          />
+          <p className="mt-1.5 text-xs text-gray-500">
+            Start typing to filter cities. Clear to reset.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+CitySelect.propTypes = {
+  cityOptions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      value: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  selectedCity: PropTypes.string, // you had the warning here
+  setSelectedCity: PropTypes.func.isRequired,
+  viewMode: PropTypes.string.isRequired, // "city" | "nearby"
+  instanceId: PropTypes.string,
+};
 
 const CghsUnitPublic = () => {
   const [units, setUnits] = useState([]);
@@ -180,63 +284,122 @@ const CghsUnitPublic = () => {
         />
       </Helmet>
 
-      <div className="text-center mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-blue-900 mb-2">
-          🏥CGHS Empanelled Centers
+      <div className="text-center mb-8 px-3">
+        {/* Title */}
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-900 mb-1 flex items-center justify-center gap-2">
+          <span aria-hidden>🏥</span>
+          <span>CGHS Empanelled Centres</span>
         </h2>
-        {/* <p className="text-xs md:text-sm text-gray-600 max-w-2xl mx-auto">
-          Search, explore, and find nearby units, check available specialties,
-          and get directions — all in one place.
-        </p> */}
 
-        <div className="mt-2 text-center bg-gray-100 py-2 rounded-lg">
-          <p className="text-sm md:text-base text-gray-600 mb-2 font-semibold">
-            All in One Place
-          </p>
-          <div className="flex flex-wrap justify-center gap-2 text-xs md:text-sm lg:text-base">
-            <span className="px-3 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full flex items-center gap-1 font-light">
-              🔍 Search & Explore
-            </span>
-            <span className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full flex items-center gap-1 font-light">
-              🏥 Find Nearby Units
-            </span>
-            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-full flex items-center gap-1 font-light">
-              ✅ See Empanelled facilities
-            </span>
-            <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full flex items-center gap-1 font-light">
-              🧭 Get Directions
-            </span>
+        {/* Subtext (short, helpful, not noisy) */}
+        <p className="text-[12px] sm:text-sm text-gray-600 max-w-xl mx-auto">
+          Search units, check facilities, and get directions—quickly.
+        </p>
+
+        {/* Feature block */}
+        <div className="mt-4 bg-gray-50 rounded-2xl shadow-sm">
+          {/* Mobile-first: compact header */}
+          <div className="px-3 py-3 sm:py-4">
+            <p className="text-sm sm:text-base text-gray-700 font-semibold">
+              All in one place
+            </p>
+          </div>
+
+          {/* Features: compact 2×2 grid on mobile; roomier on desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4">
+            {/* Item */}
+            <div
+              className="flex items-center gap-2 sm:gap-2.5 bg-white lg:bg-indigo-50 border border-gray-200 lg:border-indigo-200 rounded-xl px-2.5 py-2 sm:px-3 sm:py-2.5
+                      transition hover:shadow-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>
+                🔍
+              </span>
+              <span className="text-xs sm:text-sm md:text-base text-gray-700 lg:text-indigo-700">
+                Search & Explore
+              </span>
+            </div>
+
+            <div
+              className="flex items-center gap-2 sm:gap-2.5 bg-white lg:bg-green-50 border border-gray-200 lg:border-green-200 rounded-xl px-2.5 py-2 sm:px-3 sm:py-2.5
+                      transition hover:shadow-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>
+                📍
+              </span>
+              <span className="text-xs sm:text-sm md:text-base text-gray-700 lg:text-green-700">
+                Find Nearby Units
+              </span>
+            </div>
+
+            <div
+              className="flex items-center gap-2 sm:gap-2.5 bg-white lg:bg-yellow-50 border border-gray-200 lg:border-yellow-200 rounded-xl px-2.5 py-2 sm:px-3 sm:py-2.5
+                      transition hover:shadow-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>
+                ✅
+              </span>
+              <span className="text-xs sm:text-sm md:text-base text-gray-700 lg:text-yellow-700">
+                Empanelled Facilities
+              </span>
+            </div>
+
+            <div
+              className="flex items-center gap-2 sm:gap-2.5 bg-white lg:bg-blue-50 border border-gray-200 lg:border-blue-200 rounded-xl px-2.5 py-2 sm:px-3 sm:py-2.5
+                      transition hover:shadow-sm"
+            >
+              <span className="text-base sm:text-lg" aria-hidden>
+                🧭
+              </span>
+              <span className="text-xs sm:text-sm md:text-base text-gray-700 lg:text-blue-700">
+                Get Directions
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex w-full md:w-96 mx-auto border rounded-full overflow-hidden text-sm md:text-base font-medium mb-6 shadow-sm">
-        <button
-          onClick={() => setViewMode("city")}
-          className={`w-1/2 px-4 py-2 transition-all duration-200 ${
-            viewMode === "city"
-              ? "bg-indigo-700 text-white"
-              : "bg-white text-gray-500 hover:bg-gray-100"
-          }`}
-        >
-          <span className="flex gap-2 items-center justify-center">
-            <p>View by City</p>
-            <FaTreeCity />
-          </span>
-        </button>
-        <button
-          onClick={() => setViewMode("nearby")}
-          className={`w-1/2 px-4 py-2 transition-all duration-200 ${
-            viewMode === "nearby"
-              ? "bg-indigo-700 text-white"
-              : "bg-white text-gray-500 hover:bg-gray-100"
-          }`}
-        >
-          <span className="flex gap-2 items-center justify-center">
-            <p>Find Nearby</p>
-            <IoMdWifi />
-          </span>
-        </button>
+      <div className="w-full md:w-96 mx-auto mb-6">
+        <div className="flex border border-gray-200 rounded-full shadow-sm overflow-hidden bg-white text-sm md:text-base font-medium">
+          {/* View by City */}
+          <button
+            onClick={() => setViewMode("city")}
+            className={`flex-1 px-4 py-2 flex items-center justify-center gap-2 transition-all duration-200 ${
+              viewMode === "city"
+                ? "bg-indigo-600 text-white shadow-inner"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <FaTreeCity
+              className={`text-lg transition-transform ${
+                viewMode === "city" ? "scale-110" : "scale-100"
+              }`}
+            />
+            <span>City</span>
+          </button>
+
+          {/* Find Nearby */}
+          <button
+            onClick={() => setViewMode("nearby")}
+            className={`flex-1 px-4 py-2 flex items-center justify-center gap-2 transition-all duration-200 ${
+              viewMode === "nearby"
+                ? "bg-indigo-600 text-white shadow-inner"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            <IoMdWifi
+              className={`text-lg transition-transform ${
+                viewMode === "nearby" ? "scale-110" : "scale-100"
+              }`}
+            />
+            <span>Nearby</span>
+          </button>
+        </div>
+
+        {/* Small hint below on mobile for clarity */}
+        <p className="mt-2 text-center text-xs text-gray-500 md:hidden">
+          Switch between searching by city or finding nearby centres
+        </p>
       </div>
 
       {viewMode === "city" && (
@@ -244,51 +407,41 @@ const CghsUnitPublic = () => {
           {/* Filter Controls Container */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             {/* City Selector */}
-            <div className="flex md:flex-row md:items-center gap-2 w-full md:w-auto rounded-lg bg-blue-50 p-4">
-              <label className="text-sm md:text-base font-medium text-gray-700">
-                Select City:
-              </label>
-              <div className="w-full md:w-96 text-xs md:text-sm">
-                <Select
-                  options={cityOptions}
-                  value={{ label: selectedCity, value: selectedCity }}
-                  onChange={(selected) => setSelectedCity(selected.value)}
-                  isSearchable
-                  className="text-sm"
-                  styles={{
-                    control: (base) => ({
-                      ...base,
-                      borderRadius: "0.375rem",
-                      padding: "2px 4px",
-                      fontSize: "0.875rem",
-                    }),
-                  }}
-                  theme={(theme) => ({
-                    ...theme,
-                    colors: {
-                      ...theme.colors,
-                      primary25: "#eef2ff", // light indigo on hover
-                      primary: "#6366f1", // indigo-500 for selection
-                    },
-                  })}
-                />
-              </div>
-            </div>
+            <CitySelect
+              cityOptions={cityOptions}
+              selectedCity={selectedCity}
+              setSelectedCity={setSelectedCity}
+              viewMode={viewMode}
+            />
 
             {/* Search Bar */}
             <div className="relative w-full md:w-1/3">
+              {/* Accessible label (hidden for screen readers) */}
+              <label htmlFor="search-input" className="sr-only">
+                Search by name, specialty, or locality
+              </label>
+
               <input
+                id="search-input"
                 type="text"
                 placeholder="🔍 Search name, specialty, or locality..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="border border-gray-300 rounded-md px-4 py-4 w-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 pr-10 text-xs md:text-sm"
+                className="border border-gray-300 rounded-xl px-4 py-3 w-full 
+               text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400
+               pr-10 transition duration-200 ease-in-out
+               shadow-sm hover:shadow-md"
               />
+
+              {/* Clear button */}
               {searchTerm && (
                 <button
+                  type="button"
                   onClick={() => setSearchTerm("")}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 
+                 text-gray-400 hover:text-red-500 transition-colors"
                   title="Clear search"
+                  aria-label="Clear search"
                 >
                   <MdCancel size={20} />
                 </button>

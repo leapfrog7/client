@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
-import Helmet from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 
 const SearchWorkAllocation = () => {
   const [searchTerm, setSearchTerm] = useState("");
