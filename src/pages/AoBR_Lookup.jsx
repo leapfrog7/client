@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
+import Helmet from "react-helmet-async";
 
 const SearchWorkAllocation = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,6 +69,27 @@ const SearchWorkAllocation = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-6 px-4 md:px-6 bg-white shadow-lg rounded-lg">
+      <Helmet>
+        <title>AoBR - UnderSigned</title>
+        <meta
+          name="description"
+          content="Search the work items allocated to various Ministries/ Department as per AoBR 1961"
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/quiz/paper-i/lookup"
+        />
+        <meta property="og:title" content="AoBR - UnderSigned" />
+        <meta
+          property="og:description"
+          content="Allocation of Business Rules 1961... search as you type"
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/quiz/paper-i/lookup"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <div className="mb-4">
         <h1 className="text-xl md:text-2xl font-bold bg-blue-200 text-center rounded-lg p-2 mb-2 text-gray-700">
           AoBR Lookup

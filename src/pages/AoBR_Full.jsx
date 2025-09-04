@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
+import { Helmet } from "react-helmet-async";
 
 const ShowWorkAllocation = () => {
   const [selectedId, setSelectedId] = useState("");
@@ -85,6 +86,27 @@ const ShowWorkAllocation = () => {
 
   return (
     <div className="max-w-3xl mx-auto py-6 px-6 bg-white shadow-lg rounded-lg">
+      <Helmet>
+        <title>AoBR Complete - UnderSigned</title>
+        <meta
+          name="description"
+          content="Search the work items allocated to various Ministries/ Department as per AoBR 1961"
+        />
+        <link
+          rel="canonical"
+          href="https://undersigned.in/pages/quiz/paper-i/complete"
+        />
+        <meta property="og:title" content="AoBR Complete - UnderSigned" />
+        <meta
+          property="og:description"
+          content="Allocation of Business Rules 1961... entire work allocation of Ministries"
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/quiz/paper-i/complete"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <h1 className="text-xl md:text-2xl font-bold bg-blue-200 text-center rounded-lg p-2 mb-2 text-gray-700">
         Complete AoBR
       </h1>
