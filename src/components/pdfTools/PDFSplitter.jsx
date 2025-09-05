@@ -125,69 +125,104 @@ export default function PDFSplitter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pdf]);
 
-  const parseRange = (input, total) => {
-    const pages = new Set();
-    if (!input?.trim()) return [];
+  // Accepts input like: "1-3, 5, 7–9" (smart dashes ok)
+  // Returns: [{ label: "1-3", indices: [0,1,2] }, { label: "5-9", indices: [4,5,6,7,8] }]
+  const parseSegments = (input, total) => {
+    const norm = (input || "")
+      .replace(/[\u2012\u2013\u2014\u2212\uFE58\uFE63\uFF0D]/g, "-") // smart dashes → '-'
+      .replace(/[;，、؛]/g, ","); // various commas/semicolons → ','
 
-    input
+    if (!norm.trim() || !Number.isFinite(total) || total <= 0) return [];
+
+    return norm
       .split(",")
-      .map((s) => s.trim())
+      .map((raw) => raw.trim())
       .filter(Boolean)
-      .forEach((part) => {
+      .map((part) => {
+        let indices = [];
+        let label = part;
+
         if (part.includes("-")) {
-          const [rawStart, rawEnd] = part.split("-").map((n) => n.trim());
-          const start = Math.max(1, parseInt(rawStart, 10));
-          const end = Math.min(total, parseInt(rawEnd, 10));
+          const [a, b] = part.split("-").map((s) => s.trim());
+          const start = Math.max(1, parseInt(a, 10));
+          const end = Math.min(total, parseInt(b, 10));
           if (!Number.isNaN(start) && !Number.isNaN(end) && start <= end) {
-            for (let i = start; i <= end; i++) pages.add(i - 1);
+            for (let i = start; i <= end; i++) indices.push(i - 1);
+            label = `${start}-${end}`;
           }
         } else {
-          const page = parseInt(part, 10);
-          if (!Number.isNaN(page) && page >= 1 && page <= total) {
-            pages.add(page - 1);
+          const p = parseInt(part, 10);
+          if (!Number.isNaN(p) && p >= 1 && p <= total) {
+            indices.push(p - 1);
+            label = String(p);
           }
         }
-      });
 
-    return Array.from(pages).sort((a, b) => a - b);
+        // de-dupe & sort each segment (safety)
+        indices = Array.from(new Set(indices)).sort((x, y) => x - y);
+        return indices.length ? { label, indices } : null;
+      })
+      .filter(Boolean);
   };
 
   const splitPDFByRange = async () => {
-    // ADD
     setProgress(0);
-
     if (!file) return;
-
-    const pagesToExtract = parseRange(range, totalPages || 0);
-    if (pagesToExtract.length === 0) {
-      setError("Please enter a valid page range (e.g., 1-3, 5, 7-9).");
-      return;
-    }
 
     setIsSplitting(true);
     setError(null);
     setOutputBlob(null);
     setOutputs([]);
-    setOversizePages([]);
+    setOversizePages([]); // unused for range mode, but fine to clear
 
     try {
       const sourcePdf = await PDFDocument.load(file.bytes);
-      const splitPdf = await PDFDocument.create();
+      const total = sourcePdf.getPageCount();
 
-      for (let i = 0; i < pagesToExtract.length; i++) {
-        const pageIndex = pagesToExtract[i];
-        const [p] = await splitPdf.copyPages(sourcePdf, [pageIndex]);
-        splitPdf.addPage(p);
-
-        // progress update
-        setProgress(Math.round(((i + 1) / pagesToExtract.length) * 100));
-        // yield so UI can paint
-        await new Promise((resolve) => requestAnimationFrame(resolve));
+      const segments = parseSegments(range, total);
+      if (segments.length === 0) {
+        setError(
+          `No pages matched. You entered “${range}”. Document has ${total} pages.`
+        );
+        return;
       }
 
-      const pdfBytes = await splitPdf.save();
+      const baseName =
+        (file?.file?.name && file.file.name.replace(/\.pdf$/i, "")) ||
+        "extracted";
+      const parts = [];
+
+      const totalPagesToCopy = segments.reduce(
+        (acc, s) => acc + s.indices.length,
+        0
+      );
+      let copied = 0;
+
+      for (const seg of segments) {
+        const out = await PDFDocument.create();
+        // copy in-order
+        for (const pageIndex of seg.indices) {
+          const [p] = await out.copyPages(sourcePdf, [pageIndex]);
+          out.addPage(p);
+
+          copied += 1;
+          setProgress(Math.round((copied / totalPagesToCopy) * 100));
+          // allow UI to paint
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => requestAnimationFrame(r));
+        }
+
+        const bytes = await out.save();
+        parts.push({
+          name: `${baseName}-${seg.label}.pdf`,
+          bytes,
+          blob: new Blob([bytes], { type: "application/pdf" }),
+        });
+      }
+
       setProgress(100);
-      setOutputBlob(new Blob([pdfBytes], { type: "application/pdf" }));
+      setOutputs(parts); // <-- multiple files
+      setOutputBlob(null); // ensure single-file slot is empty
     } catch (err) {
       console.error(err);
       setError("Failed to extract pages. Please try again.");
@@ -428,23 +463,8 @@ export default function PDFSplitter() {
       {/* Primary action + status */}
       <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Downloads */}
-        {mode === "pages" ? (
-          outputBlob ? (
-            <a
-              href={URL.createObjectURL(outputBlob)}
-              download="extracted.pdf"
-              className="inline-flex items-center justify-center rounded-md border border-green-600 px-4 py-2.5 text-sm font-medium text-green-700 hover:bg-green-50"
-            >
-              📩 Download extracted.pdf
-            </a>
-          ) : (
-            <div className="text-xs text-gray-500" aria-live="polite">
-              {isSplitting
-                ? "Extracting pages…"
-                : "Your extracted file will appear here."}
-            </div>
-          )
-        ) : outputs.length > 0 ? (
+        {/* Downloads */}
+        {outputs.length > 0 ? (
           <div className="flex flex-col gap-1 text-sm">
             {outputs.map((o, idx) => (
               <a
@@ -460,6 +480,22 @@ export default function PDFSplitter() {
               </a>
             ))}
           </div>
+        ) : mode === "pages" ? (
+          outputBlob ? (
+            <a
+              href={URL.createObjectURL(outputBlob)}
+              download="extracted.pdf"
+              className="inline-flex items-center justify-center rounded-md border border-green-600 px-4 py-2.5 text-sm font-medium text-green-700 hover:bg-green-50"
+            >
+              📩 Download extracted.pdf
+            </a>
+          ) : (
+            <div className="text-xs text-gray-500" aria-live="polite">
+              {isSplitting
+                ? "Extracting pages…"
+                : "Your extracted files will appear here."}
+            </div>
+          )
         ) : (
           <div className="text-xs text-gray-500" aria-live="polite">
             {isSplitting && (
