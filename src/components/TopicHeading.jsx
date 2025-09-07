@@ -187,6 +187,7 @@ const topicNameMap = {
   Economy: "CA_Economy",
   "Govt. Schemes": "CA_Schemes",
   "TA Rules": "TA_Rules",
+  "NPS Rules": "NPS_Rules",
 };
 
 TopicHeading.propTypes = {

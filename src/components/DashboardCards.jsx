@@ -26,8 +26,8 @@ const DashboardCard = ({
   const [avgLoading, setAvgLoading] = useState(true);
   const [avgPercent, setAvgPercent] = useState(null); // null = no attempts
   const [avgAttempts, setAvgAttempts] = useState(0);
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
-  // const BASE_URL = "http://localhost:5000/api/v1";
+  // const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  const BASE_URL = "http://localhost:5000/api/v1";
   // ✅ Ensure progress is a valid number
   const progressValue = parseFloat(progress) || 0;
 

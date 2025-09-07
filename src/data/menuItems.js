@@ -122,6 +122,11 @@ export const navItems = [
         path: "pages/quiz/paper-ii/ta-rules",
         icon: MdModeOfTravel,
       },
+      {
+        label: "NPS Rules",
+        path: "pages/quiz/paper-ii/nps-rules",
+        icon: MdModeOfTravel,
+      },
     ],
   },
 

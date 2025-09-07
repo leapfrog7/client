@@ -38,6 +38,7 @@ import LeaveRules from "./pages/quiz/LeaveRules";
 import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
 import TARules from "./pages/quiz/TARules";
+import NPSRules from "./pages/quiz/NPS";
 
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
@@ -174,6 +175,11 @@ const App = () => {
         title: "TA Rules",
         progress: "0",
         path: "/pages/quiz/paper-ii/ta_rules",
+      },
+      {
+        title: "NPS Rules",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/nps-rules",
       },
     ],
   });
@@ -392,6 +398,17 @@ const App = () => {
               path="/pages/quiz/paper-ii/ta_rules"
               element={
                 <TARules
+                  progress={userStats.paperII[7].progress}
+                  quizAttempted={String(
+                    userStats.paperII[7].attemptedQuestions
+                  )}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-ii/nps-rules"
+              element={
+                <NPSRules
                   progress={userStats.paperII[7].progress}
                   quizAttempted={String(
                     userStats.paperII[7].attemptedQuestions
@@ -675,6 +692,8 @@ export default App;
 on FrontEnd - App.jsx (add the Route and edit userStats), 
 Make a file with the topic to show on the Route created above. 
 In the Tabs file, the topic Name should match the dbTitle. 
+Maps the Name and DbTitle in TopicHeading.jsx
+Update the userStat in the App.jsx as well
 
 On server-
 edit the file userStats.js
