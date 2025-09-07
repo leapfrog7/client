@@ -31,36 +31,66 @@ const DashboardCard = ({
   // ✅ Ensure progress is a valid number
   const progressValue = parseFloat(progress) || 0;
 
-  // Fetch average score for this topic (per user)
+  /// Fetch average score for this topic (per user) — mobile-safe
   useEffect(() => {
     if (!userId || !topicId) return;
-    const token = localStorage.getItem("jwtToken");
-    let cancelled = false;
 
-    (async () => {
+    const token = localStorage.getItem("jwtToken");
+    const controller = new AbortController();
+    let active = true; // guards against StrictMode re-run races
+
+    const fetchAvg = async () => {
       try {
         setAvgLoading(true);
-        const { data } = await axios.get(
+        const res = await axios.get(
           `${BASE_URL}/quiz/topicAverage/${userId}/${topicId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
+            // optional: avoid throwing on 4xx so we can handle gracefully
+            validateStatus: () => true,
+          }
         );
-        if (cancelled) return;
-        setAvgPercent(
-          typeof data?.avgPercent === "number" ? data.avgPercent : null
-        );
-        setAvgAttempts(data?.attempts || 0);
-      } catch (e) {
-        if (!cancelled) {
+
+        if (!active) return;
+
+        if (res.status >= 200 && res.status < 300) {
+          const raw = res.data?.avgPercent;
+          // robust numeric parse: accepts "72.4" or 72.4; null/undefined -> null
+          const parsed =
+            raw === null || raw === undefined || raw === ""
+              ? null
+              : Number(raw);
+
+          // clamp to 0..100 if number, else null
+          setAvgPercent(
+            typeof parsed === "number" && !Number.isNaN(parsed)
+              ? Math.max(0, Math.min(100, parsed))
+              : null
+          );
+          setAvgAttempts(
+            typeof res.data?.attempts === "number" ? res.data.attempts : 0
+          );
+        } else {
+          // auth/cors/etc — show graceful fallback
           setAvgPercent(null);
           setAvgAttempts(0);
         }
+      } catch (err) {
+        if (!active) return;
+        // aborted or network error — fallback
+        setAvgPercent(null);
+        setAvgAttempts(0);
       } finally {
-        if (!cancelled) setAvgLoading(false);
+        if (active) setAvgLoading(false);
       }
-    })();
+    };
+
+    fetchAvg();
 
     return () => {
-      cancelled = true;
+      active = false;
+      controller.abort();
     };
   }, [userId, topicId]);
 
