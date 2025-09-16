@@ -19,6 +19,7 @@ import { VscTable } from "react-icons/vsc";
 import { LuNotebookText } from "react-icons/lu";
 import { MdModeOfTravel } from "react-icons/md";
 import { TbInvoice } from "react-icons/tb";
+import { TbPigMoney } from "react-icons/tb";
 
 export const navItems = [
   {
@@ -125,7 +126,7 @@ export const navItems = [
       {
         label: "NPS Rules",
         path: "pages/quiz/paper-ii/nps-rules",
-        icon: MdModeOfTravel,
+        icon: TbPigMoney,
       },
     ],
   },

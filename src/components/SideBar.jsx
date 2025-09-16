@@ -180,7 +180,7 @@ export default function SideBar({
                 )}
               </div>
             ))}
-            {!isLoggedIn ? (
+            {/* {!isLoggedIn ? (
               <div className="p-4 bg-gray-200 rounded-lg shadow-lg text-center">
                 <h2 className="text-lg font-bold mb-1 text-gray-800">
                   Ready to Challenge Yourself?
@@ -194,6 +194,27 @@ export default function SideBar({
                 >
                   Sample Quiz
                 </a>
+              </div>
+            ) : (
+              <div></div>
+            )} */}
+
+            {!isLoggedIn ? (
+              <div className="p-4 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg shadow-md text-center">
+                <h2 className="text-lg font-bold mb-1 text-gray-800">
+                  Try it free for 24 hours and see if it’s right for you.
+                </h2>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Register now and unlock to all quizzes, PYQs, and dashboard
+                  tools.
+                </p>
+                <a
+                  href="/register"
+                  className="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-full shadow-md font-medium text-sm sm:text-base transition duration-300 inline-flex items-center justify-center gap-2 w-full"
+                >
+                  Start Free Trial
+                </a>
+                <p className="mt-2 text-xs text-gray-500">No payment needed.</p>
               </div>
             ) : (
               <div></div>

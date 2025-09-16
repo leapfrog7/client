@@ -58,15 +58,28 @@ const TermsAndConditions = () => {
           </h2>
           <ul className="list-disc list-inside text-gray-600 space-y-2 text-sm lg:text-base mb-10">
             <li>
-              The validity of the subscription will be{" "}
-              <strong>for two years</strong> or until the{" "}
-              <strong>next scheduled Departmental Examination</strong>,
-              whichever comes first.
+              The subscription is valid for the{" "}
+              <strong>LDCE 2025 examination</strong>.
             </li>
             <li>
-              If the examination is postponed or rescheduled beyond two years,
-              the subscription{" "}
-              <strong>will not be extended automatically</strong>.
+              If you are <strong>unsuccessful in LDCE 2025</strong>, your
+              subscription will be{" "}
+              <strong>extended automatically to cover LDCE 2026</strong> at no
+              additional cost.
+            </li>
+            <li>
+              To avail the extension, users must provide their
+              <strong> Roll Number</strong> and <strong>Date of Birth</strong>{" "}
+              before the conduct of LDCE 2025 for verification of results.
+            </li>
+            <li>
+              If you successfully clear LDCE 2025, the subscription will
+              conclude at that point.
+            </li>
+            <li>
+              The subscription does not carry a fixed two-year limit — it is
+              tied to your <strong>exam attempt(s)</strong> (LDCE 2025, and if
+              required, LDCE 2026).
             </li>
           </ul>
         </section>

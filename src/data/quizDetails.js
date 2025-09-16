@@ -11,6 +11,8 @@ import { LiaNetworkWiredSolid } from "react-icons/lia";
 import { TfiAgenda } from "react-icons/tfi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { MdModeOfTravel } from "react-icons/md";
+import { FiBriefcase } from "react-icons/fi";
+import { TbPigMoney } from "react-icons/tb";
 
 export const paperI_Items = [
   {
@@ -79,7 +81,7 @@ export const paperII_Items = [
     description: "General Financial Rules, 2017.",
   },
   {
-    icon: GiPayMoney,
+    icon: FiBriefcase,
     title: "CSMOP 2022",
     description: "Manual of Office Procedure (CSMOP).",
   },
@@ -87,6 +89,11 @@ export const paperII_Items = [
     icon: MdModeOfTravel,
     title: "TA Rules",
     description: "Travelling Allowance Rules",
+  },
+  {
+    icon: TbPigMoney,
+    title: "NPS Rules",
+    description: "National Pension and Unified Pension Scheme Rules",
   },
 ];
 
