@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Question from "./Question";
 import Timer from "./Timer";
 import axiosInstance from "../../../components/AxiosInstance";
@@ -10,6 +10,8 @@ import {
   FaRedo,
   FaCheckCircle,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // at top
+import Results from "./Results";
 
 const Exam = () => {
   const [questions, setQuestions] = useState([]);
@@ -26,9 +28,10 @@ const Exam = () => {
   const [showCorrectAnswer, setShowCorrectAnswer] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const timeUpRef = useRef(false);
 
   const yearsToShow = ["2016-17", "2018", "2019-20", "2021-22", "2023", "2024"]; // Only show these years
-
+  const navigate = useNavigate();
   useEffect(() => {
     // Fetch available papers and their status
     const fetchPapers = async () => {
@@ -46,6 +49,37 @@ const Exam = () => {
     fetchPapers();
   }, []);
 
+  const goHome = async () => {
+    // optional: refresh the papers list so UI is up-to-date
+    try {
+      const userId = getUserIdFromToken();
+      if (userId) {
+        const { data } = await axiosInstance.get("/available-papers", {
+          params: { userId },
+        });
+        setPapers(data);
+      }
+    } catch (e) {
+      console.warn("Refresh papers failed:", e);
+    }
+
+    // hard reset exam-local state
+    setIsSubmitted(false);
+    setIsSubmitting(false);
+    setIsStarted(false);
+    setIsSaved(false);
+    setIsCompleted(false);
+    setCurrentPaper(null);
+    setAnswers({});
+    setQuestions([]); // optional but safe
+    setPaperId("");
+    setShowCorrectAnswer(false);
+    setRemainingTime(2 * 60 * 60);
+    navigate("/pages/quiz/previousYear/Exam", { replace: true });
+    // If you truly want to leave this page, navigate (adjust path if needed)
+    // navigate("/"); // or navigate("/dashboard");
+  };
+
   // Filter papers to include only selected years - database can have more but show less
   const filteredPapers = papers.filter((paper) =>
     yearsToShow.includes(paper.year)
@@ -61,12 +95,12 @@ const Exam = () => {
   }, [isStarted]);
 
   useEffect(() => {
-    //console.log("Remaining Time ", remainingTime);
-    if (remainingTime <= 0) {
-      handleSave();
-      alert("Time is up!");
+    if (!isStarted) return;
+    if (remainingTime <= 0 && !timeUpRef.current) {
+      timeUpRef.current = true; // ensure we only run once
+      handleSaveAndSubmit();
     }
-  }, [remainingTime]);
+  }, [remainingTime, isStarted]);
 
   const handleOptionSelect = (option) => {
     setAnswers({
@@ -94,69 +128,64 @@ const Exam = () => {
 
   const handleStart = async (year, paperType, resume = false) => {
     try {
-      // Fetch paper data from the server
-      const response = await axiosInstance.get(
+      // 1) Fetch the paper
+      const { data: paper } = await axiosInstance.get(
         `/prev-year-papers/${year}/${paperType}`
       );
-      const paper = response.data;
 
-      // Reset relevant states to ensure clean start
-      setIsStarted(false); // Stop any ongoing timers
-      setIsSaved(false);
+      // 2) Reset lightweight flags & load questions
+      setIsStarted(false); // stop any running timer
+      setIsSaved(false); // clear save toast
+      setShowCorrectAnswer(false); // hide answer reveal
       setQuestions(paper.questions);
       setPaperId(paper._id);
 
       if (resume) {
+        // 3) RESUME: fetch saved session and rebuild answers map
         const userId = getUserIdFromToken();
-        console.log(
-          "Resuming session with UserId:",
-          userId,
-          "PaperId:",
-          paper._id
-        );
-
-        // Fetch the saved session data
-        const sessionResponse = await axiosInstance.get(
+        const { data: session } = await axiosInstance.get(
           `/exam-sessions/${userId}/${paper._id}`
         );
-        const { remainingTime: savedRemainingTime, responses } =
-          sessionResponse.data;
 
-        // Ensure the remaining time and answers are updated before starting the timer
-        await new Promise((resolve) => {
-          setRemainingTime(savedRemainingTime);
-          setAnswers(
-            responses.reduce((acc, { questionId, userAnswer }) => {
-              const questionIndex = paper.questions.findIndex(
-                (q) => q._id === questionId
-              );
-              if (questionIndex >= 0) {
-                acc[questionIndex] = userAnswer;
-              }
-              return acc;
-            }, {})
-          );
-          resolve(); // Ensure that this completes before continuing
-        });
+        const savedRemainingTime = Math.max(
+          Number(session.remainingTime || 0),
+          0
+        );
 
-        // Set the current paper and start the timer
+        const restoredAnswers = (session.responses || []).reduce(
+          (acc, { questionId, userAnswer }) => {
+            const idx = paper.questions.findIndex((q) => q._id === questionId);
+            if (idx >= 0) acc[idx] = userAnswer;
+            return acc;
+          },
+          {}
+        );
+
+        setRemainingTime(savedRemainingTime);
+        setAnswers(restoredAnswers);
+
         setCurrentPaper({
           year: paper.year,
           paperType: paper.paperType,
           currentQuestionIndex: 0,
           remainingTime: savedRemainingTime,
         });
-        setIsStarted(true); // Start the timer
+
+        setIsStarted(true);
       } else {
-        // Set up for a new session
-        setRemainingTime(2 * 60 * 60); // Reset timer for new sessions
+        // 4) NEW SESSION: clear per-paper selections so grids don’t carry over
+        setAnswers({});
+        const freshDuration = 2 * 60 * 60; // 2 hours (seconds)
+        setRemainingTime(freshDuration);
+
         setCurrentPaper({
           year: paper.year,
           paperType: paper.paperType,
           currentQuestionIndex: 0,
-          remainingTime: 2 * 60 * 60,
+          remainingTime: freshDuration,
         });
-        setIsStarted(true); // Start the timer
+
+        setIsStarted(true);
       }
     } catch (error) {
       console.error("Error fetching questions or resuming session:", error);
@@ -164,74 +193,84 @@ const Exam = () => {
   };
 
   const handleSave = async () => {
+    // Show toast, pause the exam view
     setIsSaved(true);
     setIsStarted(false);
 
     const userId = getUserIdFromToken();
-
     if (!userId || !paperId) {
       console.error("User ID or Paper ID is missing");
+      setTimeout(() => setIsSaved(false), 1200);
       return;
     }
 
     try {
-      const responses = Object.entries(answers).map(
-        ([questionIndex, userAnswer]) => ({
-          questionId: questions[questionIndex]._id,
-          userAnswer,
-          isCorrect: questions[questionIndex].correctAnswer === userAnswer,
-        })
-      );
+      // Build responses safely (skip any undefined question indices)
+      const responses = Object.entries(answers).flatMap(([idx, userAnswer]) => {
+        const q = questions[Number(idx)];
+        return q
+          ? [
+              {
+                questionId: q._id,
+                userAnswer,
+                isCorrect: q.correctAnswer === userAnswer,
+              },
+            ]
+          : [];
+      });
 
-      const score = responses.reduce((score, response) => {
-        if (response.isCorrect) {
-          return score + 1.25; // Correct answers are worth 1.25 points each
-        } else {
-          return score - 1 / 3; // Incorrect answers are penalized 1/3 point each
-        }
-      }, 0);
+      // UPSC-style scoring: +1.25 correct, −1/3 incorrect, 0 for unanswered
+      const score = responses.reduce(
+        (s, r) => s + (r.isCorrect ? 1.25 : -1 / 3),
+        0
+      );
 
       await axiosInstance.post("/exam-sessions", {
         userId,
         paperId,
         startTime: new Date(),
-        remainingTime,
+        remainingTime: Math.max(remainingTime, 0),
         responses,
         score,
       });
 
-      // Update the papers state to reflect the change
-      setPapers((prevPapers) =>
-        prevPapers.map((paper) =>
-          paper._id === paperId ? { ...paper, session: true } : paper
-        )
+      // Optimistic update so the row shows "Resume" immediately
+      setPapers((prev) =>
+        prev.map((p) => (p._id === paperId ? { ...p, session: true } : p))
       );
 
+      // Soft refresh the papers list from server (keeps SPA feel, no full reload)
+      try {
+        const refreshed = await axiosInstance.get("/available-papers", {
+          params: { userId },
+        });
+        setPapers(refreshed.data);
+      } catch (e) {
+        // Non-fatal; optimistic state is already applied
+        console.warn("Soft refresh of papers failed:", e);
+      }
+
+      // Close the exam view and return to the table (no page reload)
+      setCurrentPaper(null);
+
       console.log("Session saved");
-
-      // Show the toast message
-      setIsSaved(true);
-
-      // Hide the toast after 2 seconds
-      setTimeout(() => {
-        setIsSaved(false);
-        window.location.reload();
-      }, 800); // 1 second
     } catch (error) {
       console.error("Error saving exam session:", error);
+    } finally {
+      // Hide the toast after a moment
+      setTimeout(() => setIsSaved(false), 1200);
     }
   };
 
   const handleSubmitQuiz = async () => {
     try {
+      setIsStarted(false); // ⬅️ stop countdown immediately
       const userId = getUserIdFromToken();
 
-      const responses = Object.entries(answers).map(
-        ([questionIndex, userAnswer]) => ({
-          questionId: questions[questionIndex]._id,
-          userAnswer,
-        })
-      );
+      const responses = Object.entries(answers).flatMap(([i, userAnswer]) => {
+        const q = questions[Number(i)];
+        return q ? [{ questionId: q._id, userAnswer }] : [];
+      });
 
       const response = await axiosInstance.post("/submitQuiz", {
         userId,
@@ -476,7 +515,9 @@ const Exam = () => {
             </div>
           )}
           {isStarted && !isSubmitted && currentPaper && (
-            <div>
+            <div
+              key={paperId || `${currentPaper.year}-${currentPaper.paperType}`}
+            >
               <div className="flex justify-between items-center">
                 <div className="text-base md:text-lg font-semibold flex items-center justify-around bg-gradient-to-r from-customBlue to-indigo-900 text-white p-4 rounded-lg shadow-lg mx-auto w-full">
                   <div className="flex items-center">
@@ -618,69 +659,14 @@ const Exam = () => {
           )}
 
           {isSubmitted && (
-            <div className="mt-6">
-              <h2 className="text-2xl font-bold mb-6 text-center">
-                Quiz Results
-              </h2>
-
-              <div className="bg-white shadow-md rounded-lg p-6 mb-6 text-center">
-                <p className="text-lg font-semibold">
-                  Your Score: {score.toFixed(2)}
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {evaluatedResponses.map((response) => {
-                  // Find the question from questions array using questionId
-                  const question = questions.find(
-                    (q) => q._id.toString() === response.questionId
-                  );
-
-                  return (
-                    <div
-                      key={response.questionId}
-                      className="p-4 bg-gray-100 rounded-lg shadow-md"
-                    >
-                      <h3 className="font-semibold text-lg mb-2">
-                        {question
-                          ? question.questionText
-                          : "Question text not found"}
-                      </h3>
-
-                      <p className="text-sm">
-                        <span className="font-semibold">Your Answer: </span>
-                        <span
-                          className={
-                            response.isCorrect
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
-                        >
-                          {response.userAnswer || "Unanswered"}
-                        </span>
-                      </p>
-
-                      <p className="text-sm">
-                        <span className="font-semibold">Correct Answer: </span>
-                        <span className="text-green-600">
-                          {response.correctAnswer ||
-                            "Correct answer not available"}
-                        </span>
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 text-center">
-                <button
-                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
-                  onClick={() => window.location.reload()}
-                >
-                  Go to Home
-                </button>
-              </div>
-            </div>
+            <Results
+              questions={questions}
+              evaluatedResponses={evaluatedResponses}
+              score={score}
+              remainingTime={remainingTime}
+              onGoHome={goHome}
+              onRetake={() => resetTimer(paperId)}
+            />
           )}
 
           {isSaved && (
