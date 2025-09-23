@@ -1,9 +1,8 @@
 import Tabs from "../../components/Tabs";
-import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+
 import PropTypes from "prop-types";
 import TopicHeading from "../../components/TopicHeading";
+import useAuthGuard from "../../assets/useAuthGuard";
 
 CA_Economy.propTypes = {
   progress: PropTypes.string,
@@ -11,46 +10,15 @@ CA_Economy.propTypes = {
 };
 
 export default function CA_Economy({ progress, quizAttempted }) {
-  const [userId, setUserId] = useState("");
-  const navigate = useNavigate();
-  useEffect(() => {
-    getUserId();
-  }, []);
-
-  function getUserId() {
-    const token = localStorage.getItem("jwtToken");
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        const currentTime = Date.now() / 1000; // Current time in seconds
-        // console.log(decodedToken.iat - 34554, currentTime);
-        if (decodedToken.exp < currentTime) {
-          // Check if the token is expired
-          console.log("Token expired");
-          localStorage.removeItem("jwtToken");
-          navigate("/pages/TokenExpired");
-        } else {
-          // console.log(decodedToken.userId);
-          setUserId(decodedToken.userId);
-        }
-      } catch (error) {
-        console.error("Invalid token", error);
-        localStorage.removeItem("jwtToken");
-      }
-    } else {
-      console.log("User is logged out");
-      navigate("/pages/NotLoggedIn");
-    }
-  }
-
+  const userId = useAuthGuard(); // <- handles all redirects/expiry
   return (
     <div className="w-11/12 md:w-10/12 mx-auto mt-2">
       <TopicHeading
-        topicName={"Economy"}
+        topicName="Economy"
         progress={progress}
         quizAttempted={quizAttempted}
       />
-      <Tabs userId={userId} topicName={"CA_Economy"} />
+      <Tabs userId={userId} topicName="CA_Economy" />
     </div>
   );
 }
