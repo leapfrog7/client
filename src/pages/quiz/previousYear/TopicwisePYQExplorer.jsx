@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import PageFeedback from "../../../components/PageFeedback";
 
 // const BASE_URL = "http://localhost:5000/api/v1/";
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
@@ -461,6 +462,7 @@ export default function TopicwisePYQExplorer() {
           </div>
         </aside>
       </div>
+      <PageFeedback pageSlug="/PYQ Topic" />
     </div>
   );
 }
