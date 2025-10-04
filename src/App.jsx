@@ -48,6 +48,8 @@ import AddMDO from "./pages/quiz/AddMDO";
 import AoBR_Full from "./pages/AoBR_Full";
 import AoBR_Lookup from "./pages/AoBR_Lookup";
 import PreviousYearQuiz from "./pages/quiz/previousYear/Exam";
+import TopicwisePYQExplorer from "./pages/quiz/previousYear/TopicwisePYQExplorer";
+import TopicwisePYQQuiz from "./pages/quiz/previousYear/TopicwisePYQQuiz";
 import EmailOtpReset from "./pages/EmailOtpReset";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -529,6 +531,14 @@ const App = () => {
             <Route
               path="/pages/quiz/previousYear/Exam"
               element={<PreviousYearQuiz />}
+            />
+            <Route
+              path="/pages/quiz/pyq/topic"
+              element={<TopicwisePYQExplorer />}
+            />
+            <Route
+              path="/pages/quiz/pyq/topic/quiz"
+              element={<TopicwisePYQQuiz />}
             />
 
             {/* Admin Routes */}

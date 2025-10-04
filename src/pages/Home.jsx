@@ -140,6 +140,7 @@
 // export default Home;
 
 import { useEffect, useState } from "react";
+import useAuthGuard from "../assets/useAuthGuard";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import PropTypes from "prop-types";
@@ -152,6 +153,7 @@ import AccountActivationNotice from "../components/AccountActivationNotice";
 import NewCarousel from "../components/NewCarousel";
 import CTA from "../components/CTA";
 import QuickLinksCarousel from "../components/QuickLinksCarousel";
+import PrevYearCTA from "../pages/quiz/previousYear/PrevYearCTA";
 
 // Prefer env, fallback to your prod base
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
@@ -172,7 +174,7 @@ const Home = ({
 }) => {
   const [isTrialActive, setIsTrialActive] = useState(false);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
-
+  useAuthGuard(); // <- handles all redirects/expiry
   useEffect(() => {
     fetchUserStats();
   }, [fetchUserStats]);
@@ -279,25 +281,8 @@ const Home = ({
 
           <Dashboard userStats={userStats} username={username} />
 
-          {/* PYQ CTA stays visible for paid AND trial */}
-          <div className="bg-blue-100 border-l-4 border-blue-600 text-gray-800 px-2 py-4 md:px-6 rounded-md shadow-sm my-6 mx-1 flex items-center justify-between">
-            <div className="flex items-center gap-2 md:gap-4">
-              <p className="text-base lg:text-lg font-medium">
-                Access{" "}
-                <span className="font-bold">Previous Year Questions</span> for
-                SO LDCE{" "}
-                <span className="animate-pulse text-[10px] md:text-xs text-white bg-gradient-to-r from-pink-500 to-rose-500 px-2 py-1 rounded-full font-semibold shadow-sm">
-                  2024 PYQ added
-                </span>
-              </p>
-            </div>
-            <Link
-              to="/pages/quiz/previousYear/Exam"
-              className="text-blue-800 font-bold hover:text-blue-600 transition duration-200 ease-in-out bg-yellow-300 px-4 py-2 rounded-md text-sm md:text-base text-center"
-            >
-              Click Here
-            </Link>
-          </div>
+          {/* PYQ: Yearwise + Topicwise */}
+          <PrevYearCTA />
         </div>
       )}
 
