@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PageFeedback from "../../../components/PageFeedback";
+// import useAuthGuard from "../../../../src/assets/useAuthGuard";
 
 // const BASE_URL = "http://localhost:5000/api/v1/";
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
@@ -57,6 +58,7 @@ function useQueryStateSync() {
 export default function TopicwisePYQExplorer() {
   const navigate = useNavigate();
   const { get, set } = useQueryStateSync();
+  // useAuthGuard();
 
   // URL-backed state (so links are shareable)
   const [paperType, setPaperType] = useState(get("paper") || "Paper II");
