@@ -39,6 +39,7 @@ import CCA from "./pages/quiz/CCA";
 import GFR from "./pages/quiz/GFR";
 import TARules from "./pages/quiz/TARules";
 import NPSRules from "./pages/quiz/NPS";
+import Allowances from "./pages/quiz/Allowances";
 
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
@@ -182,6 +183,11 @@ const App = () => {
         title: "NPS Rules",
         progress: "0",
         path: "/pages/quiz/paper-ii/nps-rules",
+      },
+      {
+        title: "Allowances",
+        progress: "0",
+        path: "/pages/quiz/paper-ii/allowances",
       },
     ],
   });
@@ -414,6 +420,17 @@ const App = () => {
                   progress={userStats.paperII[7].progress}
                   quizAttempted={String(
                     userStats.paperII[7].attemptedQuestions
+                  )}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-ii/allowances"
+              element={
+                <Allowances
+                  progress={userStats.paperII[8].progress}
+                  quizAttempted={String(
+                    userStats.paperII[8].attemptedQuestions
                   )}
                 />
               }

@@ -188,6 +188,7 @@ const topicNameMap = {
   "Govt. Schemes": "CA_Schemes",
   "TA Rules": "TA_Rules",
   "NPS Rules": "NPS_Rules",
+  Allowances: "HRA_Rules",
 };
 
 TopicHeading.propTypes = {
