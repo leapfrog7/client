@@ -5,7 +5,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
+import { useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InstallAppButton from "./components/InstallAppButton";
@@ -26,7 +26,7 @@ import NavBar from "./components/NavBar";
 import SideBar from "./components/SideBar";
 import Subscribe from "./pages/Subscribe";
 import SampleQuiz from "./pages/quiz/SampleQuiz";
-import SharePopup from "./components/SharePopup";
+// import SharePopup from "./components/SharePopup";
 import Constitution from "./pages/quiz/Constitution";
 import Conduct from "./pages/quiz/Conduct";
 import RTI from "./pages/quiz/RTI";
@@ -240,23 +240,38 @@ const App = () => {
   }
 
   //Fetch user stats from the backend to populate the dashboard progress
-  const fetchUserStats = async () => {
+  // const fetchUserStats = async () => {
+  //   const token = localStorage.getItem("jwtToken");
+  //   try {
+  //     if (token) {
+  //       const response = await axios.get(`${BASE_URL}/quiz/getUserStats`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       setUserStats(response.data);
+  //       //console.log(response.data);
+  //       // console.log(userStats);
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to fetch user stats", err);
+  //   }
+  // };
+  const fetchUserStats = useCallback(async () => {
     const token = localStorage.getItem("jwtToken");
+    if (!token) return;
+
     try {
-      if (token) {
-        const response = await axios.get(`${BASE_URL}/quiz/getUserStats`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserStats(response.data);
-        //console.log(response.data);
-        // console.log(userStats);
-      }
+      const response = await axios.get(`${BASE_URL}/quiz/getUserStats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUserStats(response.data);
     } catch (err) {
       console.error("Failed to fetch user stats", err);
     }
-  };
+  }, []); // deps: [] is fine because we always read token fresh from localStorage
 
   return (
     <BrowserRouter>
@@ -310,7 +325,7 @@ const App = () => {
           )}
         </div>
         {/* Share Popup */}
-        <SharePopup />
+        {/* <SharePopup /> */}
         <div className="flex-grow min-h-screen">
           <Routes>
             {/* Admin Routes */}
