@@ -59,27 +59,27 @@ const TermsAndConditions = () => {
           <ul className="list-disc list-inside text-gray-600 space-y-2 text-sm lg:text-base mb-10">
             <li>
               The subscription is valid for the{" "}
-              <strong>LDCE 2025 examination</strong>.
+              <strong>LDCE 2026 examination</strong>.
             </li>
             <li>
-              If you are <strong>unsuccessful in LDCE 2025</strong>, your
+              If you are <strong>unsuccessful in LDCE 2026</strong>, your
               subscription will be{" "}
-              <strong>extended automatically to cover LDCE 2026</strong> at no
+              <strong>extended automatically to cover LDCE 2027</strong> at no
               additional cost.
             </li>
             <li>
               To avail the extension, users must provide their
               <strong> Roll Number</strong> and <strong>Date of Birth</strong>{" "}
-              before the conduct of LDCE 2025 for verification of results.
+              for verification of results.
             </li>
             <li>
-              If you successfully clear LDCE 2025, the subscription will
+              If you successfully clear LDCE 2026, the subscription will
               conclude at that point.
             </li>
             <li>
               The subscription does not carry a fixed two-year limit — it is
-              tied to your <strong>exam attempt(s)</strong> (LDCE 2025, and if
-              required, LDCE 2026).
+              tied to your <strong>exam attempt(s)</strong> (LDCE 2026, and if
+              required, LDCE 2027).
             </li>
           </ul>
         </section>

@@ -140,7 +140,7 @@
 // export default Home;
 
 import { useEffect, useState } from "react";
-import useAuthGuard from "../assets/useAuthGuard";
+// import useAuthGuard from "../assets/useAuthGuard";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import PropTypes from "prop-types";
@@ -174,7 +174,7 @@ const Home = ({
 }) => {
   const [isTrialActive, setIsTrialActive] = useState(false);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
-  useAuthGuard(); // <- handles all redirects/expiry
+  // useAuthGuard(); // <- handles all redirects/expiry
   useEffect(() => {
     fetchUserStats();
   }, [fetchUserStats]);

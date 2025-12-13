@@ -117,8 +117,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
           </h1>
 
           <p className="mt-3 text-gray-700 text-base lg:text-lg max-w-xl">
-            Get full access to all quizzes, PYQs (including 2024), analytics and
-            bookmarks
+            Get full access to all quizzes, PYQs, analytics and bookmarks
           </p>
 
           <motion.ul
@@ -161,9 +160,9 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               </span>
               <p className="flex-1 text-base lg:text-xl text-gray-700 font-medium leading-snug text-left">
                 Topic-wise quizzes + PYQs{" "}
-                <span className="font-semibold text-indigo-600">
+                {/* <span className="font-semibold text-indigo-600">
                   (2024 included)
-                </span>
+                </span> */}
               </p>
             </motion.li>
           </motion.ul>

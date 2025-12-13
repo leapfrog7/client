@@ -124,9 +124,12 @@ const PricingSection = () => {
   const discountedPrice = 999;
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
   const sectionRef = useRef(null);
   const [tncOpen, setTncOpen] = useState(false);
+  // Toggle this to false the day UPSC releases the SO-LDCE 2026 notification
+  const IS_EARLY_BIRD = true;
+  const EARLY_BIRD_PRICE = 699;
 
   // Reveal on view (more reliable than scroll handlers)
   useEffect(() => {
@@ -165,9 +168,10 @@ const PricingSection = () => {
           </div>
 
           <p className="text-gray-700 text-base md:text-lg max-w-xl">
-            Your subscription covers <strong>LDCE 2025</strong>. If you don’t
-            clear, it <strong>automatically extends to LDCE 2026</strong> —
-            completely free.
+            From 13th December 2025, your subscription will cover{" "}
+            <strong>LDCE 2026</strong>. If you don’t clear, it{" "}
+            <strong>automatically extends to LDCE 2027</strong> — completely
+            free.
           </p>
           <div className="flex gap-4 justify-center items-baseline">
             <h4 className="text-lg font-semibold text-gray-800 mt-6">
@@ -221,24 +225,24 @@ const PricingSection = () => {
             >
               <FontAwesomeIcon icon={faCheck} className="text-blue-600 mr-3" />
               <span>Previous Year Questions</span>
-              <span className="ml-2 animate-pulse text-[10px] md:text-xs text-white bg-gradient-to-r from-pink-500 to-rose-500 px-2 py-0.5 rounded-full font-semibold shadow-sm">
+              {/* <span className="ml-2 animate-pulse text-[10px] md:text-xs text-white bg-gradient-to-r from-pink-500 to-rose-500 px-2 py-0.5 rounded-full font-semibold shadow-sm">
                 2024 included
-              </span>
+              </span> */}
             </motion.div>
           </div>
           {/* Inside the Pricing Card, put a "View Terms" link/button */}
         </div>
 
         {/* Right: Pricing Card */}
-        <div className="bg-slate-50 shadow-xl rounded-2xl px-6 sm:px-8 py-6 max-w-md mx-auto w-full border border-gray-200">
-          {/* Guarantee badge */}
-          {/* <div className="flex justify-center">
-            <span className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1 text-xs font-medium">
-              ✅ Pass Protection: LDCE 2025 → 2026
-            </span>
-          </div> */}
+        <div className="bg-slate-50 shadow-xl rounded-2xl px-6 sm:px-8 py-6 max-w-md mx-auto w-full border border-gray-200 relative overflow-hidden">
+          {/* Early Bird ribbon */}
+          {IS_EARLY_BIRD && (
+            <div className="absolute -right-12 top-4 rotate-45 bg-amber-500 text-white text-xs font-semibold tracking-wider px-16 py-1 shadow">
+              EARLY BIRD
+            </div>
+          )}
 
-          <p className="mt-3 text-indigo-600 text-base lg:text-lg text-center font-semibold">
+          <p className="mt-1 text-indigo-600 text-lg lg:text-xl text-center font-semibold">
             Unlimited access to all features
           </p>
 
@@ -246,19 +250,32 @@ const PricingSection = () => {
             <span className="text-gray-400 line-through text-lg flex items-center">
               <PiCurrencyInr /> {originalPrice}
             </span>
+
             <span className="text-blue-800 text-4xl lg:text-5xl font-extrabold flex items-center">
-              <PiCurrencyInr /> {discountedPrice}
+              <PiCurrencyInr />
+              {IS_EARLY_BIRD ? EARLY_BIRD_PRICE : discountedPrice}
             </span>
           </div>
 
-          {/* New policy copy */}
+          {/* Policy copy */}
           <div className="text-center text-sm md:text-base text-gray-600 space-y-1">
             <p>
-              Valid through <strong>LDCE 2025</strong>.
+              Valid through <strong>LDCE 2026</strong>.
             </p>
             <p>
-              Didn’t clear? <strong>Auto-extends to LDCE 2026</strong> at no
+              Didn’t clear? <strong>Auto-extends to LDCE 2027</strong> at no
               cost.
+            </p>
+          </div>
+
+          {/* Early-bird explainer */}
+          <div className="mt-3 rounded-lg bg-blue-50 border border-blue-200 p-3 text-center">
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">Early Bird ₹699</span> available{" "}
+              <span className="font-medium">
+                until UPSC publishes the SO-LDCE 2026 notification
+              </span>
+              . Prices will be Rs 999/- thereafter.
             </p>
           </div>
 
@@ -269,46 +286,6 @@ const PricingSection = () => {
           >
             Subscribe Now <FaRegHandPointUp className="ml-3 text-xl" />
           </button>
-
-          {/* Collapsible “How the extension works” */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => setShowDetails((v) => !v)}
-              className="w-full text-xs text-gray-600 underline hover:text-gray-800"
-              aria-expanded={showDetails}
-              aria-controls="extension-details"
-            >
-              How the extension works
-            </button>
-
-            {showDetails && (
-              <div
-                id="extension-details"
-                className="mt-3 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg p-3 text-left"
-              >
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    Enter your <strong>Roll Number</strong> &{" "}
-                    <strong>DOB</strong> in your dashboard{" "}
-                    <em>before LDCE 2025 Exam</em>.
-                  </li>
-                  <li>
-                    After results, if you didn’t clear, your access{" "}
-                    <strong>continues for LDCE 2026</strong> automatically.
-                  </li>
-                  <li>
-                    If you cleared in 2025, the subscription ends (fair usage
-                    for everyone).
-                  </li>
-                </ul>
-                <p className="mt-2 text-[11px] text-gray-500">
-                  Note: We only use Roll No. & DOB to verify your result. Your
-                  data is stored securely and never sold.
-                </p>
-              </div>
-            )}
-          </div>
 
           <hr className="mt-5 border-gray-200" />
         </div>
