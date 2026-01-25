@@ -1,142 +1,215 @@
-// src/pages/public/CghsRatePublic.jsx
-
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import Select from "react-select";
-import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
-import { MdCancel } from "react-icons/md";
+import { MdNavigateBefore, MdNavigateNext, MdCancel } from "react-icons/md";
 import { Link } from "react-router-dom";
+import Loading from "../../components/Loading";
 import PageFeedback from "../../components/PageFeedback";
-import Loading from "../../components/Loading"; // adjust path if needed
-import CGHSEstimatorModal from "../../components/Tools/CGHSEstimatorModal";
 import { Helmet } from "react-helmet-async";
 
-const CghsRatePublic = () => {
-  const [rates, setRates] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCity, setSelectedCity] = useState("Delhi");
-  const [currentPage, setCurrentPage] = useState(1);
+// ---------- helpers ----------
+const TIERS = [
+  { value: "TIER_I", label: "Tier I" },
+  { value: "TIER_II", label: "Tier II" },
+  { value: "TIER_III", label: "Tier III" },
+];
+
+const WARD_CHIPS = [
+  { value: "PRIVATE", label: "Private" },
+  { value: "SEMI_PRIVATE", label: "Semi-Private" },
+  { value: "GENERAL", label: "General" },
+];
+
+const WARD_LABEL = {
+  PRIVATE: "Private",
+  SEMI_PRIVATE: "Semi-Private",
+  GENERAL: "General",
+};
+
+const FACILITY_ROWS = [
+  { key: "SS", label: "Super Spl." },
+  { key: "NABH", label: "NABH" },
+  { key: "NON_NABH", label: "Non-NABH" },
+  // render only if showSS=true
+];
+
+function formatCell(cell) {
+  if (!cell) return "—";
+  if (cell.amount !== null && cell.amount !== undefined && cell.amount !== "") {
+    const n = Number(cell.amount);
+    if (Number.isFinite(n)) return `₹${n.toLocaleString("en-IN")}`;
+  }
+  const raw = String(cell.raw || "").trim();
+  return raw ? raw : "—";
+}
+
+function getRateCell(proc, tier, facility, ward) {
+  return proc?.rates?.[tier]?.[facility]?.[ward] || null;
+}
+
+// Small debounce (no library)
+function useDebouncedValue(value, delayMs = 350) {
+  const [deb, setDeb] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDeb(value), delayMs);
+    return () => clearTimeout(t);
+  }, [value, delayMs]);
+  return deb;
+}
+
+const chipBase =
+  "px-3 py-1.5 rounded-full text-sm border transition whitespace-nowrap";
+const chipOn = "bg-blue-600 text-white border-blue-600";
+const chipOff = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50";
+
+const CghsRatesPublic = () => {
+  // keep old link working (same component path unchanged)
+  const BASE_URL = "https://server-v4dy.onrender.com";
+  // const BASE_URL = "http://localhost:5000";
+
+  // IMPORTANT: your app.js mounts public V2 here:
+  const API = `${BASE_URL}/api/v1/public-cghs-rates-v2`;
+
+  // paging
+  const limit = 10;
+  const [page, setPage] = useState(1);
+
+  // filters
+  const [q, setQ] = useState("");
+  const dq = useDebouncedValue(q, 350);
+
+  const [tier, setTier] = useState("TIER_I"); // default Tier I
+  // const [ward, setWard] = useState("PRIVATE"); // default Private
+  const [selectedWards, setSelectedWards] = useState([
+    "PRIVATE",
+    "SEMI_PRIVATE",
+  ]);
+  //  const [showSS, setShowSS] = useState(false); // SS chip
+
+  // “More options”
+  // const [moreOpen, setMoreOpen] = useState(false);
+  // const [showNonNabh, setShowNonNabh] = useState(false); // hidden by default
+  // const [showRawOnExpand, setShowRawOnExpand] = useState(true);
+
+  // data
   const [loading, setLoading] = useState(true);
-  const [showEstimator, setShowEstimator] = useState(false);
+  const [loadingRows, setLoadingRows] = useState(false);
 
-  const ratesPerPage = 10;
+  const [activeRateSet, setActiveRateSet] = useState(null);
 
+  const [items, setItems] = useState([]); // list results (code+name+speciality)
+  const [total, setTotal] = useState(0);
+
+  // details per row (cghsCode -> full procedure doc)
+  const [detailsMap, setDetailsMap] = useState({});
+  // const [expanded, setExpanded] = useState({}); // code -> true/false
+
+  const skip = (page - 1) * limit;
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(total / limit)),
+    [total, limit],
+  );
+
+  // reset paging when filters change
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+    setPage(1);
+  }, [dq, tier, selectedWards.join("|")]);
 
-  //   const BASE_URL = "http://localhost:5000/api/v1/public"; // Replace with your live URL
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public";
-
-  const cityOptions = [
-    { value: "Delhi", label: "Delhi-NCR" },
-    // { value: "Mumbai", label: "Mumbai" },
-    // { value: "Chennai", label: "Chennai" },
-    // { value: "Kolkata", label: "Kolkata" },
-  ];
-
+  // fetch list
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, []);
-
-  useEffect(() => {
-    const fetchRates = async () => {
+    const run = async () => {
       try {
-        setLoading(true); // Start loading
-        const response = await axios.get(`${BASE_URL}/cghsRates`);
-        setRates(response.data);
-      } catch (error) {
-        console.error("Error fetching CGHS Rates:", error);
+        setLoading(page === 1 && !items.length);
+        setLoadingRows(true);
+
+        // NOTE: your existing publicController uses page/limit style.
+        // But your earlier UI used skip/limit. We'll support both patterns safely:
+        // If your backend currently expects page/limit, it will ignore skip.
+        // If it expects skip/limit, it will ignore page.
+        const res = await axios.get(`${API}/search`, {
+          params: {
+            q: dq || "",
+            page,
+            limit,
+            skip,
+          },
+        });
+
+        // Try to read response in either format:
+        const apiItems = res.data?.items || [];
+        const apiTotal =
+          typeof res.data?.total === "number"
+            ? res.data.total
+            : typeof res.data?.count === "number"
+              ? res.data.count
+              : 0;
+
+        setActiveRateSet(res.data?.activeRateSet || null);
+        setItems(apiItems);
+        setTotal(apiTotal);
+
+        // keep already fetched details for caching; just collapse all on new search/page
+      } catch (e) {
+        console.error(e);
+        setItems([]);
+        setTotal(0);
       } finally {
         setLoading(false);
-      } // Done loading
+        setLoadingRows(false);
+      }
     };
 
-    fetchRates();
-  }, []);
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [API, dq, page, limit, skip]);
 
-  const filteredRates = rates.filter((rate) => {
-    const search = searchTerm.toLowerCase();
-    return (
-      rate.name.toLowerCase().includes(search) ||
-      rate.category.toLowerCase().includes(search) ||
-      (rate.cghsCode &&
-        rate.cghsCode.toString().toLowerCase().includes(search)) ||
-      (rate.rates &&
-        rate.rates[selectedCity]?.nabhRate?.toString().includes(search)) ||
-      (rate.rates &&
-        rate.rates[selectedCity]?.nonNabhRate?.toString().includes(search))
-    );
-  });
+  // fetch details for visible items (so cards can show NABH + SS without expanding)
+  useEffect(() => {
+    const run = async () => {
+      if (!items.length) return;
 
-  // const generatePageNumbers = () => {
-  //   const pages = [];
+      // fetch only missing
+      const missing = items
+        .map((x) => x.cghsCode)
+        .filter((code) => code && !detailsMap[code]);
 
-  //   if (totalPages <= 6) {
-  //     // Show all pages if total is 6 or less
-  //     for (let i = 1; i <= totalPages; i++) {
-  //       pages.push(i);
-  //     }
-  //   } else {
-  //     if (currentPage <= 6) {
-  //       // If current page is in first 6 pages, show 1 to 6 and last page
-  //       for (let i = 1; i <= 6; i++) {
-  //         pages.push(i);
-  //       }
-  //       pages.push(totalPages);
-  //     } else {
-  //       // After 7th page, show 1, ..., currentPage, ..., lastPage
-  //       pages.push(1);
-  //       pages.push("...");
-  //       pages.push(currentPage);
-  //       pages.push("...");
-  //       pages.push(totalPages);
-  //     }
-  //   }
+      if (missing.length === 0) return;
 
-  //   return pages;
+      try {
+        const results = await Promise.all(
+          missing.map((code) =>
+            axios
+              .get(`${API}/procedure/${code}`)
+              .then((r) => r.data)
+              .catch(() => null),
+          ),
+        );
+
+        setDetailsMap((prev) => {
+          const next = { ...prev };
+          results.forEach((doc) => {
+            if (doc?.cghsCode) next[doc.cghsCode] = doc;
+          });
+          return next;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  const pageInfo = useMemo(() => {
+    if (!total) return "0 results";
+    const from = skip + 1;
+    const to = Math.min(skip + items.length, total);
+    return `Showing ${from}–${to} of ${total}`;
+  }, [skip, items.length, total]);
+
+  // const toggleExpanded = (code) => {
+  //   setExpanded((p) => ({ ...p, [code]: !p[code] }));
   // };
-
-  const generatePageNumbers = () => {
-    const pages = [];
-
-    if (totalPages <= 6) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-
-      if (currentPage > 4) {
-        pages.push("...");
-      }
-
-      const startPage = Math.max(2, currentPage - 1);
-      const endPage = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 3) {
-        pages.push("...");
-      }
-
-      pages.push(totalPages);
-    }
-
-    return pages;
-  };
-
-  const indexOfLastRate = currentPage * ratesPerPage;
-  const indexOfFirstRate = indexOfLastRate - ratesPerPage;
-  const currentRates = filteredRates.slice(indexOfFirstRate, indexOfLastRate);
-  const totalPages = Math.ceil(filteredRates.length / ratesPerPage);
-
-  // Inside src/pages/public/CghsRatePublic.jsx, find this function and replace it
 
   if (loading) return <Loading />;
 
@@ -146,226 +219,310 @@ const CghsRatePublic = () => {
         <title>Find CGHS Rates | UnderSigned</title>
         <meta
           name="description"
-          content="Search and explore Central Government Health Scheme (CGHS) prescribed rates. Prepare Estimate of expenditure as per CGHS rates"
+          content="Search and explore CGHS prescribed rates using the latest active dataset."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/cghs-rates"
         />
       </Helmet>
+
       <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2 mt-4">
-        Find CGHS Rates 📋
+        Latest CGHS Rates 📋
       </h1>
 
-      <p className="text-center text-gray-600 text-sm md:text-base mb-6 max-w-2xl mx-auto leading-relaxed">
-        Discover CGHS-approved rates for lab tests, medical procedures, and
-        implants — neatly organized by city (Delhi NCR for now) and prepare
-        estimates before lab visits.
+      <p className="text-center text-gray-600 text-sm md:text-base mb-4 max-w-2xl mx-auto leading-relaxed">
+        Search and Find Latest CGHS procedures and view rates in the most
+        convenient manner.
       </p>
 
-      <div className="flex flex-col items-center gap-6 mb-8 px-4">
-        {/* Top Row: Selector + Stats */}
-        <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-4">
-          {/* City Selector */}
-          <Select
-            value={cityOptions.find((option) => option.value === selectedCity)}
-            onChange={(option) => {
-              setSelectedCity(option.value);
-              setCurrentPage(1);
-            }}
-            options={cityOptions}
-            placeholder="Select a City"
-            className="w-full md:w-2/3 lg:w-1/3 text-sm md:text-base shadow-sm"
-            isSearchable={true}
-          />
-
-          {/* Stats Box */}
-          <div className="bg-white border border-gray-200 rounded-md px-6 py-2 shadow-sm flex items-center gap-2">
-            <span className="text-gray-600 text-sm md:text-base">
-              🧮 Total Entries:
-            </span>
-            <span className="text-blue-700 font-bold text-base">
-              {filteredRates.length}
-            </span>
+      {/* Sticky filter bar (mobile-first) */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-200 -mx-2 px-2 py-3">
+        {/* Tier tabs */}
+        <div className="mt-1">
+          <div className="inline-flex w-full rounded-md border border-gray-200 bg-gray-50 p-1 shadow-sm">
+            {TIERS.map((t) => {
+              const active = tier === t.value;
+              return (
+                <button
+                  key={t.value}
+                  onClick={() => setTier(t.value)}
+                  className={[
+                    "flex-1 rounded-md px-3 py-2 text-sm font-semibold transition",
+                    "focus:outline-none focus:ring-2 focus:ring-blue-600/30",
+                    active
+                      ? "bg-white text-blue-800 shadow border border-gray-200"
+                      : "text-gray-600 hover:text-gray-800 hover:bg-white/60",
+                  ].join(" ")}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative w-full md:w-2/3 lg:w-1/2  ring-2">
-          <input
-            type="text"
-            placeholder="Search .... by name, category, code, or rate 🔍︎ "
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full  border-gray-300 rounded-md px-4 py-2 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm("")}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500"
-              title="Clear search"
-            >
-              <MdCancel size={20} />
-            </button>
-          )}
+        {/* Ward chips + More */}
+        <div className="mt-4">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {WARD_CHIPS.map((w) => {
+              const on = selectedWards.includes(w.value);
+
+              return (
+                <button
+                  key={w.value}
+                  type="button"
+                  className={`${chipBase} ${on ? chipOn : chipOff}`}
+                  aria-pressed={on}
+                  onClick={() => {
+                    setSelectedWards((prev) => {
+                      const isOn = prev.includes(w.value);
+                      let next = isOn
+                        ? prev.filter((x) => x !== w.value)
+                        : [...prev, w.value];
+
+                      // If user unselects everything, revert to your two defaults
+                      if (next.length === 0) return ["PRIVATE", "SEMI_PRIVATE"];
+
+                      // Optional: if user removes BOTH defaults, snap back to both defaults.
+                      // (This keeps your UI focused on what most people need.)
+                      const hasPrivate = next.includes("PRIVATE");
+                      const hasSemi = next.includes("SEMI_PRIVATE");
+                      if (!hasPrivate && !hasSemi)
+                        return ["PRIVATE", "SEMI_PRIVATE"];
+
+                      return next;
+                    });
+                  }}
+                >
+                  {w.label}
+                  {on ? <span className="ml-1">✓</span> : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="ml-auto text-xs text-gray-500 whitespace-nowrap text-right mr-2">
+          {pageInfo}
+        </div>
+        {/* Search */}
+        <div className="mt-3">
+          <div className="relative">
+            {/* Search icon */}
+            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+              🔍
+            </div>
+
+            <input
+              type="text"
+              placeholder="Search procedure name or CGHS code"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="
+        w-full
+        rounded-xl
+        border border-gray-300
+        bg-white
+        pl-10 pr-10 py-2.5
+        text-sm md:text-base
+        shadow-sm
+        focus:outline-none
+        focus:ring-2 focus:ring-blue-600/40
+        focus:border-blue-600
+        transition
+      "
+            />
+
+            {/* Clear button */}
+            {q && (
+              <button
+                onClick={() => setQ("")}
+                className="
+          absolute right-3 top-1/2 -translate-y-1/2
+          text-gray-400 hover:text-gray-700
+          transition
+        "
+                title="Clear search"
+              >
+                <MdCancel size={20} />
+              </button>
+            )}
+          </div>
+          {/* Helper text
+          <div className="mt-1 text-[11px] text-gray-500 px-1">
+            Example: <span className="font-medium">MRI Brain</span>,{" "}
+            <span className="font-medium">CGHS Code 1234</span>
+          </div> */}
         </div>
       </div>
-      <div className="w-full overflow-x-auto">
-        <table className="min-w-full table-auto text-sm rounded-md overflow-hidden">
-          <thead className="bg-gray-50 text-gray-600">
-            <tr>
-              <th className="px-3 py-2 text-left text-sm md:text-base w-[65%]">
-                Tests / Procedure
-              </th>
-              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] ">
-                Non-NABH (₹)
-              </th>
-              <th className="px-3 py-2 text-center text-sm md:text-base w-[17.5%] whitespace-nowrap">
-                NABH (₹)
-              </th>
-            </tr>
-          </thead>
 
-          <tbody>
-            {currentRates.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="p-4 text-center text-gray-500">
-                  No rates found for the selected city.
-                </td>
-              </tr>
-            ) : (
-              currentRates.map((rate) => (
-                <tr
-                  key={rate._id}
-                  className="bg-white hover:bg-gray-50 border-b border-gray-200 transition-colors"
-                >
-                  {/* Name, CGHS Code, Note, Reference */}
-                  <td className="p-4 align-top break-words">
-                    <div className="space-y-1">
-                      <p className="text-blue-800 font-semibold flex items-center gap-1 text-sm md:text-base">
-                        🧪 {rate.name}
-                      </p>
-
-                      {rate.cghsCode && (
-                        <p className="text-blue-600 text-xs flex items-center gap-1">
-                          #️⃣ CGHS Code: {rate.cghsCode}
-                        </p>
-                      )}
-                      {rate.note && (
-                        <p
-                          className="text-amber-700 text-xs break-words"
-                          title={rate.note}
-                        >
-                          🏷️ {rate.note}
-                        </p>
-                      )}
-                      {rate.reference && (
-                        <p
-                          className="text-gray-400 text-[10px] break-words"
-                          title={rate.reference}
-                        >
-                          📄 {rate.reference}
-                        </p>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Non-NABH */}
-                  <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
-                    {rate.rates?.[selectedCity]?.nonNabhRate !== undefined
-                      ? `₹${rate.rates[selectedCity].nonNabhRate.toLocaleString(
-                          "en-IN"
-                        )}`
-                      : rate.rates?.Delhi?.nonNabhRate !== undefined
-                      ? `₹${rate.rates.Delhi.nonNabhRate.toLocaleString(
-                          "en-IN"
-                        )}`
-                      : "N/A"}
-                  </td>
-
-                  {/* NABH */}
-                  <td className="p-4 text-center align-top text-sm md:text-base text-gray-700 font-medium whitespace-nowrap">
-                    {rate.rates?.[selectedCity]?.nabhRate !== undefined
-                      ? `₹${rate.rates[selectedCity].nabhRate.toLocaleString(
-                          "en-IN"
-                        )}`
-                      : rate.rates?.Delhi?.nabhRate !== undefined
-                      ? `₹${rate.rates.Delhi.nabhRate.toLocaleString("en-IN")}`
-                      : "N/A"}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Active dataset meta */}
+      <div className="hidden mt-4 bg-white border border-gray-200 rounded-md px-4 py-3 shadow-sm">
+        <div className="text-sm text-gray-700">
+          <span className="font-semibold">Dataset:</span>{" "}
+          {activeRateSet?.title || "ACTIVE RateSet"}
+          {activeRateSet?.effectiveFrom ? (
+            <span className="text-gray-500">
+              {" "}
+              • Effective:{" "}
+              {new Date(activeRateSet.effectiveFrom).toLocaleDateString(
+                "en-IN",
+              )}
+            </span>
+          ) : null}
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Showing rates for <b>{tier.replace("_", " ")}</b> • Wards:{" "}
+          <b>{selectedWards.map((w) => w.replace("_", "-")).join(", ")}</b>
+        </div>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination
       {totalPages > 1 && (
         <div className="flex justify-center items-center flex-wrap gap-2 mt-6 text-sm md:text-base">
-          {/* Previous */}
           <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Previous page"
           >
             <MdNavigateBefore size={20} />
           </button>
 
-          {/* Page Buttons with Ellipses */}
-          {generatePageNumbers().map((page, idx) =>
-            page === "..." ? (
-              <span key={idx} className="px-2 text-gray-400">
-                ...
-              </span>
-            ) : (
-              <button
-                key={`page-${idx}`}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-full border transition ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                {page}
-              </button>
-            )
-          )}
+          <span className="px-3 py-1 rounded-full border bg-white text-gray-700">
+            Page {page} / {totalPages}
+          </span>
 
-          {/* Next */}
           <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Next page"
           >
             <MdNavigateNext size={20} />
           </button>
         </div>
-      )}
+      )} */}
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 md:p-6 text-center shadow-sm mt-8">
-        <p className="text-gray-700 text-sm md:text-base mb-3">
-          🧾 <strong>Be informed.</strong> Get an estimate before your next lab
-          test or procedure — no surprises, no confusion. Know exactly what
-          you’ll pay as per CGHS.
-        </p>
-        <button
-          onClick={() => setShowEstimator(true)}
-          className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white text-sm md:text-base font-semibold px-6 py-3 rounded-full transition shadow-md"
-        >
-          💡 Prepare CGHS Estimate Instantly
-        </button>
+      {/* Results */}
+      <div className="mt-4 space-y-3">
+        {loadingRows ? (
+          <div className="py-8 text-center text-gray-500">Loading…</div>
+        ) : items.length === 0 ? (
+          <div className="py-8 text-center text-gray-500">No results.</div>
+        ) : (
+          items.map((it) => {
+            const proc = detailsMap[it.cghsCode];
+
+            // Visible ward columns: Private always + optional selected
+            const visibleWards = ["PRIVATE"];
+            if (selectedWards.includes("SEMI_PRIVATE"))
+              visibleWards.push("SEMI_PRIVATE");
+            if (selectedWards.includes("GENERAL")) visibleWards.push("GENERAL");
+
+            const get = (facility, ward) =>
+              getRateCell(proc, tier, facility, ward);
+
+            return (
+              <div
+                key={it.cghsCode}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+              >
+                <div className="py-4 px-2">
+                  {/* title */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-blue-900 font-semibold text-sm md:text-base break-words">
+                        🧪 {it.name}
+                      </div>
+                      <div className="mt-1 text-xs text-blue-700">
+                        #️⃣ {it.cghsCode}
+                        {it.speciality ? (
+                          <span className="text-gray-500">
+                            {" "}
+                            • 🏷️ {it.speciality}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grouped Rates: rows = facility, cols = wards */}
+                  <div className="mt-3 border border-gray-200 rounded-lg overflow-hidden">
+                    {/* Header row */}
+                    <div
+                      className="grid bg-gray-50 text-[12px] md:text-base text-gray-600"
+                      style={{
+                        gridTemplateColumns: `90px repeat(${visibleWards.length}, minmax(0, 1fr))`,
+                      }}
+                    >
+                      <div className="px-2 py-2 font-semibold">Rate</div>
+                      {visibleWards.map((w) => (
+                        <div key={w} className="px-2 py-2 text-center">
+                          {WARD_LABEL[w]}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Facility rows */}
+                    {FACILITY_ROWS.map((row) => (
+                      <div
+                        key={row.key}
+                        className="grid border-t border-gray-200"
+                        style={{
+                          gridTemplateColumns: `90px repeat(${visibleWards.length}, minmax(0, 1fr))`,
+                        }}
+                      >
+                        <div className="px-2 py-2 text-[12px] md:text-base text-gray-600 bg-white">
+                          {row.label}
+                        </div>
+
+                        {visibleWards.map((w) => (
+                          <div
+                            key={w}
+                            className="px-2 py-2 text-center bg-white"
+                          >
+                            <div className="text-[12px] md:text-base text-gray-900">
+                              {formatCell(get(row.key, w))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {showEstimator && (
-        <CGHSEstimatorModal
-          onClose={() => setShowEstimator(false)}
-          rates={rates}
-          selectedCity={selectedCity}
-        />
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center flex-wrap gap-2 mt-6 text-sm md:text-base">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label="Previous page"
+          >
+            <MdNavigateBefore size={20} />
+          </button>
+
+          <span className="px-3 py-1 rounded-full border bg-white text-gray-700">
+            Page {page} / {totalPages}
+          </span>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            className="p-2 rounded-full border text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            aria-label="Next page"
+          >
+            <MdNavigateNext size={20} />
+          </button>
+        </div>
       )}
 
       <PageFeedback pageSlug="/cghs-rates" />
@@ -389,13 +546,11 @@ const CghsRatePublic = () => {
       </div>
 
       <p className="text-xs text-gray-400 my-12 text-center px-4">
-        <strong>Disclaimer:</strong> While every effort has been made to ensure
-        the accuracy of the information presented, users are advised that CGHS
-        rates are subject to change. We shall not be held liable for any
-        inadvertent errors or outdated information.
+        <strong>Disclaimer:</strong> Rates are subject to change; please verify
+        at the time of billing.
       </p>
     </div>
   );
 };
 
-export default CghsRatePublic;
+export default CghsRatesPublic;
