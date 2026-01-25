@@ -1129,7 +1129,7 @@ const CghsRateManagementV2 = () => {
                           <label className="flex items-center gap-2 mt-2 text-sm">
                             <input
                               type="checkbox"
-                              checked="true"
+                              checked={confirmLiveEdit}
                               onChange={(e) =>
                                 setConfirmLiveEdit(e.target.checked)
                               }
@@ -1140,7 +1140,7 @@ const CghsRateManagementV2 = () => {
                           <input
                             className="mt-2 w-full border rounded p-2 text-sm"
                             placeholder="Reason for live edit (required)"
-                            value="yes"
+                            value={liveEditReason}
                             onChange={(e) => setLiveEditReason(e.target.value)}
                           />
                         </div>

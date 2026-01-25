@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Loading from "../../components/Loading";
 import PageFeedback from "../../components/PageFeedback";
 import { Helmet } from "react-helmet-async";
-
+import CghsGuidelinesModal from "./CghsGuidelinesModal"; // adjust path
 // ---------- helpers ----------
 const TIERS = [
   { value: "TIER_I", label: "Tier I" },
@@ -76,7 +76,7 @@ const CghsRatesPublic = () => {
   // filters
   const [q, setQ] = useState("");
   const dq = useDebouncedValue(q, 350);
-
+  const [guidelinesOpen, setGuidelinesOpen] = useState(false);
   const [tier, setTier] = useState("TIER_I"); // default Tier I
   // const [ward, setWard] = useState("PRIVATE"); // default Private
   const [selectedWards, setSelectedWards] = useState([
@@ -497,6 +497,187 @@ const CghsRatesPublic = () => {
           })
         )}
       </div>
+
+      {/* Tier-wise CGHS Cities */}
+      <div className="mt-10 border-t border-gray-200 pt-6">
+        <details className="group bg-gray-50 rounded-xl shadow-sm">
+          <summary className="flex items-center justify-between cursor-pointer px-4 py-3 text-sm md:text-base font-semibold text-blue-800">
+            <span>📍 CGHS Cities (Tier-wise)</span>
+            <span className="text-gray-400 group-open:rotate-180 transition-transform">
+              ▼
+            </span>
+          </summary>
+
+          <div className="px-4 pb-4 pt-2 text-sm text-gray-700 space-y-4">
+            {/* Tier I */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Tier I Cities
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Hyderabad (UA)",
+                  "Delhi (UA)",
+                  "Ahmedabad (UA)",
+                  "Bengaluru (UA)",
+                  "Mumbai (UA)",
+                  "Pune (UA)",
+                  "Chennai (UA)",
+                  "Kolkata (UA)",
+                ].map((city) => (
+                  <span
+                    key={city}
+                    className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs"
+                  >
+                    {city}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Tier II */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Tier II Cities
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "Vijayawada",
+                  "Warangal",
+                  "Visakhapatnam",
+                  "Guntur",
+                  "Nellore",
+                  "Guwahati",
+                  "Patna",
+                  "Chandigarh",
+                  "Durg-Bhilai",
+                  "Raipur",
+                  "Rajkot",
+                  "Jamnagar",
+                  "Bhavnagar",
+                  "Vadodara",
+                  "Surat",
+                  "Faridabad",
+                  "Gurgaon",
+                  "Srinagar",
+                  "Jammu",
+                  "Jamshedpur",
+                  "Dhanbad",
+                  "Ranchi Bokaro",
+                  "Belgaum",
+                  "Hubli-Dharwad",
+                  "Mangalore",
+                  "Mysore",
+                  "Gulbarga",
+                  "Kozhikode",
+                  "Kochi",
+                  "Thiruvananthapuram",
+                  "Thrissur",
+                  "Malappuram",
+                  "Kannur",
+                  "Kollam",
+                  "Gwalior",
+                  "Indore",
+                  "Bhopal",
+                  "Jabalpur",
+                  "Ujjain",
+                  "Amravati",
+                  "Nagpur",
+                  "Aurangabad",
+                  "Nashik",
+                  "Bhiwandi",
+                  "Solapur",
+                  "Kolhapur",
+                  "Vasai-Virar",
+                  "Malegaon",
+                  "Nanded-Waghala",
+                  "Sangli",
+                  "Cuttack",
+                  "Bhubaneswar",
+                  "Raurkela",
+                  "Puducherry",
+                  "Amritsar",
+                  "Jalandhar",
+                  "Ludhiana",
+                  "Bikaner",
+                  "Jaipur",
+                  "Jodhpur",
+                  "Kota",
+                  "Ajmer",
+                  "Salem",
+                  "Tiruppur",
+                  "Coimbatore",
+                  "Tiruchirappalli",
+                  "Madurai",
+                  "Erode",
+                  "Moradabad",
+                  "Meerut",
+                  "Ghaziabad",
+                  "Aligarh",
+                  "Agra",
+                  "Bareilly",
+                  "Lucknow",
+                  "Kanpur",
+                  "Allahabad",
+                  "Gorakhpur",
+                  "Varanasi",
+                  "Saharanpur",
+                  "Noida",
+                  "Firozabad",
+                  "Jhansi",
+                  "Dehradun",
+                  "Asansol",
+                  "Siliguri",
+                  "Durgapur",
+                ].map((city) => (
+                  <span
+                    key={city}
+                    className="px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-xs"
+                  >
+                    {city}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* Tier III */}
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-2">
+                Tier III Cities
+              </h4>
+              <p className="text-sm text-gray-600">
+                Cities not mentioned above are Tier III
+              </p>
+            </div>
+          </div>
+        </details>
+
+        {/* <p className="mt-3 text-xs text-gray-500 text-center">
+          City classification as per CGHS guidelines for rate applicability.
+        </p> */}
+      </div>
+      <div className="mx-auto text-center w-full">
+        <button
+          onClick={() => setGuidelinesOpen(true)}
+          className="
+    mt-3 inline-flex items-center gap-2
+    px-5 py-2.5
+    rounded-lg
+    border border-blue-200
+    bg-blue-50
+    text-sm font-medium text-blue-800
+    hover:bg-blue-100 hover:border-blue-300
+    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+    shadow-sm"
+        >
+          <span className="text-base">ℹ️</span>
+          <span>Summary of CGHS General Guidelines</span>
+        </button>
+      </div>
+
+      <CghsGuidelinesModal
+        open={guidelinesOpen}
+        onClose={() => setGuidelinesOpen(false)}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
