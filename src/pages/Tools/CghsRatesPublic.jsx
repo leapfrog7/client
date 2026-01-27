@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import Loading from "../../components/Loading";
 import PageFeedback from "../../components/PageFeedback";
 import { Helmet } from "react-helmet-async";
+import { FiShare2, FiInfo } from "react-icons/fi";
+
 import CghsGuidelinesModal from "./CghsGuidelinesModal"; // adjust path
 // ---------- helpers ----------
 const TIERS = [
@@ -652,25 +654,63 @@ const CghsRatesPublic = () => {
         </details>
 
         {/* <p className="mt-3 text-xs text-gray-500 text-center">
-          City classification as per CGHS guidelines for rate applicability.
+          City classification as per CGHS guidelines for rate applicability.  
         </p> */}
       </div>
-      <div className="mx-auto text-center w-full">
+      <div className="mx-auto mt-3 flex flex-wrap items-center justify-center gap-3 w-full">
+        {/* Guidelines button */}
         <button
           onClick={() => setGuidelinesOpen(true)}
           className="
-    mt-3 inline-flex items-center gap-2
-    px-5 py-2.5
-    rounded-lg
-    border border-blue-200
-    bg-blue-50
-    text-sm font-medium text-blue-800
-    hover:bg-blue-100 hover:border-blue-300
-    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
-    shadow-sm"
+      inline-flex items-center gap-2
+      px-5 py-2.5
+      rounded-lg
+      border border-blue-200
+      bg-blue-50
+      text-sm font-medium text-blue-800
+      hover:bg-blue-100 hover:border-blue-300
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+      shadow-sm
+    "
         >
-          <span className="text-base">ℹ️</span>
-          <span>Summary of CGHS General Guidelines</span>
+          <FiInfo className="text-base" />
+          <span>CGHS General Guidelines</span>
+        </button>
+
+        {/* Share button */}
+        <button
+          onClick={async () => {
+            const url = window.location.href;
+            const title = "CGHS Rates & Guidelines";
+            const text =
+              "Check CGHS package rates, ward entitlement rules and billing guidelines.";
+
+            try {
+              if (navigator.share) {
+                await navigator.share({ title, text, url });
+              } else {
+                await navigator.clipboard.writeText(url);
+                alert("Link copied to clipboard");
+              }
+            } catch (err) {
+              console.error("Share failed", err);
+            }
+          }}
+          className="
+      inline-flex items-center justify-center
+      w-11 h-11
+      rounded-full
+      border border-gray-300
+      bg-white
+      text-gray-600
+      hover:bg-gray-50 hover:text-blue-700
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+      shadow-sm
+    "
+          title="Share this page"
+          aria-label="Share CGHS rates page"
+        >
+          <FiShare2 className="text-lg" />
         </button>
       </div>
 

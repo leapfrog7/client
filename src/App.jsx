@@ -58,20 +58,20 @@ const UserManagement = lazy(() => import("./pages/Admin/UserManagement"));
 const MCQManagement = lazy(() => import("./pages/Admin/MCQ_Management"));
 const RevenueManagement = lazy(() => import("./pages/Admin/RevenueManagement"));
 const AobrManagement = lazy(() => import("./pages/Admin/AobrManagement"));
-const FeedbackManagement = lazy(() =>
-  import("./pages/Admin/QuestionFeedbackManagement")
+const FeedbackManagement = lazy(
+  () => import("./pages/Admin/QuestionFeedbackManagement"),
 );
-const CghsUnitManagement = lazy(() =>
-  import("./pages/Admin/CghsUnitManagement")
+const CghsUnitManagement = lazy(
+  () => import("./pages/Admin/CghsUnitManagement"),
 );
-const CghsRateManagement = lazy(() =>
-  import("./pages/Admin/CghsRateManagement")
+const CghsRateManagement = lazy(
+  () => import("./pages/Admin/CghsRateManagement"),
 );
-const ResourceManagement = lazy(() =>
-  import("./pages/Admin/ResourceManagement")
+const ResourceManagement = lazy(
+  () => import("./pages/Admin/ResourceManagement"),
 );
-const GeneralFeedbackManagement = lazy(() =>
-  import("./pages/Admin/GeneralFeedbackManagement")
+const GeneralFeedbackManagement = lazy(
+  () => import("./pages/Admin/GeneralFeedbackManagement"),
 ); // <-- add this
 const IdeaManagement = lazy(() => import("./pages/Admin/IdeaManagement"));
 const SectionEditor = lazy(() => import("./pages/Admin/SectionEditor"));
@@ -98,6 +98,8 @@ import PublicResources from "./pages/PublicResources";
 import ResourceDetail from "./pages/ResourceDetail";
 import PrintEstimate from "./pages/Tools/PrintEstimate";
 import PDFUtility from "./pages/Tools/PDFUtility";
+import TaskTrackerHome from "./pages/Tools/taskTracker/TaskTrackerHome";
+import TaskShareView from "./pages/Tools/taskTracker/TaskShareView";
 
 const App = () => {
   //States
@@ -381,7 +383,7 @@ const App = () => {
                 <Conduct
                   progress={userStats.paperII[3].progress}
                   quizAttempted={String(
-                    userStats.paperII[3].attemptedQuestions
+                    userStats.paperII[3].attemptedQuestions,
                   )}
                 />
               }
@@ -401,7 +403,7 @@ const App = () => {
                 <Pension
                   progress={userStats.paperII[2].progress}
                   quizAttempted={String(
-                    userStats.paperII[2].attemptedQuestions
+                    userStats.paperII[2].attemptedQuestions,
                   )}
                 />
               }
@@ -412,7 +414,7 @@ const App = () => {
                 <OfficeProcedure
                   progress={userStats.paperII[5].progress}
                   quizAttempted={String(
-                    userStats.paperII[5].attemptedQuestions
+                    userStats.paperII[5].attemptedQuestions,
                   )}
                 />
               }
@@ -423,7 +425,7 @@ const App = () => {
                 <TARules
                   progress={userStats.paperII[7].progress}
                   quizAttempted={String(
-                    userStats.paperII[7].attemptedQuestions
+                    userStats.paperII[7].attemptedQuestions,
                   )}
                 />
               }
@@ -434,7 +436,7 @@ const App = () => {
                 <NPSRules
                   progress={userStats.paperII[7].progress}
                   quizAttempted={String(
-                    userStats.paperII[7].attemptedQuestions
+                    userStats.paperII[7].attemptedQuestions,
                   )}
                 />
               }
@@ -445,7 +447,7 @@ const App = () => {
                 <Allowances
                   progress={userStats.paperII[8].progress}
                   quizAttempted={String(
-                    userStats.paperII[8].attemptedQuestions
+                    userStats.paperII[8].attemptedQuestions,
                   )}
                 />
               }
@@ -495,7 +497,7 @@ const App = () => {
                 <LeaveRules
                   progress={userStats.paperII[0].progress}
                   quizAttempted={String(
-                    userStats.paperII[0].attemptedQuestions
+                    userStats.paperII[0].attemptedQuestions,
                   )}
                 />
               }
@@ -527,7 +529,7 @@ const App = () => {
                 <CCA
                   progress={userStats.paperII[1].progress}
                   quizAttempted={String(
-                    userStats.paperII[1].attemptedQuestions
+                    userStats.paperII[1].attemptedQuestions,
                   )}
                 />
               }
@@ -538,7 +540,7 @@ const App = () => {
                 <GFR
                   progress={userStats.paperII[4].progress}
                   quizAttempted={String(
-                    userStats.paperII[4].attemptedQuestions
+                    userStats.paperII[4].attemptedQuestions,
                   )}
                 />
               }
@@ -549,7 +551,7 @@ const App = () => {
                 <FRPage
                   progress={userStats.paperII[6].progress}
                   quizAttempted={String(
-                    userStats.paperII[6].attemptedQuestions
+                    userStats.paperII[6].attemptedQuestions,
                   )}
                 />
               }
@@ -708,6 +710,14 @@ const App = () => {
 
             <Route path="/print-estimate" element={<PrintEstimate />} />
             <Route path="/pages/public/pdf-utility" element={<PDFUtility />} />
+            <Route
+              path="/pages/tools/task-tracker"
+              element={<TaskTrackerHome />}
+            />
+            <Route
+              path="/pages/tools/task-tracker/share/:taskId"
+              element={<TaskShareView />}
+            />
 
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}
           </Routes>
