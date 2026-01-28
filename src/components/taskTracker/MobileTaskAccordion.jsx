@@ -9,6 +9,7 @@ export default function MobileTaskAccordion({
   expandedTaskId,
   onToggle,
   onAddUpdate,
+  onNotify,
   onEditDetails,
 }) {
   if (!tasks.length) {
@@ -28,12 +29,13 @@ export default function MobileTaskAccordion({
             className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
           >
             {/* Header */}
-            <button
-              type="button"
-              onClick={() => onToggle(t.id)}
-              className="w-full text-left p-3 flex items-start justify-between gap-3 hover:bg-slate-50"
-            >
-              <div className="min-w-0">
+            {/* Header */}
+            <div className="p-3 flex items-start justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => onToggle(t.id)}
+                className="flex-1 text-left hover:bg-slate-50 rounded-xl p-2 -m-2"
+              >
                 <div className="text-sm font-semibold text-slate-900 truncate">
                   {t.title}
                 </div>
@@ -52,12 +54,28 @@ export default function MobileTaskAccordion({
                     </span>
                   ) : null}
                 </div>
-              </div>
+              </button>
 
-              <span className="text-slate-500 text-sm pt-1">
-                {open ? "▲" : "▼"}
-              </span>
-            </button>
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => onEditDetails(t.id)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs hover:border-slate-300"
+                  title="Edit details"
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onToggle(t.id)}
+                  className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs hover:border-slate-300"
+                  title={open ? "Collapse" : "Expand"}
+                >
+                  {open ? "▲" : "▼"}
+                </button>
+              </div>
+            </div>
 
             {/* Body */}
             {open && (
@@ -67,6 +85,7 @@ export default function MobileTaskAccordion({
                   onAddUpdate={onAddUpdate}
                   onOpenShare={() => {}}
                   onEditDetails={() => onEditDetails(t.id)}
+                  onNotify={onNotify}
                   embedded
                 />
               </div>
@@ -84,4 +103,5 @@ MobileTaskAccordion.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onAddUpdate: PropTypes.func.isRequired,
   onEditDetails: PropTypes.func.isRequired,
+  onNotify: PropTypes.func,
 };

@@ -18,6 +18,7 @@ import PropTypes from "prop-types";
 export default function TaskTrackerHome() {
   const [tasks, setTasks] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [toast, setToast] = useState(null); // { message, type }
 
   // Form (create/edit)
   const [formOpen, setFormOpen] = useState(false);
@@ -49,6 +50,12 @@ export default function TaskTrackerHome() {
     const due = new Date(dueAt);
     const ms = due.getTime() - now.getTime();
     return Math.ceil(ms / (1000 * 60 * 60 * 24));
+  }
+
+  function notify(message, type = "success") {
+    setToast({ message, type });
+    window.clearTimeout(notify._t);
+    notify._t = window.setTimeout(() => setToast(null), 1600);
   }
 
   const visibleTasks = useMemo(() => {
@@ -254,6 +261,7 @@ export default function TaskTrackerHome() {
               onAddUpdate={handleAddUpdate}
               onOpenShare={openShareView}
               onEditDetails={handleEditDetails}
+              onNotify={notify}
             />
           </div>
         </div>
@@ -313,6 +321,24 @@ export default function TaskTrackerHome() {
           )}
         </div>
       </div>
+
+      {toast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999]">
+          <div
+            className={`px-4 py-2 rounded-xl shadow-lg border text-sm flex items-center gap-2
+      ${
+        toast.type === "success"
+          ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+          : "bg-rose-50 border-rose-200 text-rose-900"
+      }`}
+          >
+            <span className="text-base">
+              {toast.type === "success" ? "✅" : "⚠️"}
+            </span>
+            <span>{toast.message}</span>
+          </div>
+        </div>
+      )}
 
       <TaskFormModal
         open={formOpen}

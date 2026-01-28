@@ -10,6 +10,7 @@ export default function TaskDetail({
   onAddUpdate,
   onOpenShare,
   onEditDetails,
+  onNotify,
   embedded = false,
 }) {
   const stats = useMemo(() => {
@@ -63,6 +64,55 @@ export default function TaskDetail({
     emphasize: PropTypes.bool,
   };
 
+  function MiniSeg({
+    label,
+    value,
+    accent,
+    emphasize,
+    dividerMd,
+    dividerMobile,
+  }) {
+    return (
+      <div
+        className={`relative px-3 py-2.5 bg-white
+        ${emphasize ? "bg-rose-50" : ""}
+        ${dividerMd ? "md:border-l md:border-slate-200" : ""}
+        ${dividerMobile ? "border-t border-slate-200 md:border-t-0" : ""}
+      `}
+      >
+        {/* top accent */}
+        <div
+          className={`absolute left-0 top-0 h-1 w-full ${accent} ${
+            emphasize ? "opacity-100" : "opacity-70"
+          }`}
+          aria-hidden="true"
+        />
+
+        <div className="pt-1">
+          <div className="text-[12px] leading-4 text-slate-500">{label}</div>
+          {/* slightly smaller on mobile to avoid date looking huge */}
+          <div
+            className={`mt-0.5 font-semibold leading-5 ${
+              emphasize ? "text-rose-700" : "text-blue-900"
+            } text-sm sm:text-base`}
+          >
+            {value}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  MiniSeg.propTypes = {
+    label: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+    accent: PropTypes.string.isRequired,
+    divider: PropTypes.bool,
+    emphasize: PropTypes.bool,
+    dividerMd: PropTypes.bool,
+    dividerMobile: PropTypes.bool,
+  };
+
   return (
     <div
       className={
@@ -111,23 +161,64 @@ export default function TaskDetail({
         </div>
 
         {stats && (
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatCard label="Total Time" value={`${stats.totalAging} days`} />
-            <StatCard
-              label="In current stage"
-              value={`${stats.inStageDays} days`}
-            />
-            <StatCard
-              label="Last updated"
-              value={new Date(task.updatedAt).toLocaleString()}
-            />
-            <StatCard
-              label="Due date"
-              value={
-                task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "—"
-              }
-              emphasize={task.dueAt && new Date(task.dueAt) < new Date()}
-            />
+          <div className="mt-4 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            {/* 2x2 on mobile, 4x1 on md+ */}
+            <div className="grid grid-cols-2 md:grid-cols-4 text-center">
+              <MiniSeg
+                label="Total"
+                value={`${stats.totalAging} d`}
+                accent="bg-rose-400"
+              />
+              <MiniSeg
+                label="In stage"
+                value={`${stats.inStageDays} d`}
+                accent="bg-sky-500"
+                dividerMd
+              />
+              <MiniSeg
+                label="Last Updated"
+                value={
+                  task.updatedAt
+                    ? new Date(task.updatedAt).toLocaleDateString()
+                    : "—"
+                }
+                accent="bg-slate-400"
+                dividerMobile
+              />
+              <MiniSeg
+                label="Due"
+                value={
+                  task.dueAt ? new Date(task.dueAt).toLocaleDateString() : "—"
+                }
+                accent={
+                  task.dueAt && new Date(task.dueAt) < new Date()
+                    ? "bg-rose-500"
+                    : "bg-amber-500"
+                }
+                dividerMd
+                dividerMobile
+                emphasize={task.dueAt && new Date(task.dueAt) < new Date()}
+              />
+            </div>
+
+            <div className="px-3 py-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+              <div className="text-[11px] text-slate-500">Quick snapshot</div>
+              {task?.dueAt ? (
+                <div
+                  className={`text-[11px] font-medium ${
+                    task.dueAt && new Date(task.dueAt) < new Date()
+                      ? "text-rose-700"
+                      : "text-slate-700"
+                  }`}
+                >
+                  {task.dueAt && new Date(task.dueAt) < new Date()
+                    ? "Overdue"
+                    : "On track"}
+                </div>
+              ) : (
+                <div className="text-[11px] text-slate-400">No due date</div>
+              )}
+            </div>
           </div>
         )}
 
@@ -135,6 +226,7 @@ export default function TaskDetail({
           <UpdateComposer
             currentStage={task.currentStage}
             onAddUpdate={onAddUpdate}
+            onNotify={onNotify}
           />
           <Timeline task={task} />
         </div>
@@ -173,4 +265,5 @@ TaskDetail.propTypes = {
   onOpenShare: PropTypes.func.isRequired,
   onEditDetails: PropTypes.func.isRequired,
   embedded: PropTypes.bool,
+  onNotify: PropTypes.func,
 };
