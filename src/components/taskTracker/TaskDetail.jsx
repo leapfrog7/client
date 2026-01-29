@@ -116,52 +116,73 @@ export default function TaskDetail({
   return (
     <div
       className={
-        embedded ? "bg-white" : "h-full overflow-auto bg-slate-50 mt-2"
+        embedded ? "bg-white" : "h-full min-h-0 overflow-auto bg-slate-50 mt-2"
       }
     >
       {" "}
       <div className={embedded ? "p-3" : "p-6"}>
-        <div className="flex items-start justify-between gap-3 mt-2">
-          <div className="min-w-0">
-            <h1 className="text-sm lg:text-lg font-semibold text-slate-600 md:text-slate-800 truncate">
-              {title}
-            </h1>
-            <div className="mt-1 text-xs md:text-sm text-slate-600">
-              <span className="font-medium">Stage:</span>{" "}
-              <span
-                className={`inline-flex px-2 py-0.5 rounded-full border ${s.chip}`}
+        {!embedded && (
+          <div className="flex items-start justify-between gap-3 mt-2">
+            <div className="min-w-0">
+              <h1 className="text-sm lg:text-lg font-semibold text-slate-600 md:text-slate-800 truncate">
+                {title}
+              </h1>
+              <div className="mt-1 text-xs md:text-sm text-slate-600">
+                <span className="font-medium">Stage:</span>{" "}
+                <span
+                  className={`inline-flex px-2 py-0.5 rounded-full border ${s.chip}`}
+                >
+                  {task.currentStage || "—"}
+                </span>
+              </div>
+              <div className="mt-2 text-xs text-slate-500">
+                {id.section ? `${id.section} · ` : ""}
+                {id.fileNo ? `eFile No: ${id.fileNo} · ` : ""}
+                {id.receiptNo ? `Receipt: ${id.receiptNo}` : ""}
+              </div>
+            </div>
+            {!embedded && (
+              <button
+                onClick={onOpenShare}
+                className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
+                title="Open read-only share view"
               >
-                {task.currentStage || "—"}
-              </span>
-            </div>
-            <div className="mt-2 text-xs text-slate-500">
-              {id.section ? `${id.section} · ` : ""}
-              {id.fileNo ? `eFile No: ${id.fileNo} · ` : ""}
-              {id.receiptNo ? `Receipt: ${id.receiptNo}` : ""}
-            </div>
+                Share View
+              </button>
+            )}
+            {!embedded && (
+              <button
+                onClick={onEditDetails}
+                className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
+                title="Edit title / due date / identifiers"
+              >
+                Edit Details
+              </button>
+            )}
           </div>
-          {!embedded && (
-            <button
-              onClick={onOpenShare}
-              className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
-              title="Open read-only share view"
-            >
-              Share View
-            </button>
-          )}
-          {!embedded && (
-            <button
-              onClick={onEditDetails}
-              className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
-              title="Edit title / due date / identifiers"
-            >
-              Edit Details
-            </button>
-          )}
-        </div>
+        )}
 
         {stats && (
-          <div className="mt-4 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+          <div className=" rounded-md border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div className="px-3 py-2  bg-black flex items-center justify-between mb-2">
+              <div className="text-[11px] text-slate-50">Quick snapshot</div>
+              {task?.dueAt ? (
+                <div
+                  className={`text-[11px] font-medium ${
+                    task.dueAt && new Date(task.dueAt) < new Date()
+                      ? "text-rose-700"
+                      : "text-slate-50"
+                  }`}
+                >
+                  {task.dueAt && new Date(task.dueAt) < new Date()
+                    ? "Overdue"
+                    : "On track"}
+                </div>
+              ) : (
+                <div className="text-[11px] text-slate-50">No due date</div>
+              )}
+            </div>
+
             {/* 2x2 on mobile, 4x1 on md+ */}
             <div className="grid grid-cols-2 md:grid-cols-4 text-center">
               <MiniSeg
@@ -199,25 +220,6 @@ export default function TaskDetail({
                 dividerMobile
                 emphasize={task.dueAt && new Date(task.dueAt) < new Date()}
               />
-            </div>
-
-            <div className="px-3 py-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-              <div className="text-[11px] text-slate-500">Quick snapshot</div>
-              {task?.dueAt ? (
-                <div
-                  className={`text-[11px] font-medium ${
-                    task.dueAt && new Date(task.dueAt) < new Date()
-                      ? "text-rose-700"
-                      : "text-slate-700"
-                  }`}
-                >
-                  {task.dueAt && new Date(task.dueAt) < new Date()
-                    ? "Overdue"
-                    : "On track"}
-                </div>
-              ) : (
-                <div className="text-[11px] text-slate-400">No due date</div>
-              )}
             </div>
           </div>
         )}

@@ -237,25 +237,32 @@ export default function TaskTrackerHome() {
   }
 
   return (
-    <div className="h-[calc(100vh-0px)] w-full">
+    <div
+      className="w-full min-h-0 overflow-hidden"
+      style={{ height: "calc(100dvh - 120px)" }} // adjust 120px if needed
+    >
       {/* Desktop layout */}
-      <div className="hidden lg:grid h-full grid-cols-[380px_1fr]">
-        <TaskList
-          tasks={visibleTasks}
-          selectedTaskId={selectedTaskId}
-          onSelect={setSelectedTaskId}
-          onCreate={handleCreate}
-          onDelete={handleDelete}
-        />
 
-        <div className="h-full flex flex-col">
+      <div className="hidden lg:grid h-full min-h-0 grid-cols-[380px_minmax(0,1fr)] overflow-hidden">
+        <div className="h-full min-h-0 overflow-hidden">
+          <TaskList
+            tasks={visibleTasks}
+            selectedTaskId={selectedTaskId}
+            onSelect={setSelectedTaskId}
+            onCreate={handleCreate}
+            onDelete={handleDelete}
+          />
+        </div>
+
+        <div className="h-full min-h-0 flex flex-col overflow-hidden">
           <DashboardStrip
             tasks={tasks}
             activeView={activeView}
-            onSelectView={(v) => setActiveView(v)}
+            onSelectView={setActiveView}
           />
 
-          <div className="flex-1 overflow-auto">
+          {/* Right pane scroll container */}
+          <div className="flex-1 min-h-0 overflow-hidden">
             <TaskDetail
               task={selectedTask}
               onAddUpdate={handleAddUpdate}
@@ -268,7 +275,7 @@ export default function TaskTrackerHome() {
       </div>
 
       {/* Mobile layout: Dashboard + Accordion list */}
-      <div className="lg:hidden h-full flex flex-col bg-slate-50">
+      <div className="lg:hidden h-full min-h-0 flex flex-col bg-slate-50 overflow-hidden">
         <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between gap-2">
           <button
             onClick={handleCreate}

@@ -16,6 +16,12 @@ export default function MobileTaskAccordion({
     return <div className="p-4 text-sm text-slate-600">No tasks found.</div>;
   }
 
+  function displayTitle(title = "", max = 100) {
+    const t = title.trim();
+    if (t.length <= max) return t;
+    return t.slice(0, max - 1) + "…";
+  }
+
   return (
     <div className="px-3 pb-6 space-y-3">
       {tasks.map((t) => {
@@ -26,7 +32,7 @@ export default function MobileTaskAccordion({
         return (
           <div
             key={t.id}
-            className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
+            className="rounded-md bg-white border border-slate-200 overflow-hidden"
           >
             {/* Header */}
             {/* Header */}
@@ -36,9 +42,10 @@ export default function MobileTaskAccordion({
                 onClick={() => onToggle(t.id)}
                 className="flex-1 text-left hover:bg-slate-50 rounded-xl p-2 -m-2"
               >
-                <div className="text-sm font-semibold text-slate-900 truncate">
-                  {t.title}
+                <div className="text-sm font-semibold text-slate-900 break-words line-clamp-2">
+                  <span title={t.title}>{displayTitle(t.title, 100)}</span>
                 </div>
+
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   <span
                     className={`text-xs px-2 py-1 rounded-full border ${s.chip}`}
@@ -60,10 +67,22 @@ export default function MobileTaskAccordion({
                 <button
                   type="button"
                   onClick={() => onEditDetails(t.id)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs hover:border-slate-300"
+                  className="p-2 rounded-lg border border-slate-200 bg-white hover:border-slate-300 active:scale-[0.99]"
+                  aria-label="Edit task details"
                   title="Edit details"
                 >
-                  Edit
+                  {/* Pencil icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="h-4 w-4 text-slate-700"
+                  >
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5z" />
+                  </svg>
                 </button>
 
                 <button
