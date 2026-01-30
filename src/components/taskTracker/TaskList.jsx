@@ -135,7 +135,7 @@ export default function TaskList({
                           {t.currentStage || "—"}
                         </span>
                         <span className="text-xs text-slate-500">
-                          Aging: {agingDays}d
+                          Total: {agingDays}d
                         </span>
                       </div>
                     </div>

@@ -39,13 +39,15 @@ export default function Timeline({ task }) {
         <h3 className="text-sm font-semibold text-slate-900">Milestones</h3>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">{total} updates</span>
+          <span className="text-xs md:text-sm text-slate-500">
+            {total} updates
+          </span>
 
           {total > 5 && (
             <button
               type="button"
               onClick={() => setShowAll((v) => !v)}
-              className="text-xs font-medium text-slate-700 hover:text-slate-900"
+              className="bg-indigo-100 p-2 rounded-lg shadow-sm text-xs md:text-sm font-medium text-indigo-800 hover:text-slate-50 hover:bg-indigo-800"
             >
               {showAll ? "Show recent" : `Show all (${hiddenCount}+ more)`}
             </button>
@@ -91,7 +93,7 @@ export default function Timeline({ task }) {
 
                 {/* ripple ring */}
                 {isCurrent && (
-                  <span className="absolute inset-0 rounded-full ring-2 ring-gray-500 animate-[ping_2.0s_ease-in-out_infinite]" />
+                  <span className="absolute inset-0 rounded-full ring-2 ring-gray-500 animate-[ping_2.0s_ease-out_infinite]" />
                 )}
               </div>
 
@@ -107,22 +109,22 @@ export default function Timeline({ task }) {
                     {title}
                   </div>
 
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                  <span className="text-[11px] md:text-sm px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                     +{gap}d
                   </span>
 
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] md:text-sm text-slate-500">
                     {formatDateTime(e.at)}
                   </span>
 
                   {isCurrent && (
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-900 text-white">
+                    <span className="text-[11px] md:text-sm px-2 py-0.5 rounded-full bg-slate-900 text-white">
                       Current
                     </span>
                   )}
 
                   {e.actor ? (
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] md:text-sm text-slate-500">
                       • {e.actor}
                     </span>
                   ) : null}

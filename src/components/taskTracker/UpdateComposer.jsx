@@ -10,7 +10,7 @@ function TabButton({ active, onClick, children }) {
       className={`px-3 py-2 text-xs font-medium border-r last:border-r-0 transition
         ${
           active
-            ? "bg-white text-slate-900"
+            ? "bg-slate-100 text-slate-900 font-semibold"
             : "bg-slate-50 text-slate-600 hover:bg-white"
         }
         border-slate-200`}

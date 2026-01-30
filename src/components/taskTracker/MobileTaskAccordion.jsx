@@ -23,7 +23,7 @@ export default function MobileTaskAccordion({
   }
 
   return (
-    <div className="px-3 pb-6 space-y-3">
+    <div className="px-2 pb-6 space-y-1">
       {tasks.map((t) => {
         const open = expandedTaskId === t.id;
         const s = getStageStyle(t.currentStage);

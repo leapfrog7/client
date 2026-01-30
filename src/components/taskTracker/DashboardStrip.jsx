@@ -77,7 +77,7 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
                 key={it.id}
                 type="button"
                 onClick={() => onSelectView(it.id)}
-                className={`relative text-left px-2.5 py-2 transition active:scale-[0.99]
+                className={`text-center relative px-2.5 py-2 transition active:scale-[0.99]
                   ${idx !== 0 ? "border-l border-slate-200" : ""}
                   ${active ? "bg-slate-50" : "bg-white hover:bg-slate-50"}
                 `}
@@ -92,7 +92,7 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
                 />
 
                 <div className="pt-1">
-                  <div className="text-[12px] leading-4 text-slate-500">
+                  <div className="text-sm md:text-base leading-4 text-slate-600">
                     {labelFor(it.id)}
                   </div>
 

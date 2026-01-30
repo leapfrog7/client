@@ -89,7 +89,9 @@ export default function TaskDetail({
         />
 
         <div className="pt-1">
-          <div className="text-[12px] leading-4 text-slate-500">{label}</div>
+          <div className="text-[12px] md:text-sm leading-4 text-gray-600">
+            {label}
+          </div>
           {/* slightly smaller on mobile to avoid date looking huge */}
           <div
             className={`mt-0.5 font-semibold leading-5 ${
@@ -163,15 +165,17 @@ export default function TaskDetail({
         )}
 
         {stats && (
-          <div className=" rounded-md border border-slate-200 bg-white overflow-hidden shadow-sm">
-            <div className="px-3 py-2  bg-black flex items-center justify-between mb-2">
-              <div className="text-[11px] text-slate-50">Quick snapshot</div>
+          <div className="mt-2 rounded-md border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div className="px-3 py-3 bg-gray-200 flex items-center justify-between mb-2">
+              <div className="text-[11px] md:text-sm text-slate-800">
+                Quick snapshot
+              </div>
               {task?.dueAt ? (
                 <div
                   className={`text-[11px] font-medium ${
                     task.dueAt && new Date(task.dueAt) < new Date()
                       ? "text-rose-700"
-                      : "text-slate-50"
+                      : "text-slate-800"
                   }`}
                 >
                   {task.dueAt && new Date(task.dueAt) < new Date()
@@ -179,7 +183,9 @@ export default function TaskDetail({
                     : "On track"}
                 </div>
               ) : (
-                <div className="text-[11px] text-slate-50">No due date</div>
+                <div className="text-[11px] md:text-sm text-slate-800">
+                  No due date
+                </div>
               )}
             </div>
 

@@ -239,7 +239,7 @@ export default function TaskTrackerHome() {
   return (
     <div
       className="w-full min-h-0 overflow-hidden"
-      style={{ height: "calc(100dvh - 120px)" }} // adjust 120px if needed
+      style={{ height: "calc(100dvh - 20px)" }} // adjust 120px if needed
     >
       {/* Desktop layout */}
 
@@ -276,19 +276,13 @@ export default function TaskTrackerHome() {
 
       {/* Mobile layout: Dashboard + Accordion list */}
       <div className="lg:hidden h-full min-h-0 flex flex-col bg-slate-50 overflow-hidden">
-        <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between gap-2">
+        <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between">
           <button
             onClick={handleCreate}
             className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
           >
             + Create New Task
           </button>
-          {/* <div className="text-xs text-slate-500">Tap a task to expand</div> */}
-        </div>
-
-        <div className="text-center text-base font-semibold text-teal-700 p-2 bg-slate-200 mb-2">
-          {" "}
-          <p>Tasks Dashboard</p>
         </div>
 
         <DashboardStrip
@@ -296,15 +290,12 @@ export default function TaskTrackerHome() {
           activeView={activeView}
           onSelectView={(v) => {
             setActiveView(v);
-            setExpandedTaskId(null); // collapse on filter change (optional)
+            setExpandedTaskId(null);
           }}
         />
 
-        <div className="flex-1 overflow-auto mt-4">
-          <div className="text-center text-base font-semibold text-blue-700 p-2 bg-slate-200 mb-2">
-            {" "}
-            <p>List of Tasks</p>
-          </div>
+        {/* ONE scroll container */}
+        <div className="flex-1 min-h-0 overflow-auto px-3 py-3">
           {visibleTasks.length === 0 ? (
             <EmptyState
               activeView={activeView}
