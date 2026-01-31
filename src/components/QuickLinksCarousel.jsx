@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { GiMedicalDrip } from "react-icons/gi";
 import { BsFiletypePdf } from "react-icons/bs";
+import { GoTasklist } from "react-icons/go";
 
 const QuickLinksCarousel = ({
   title = "Quick and Free Links",
@@ -45,6 +46,13 @@ const QuickLinksCarousel = ({
       subtitle: "Merge, Split, Rotate, Compress and Convert JPG to PDF",
       url: "/pages/public/pdf-utility",
       icon: BsFiletypePdf,
+    },
+    {
+      title: "Task Manager",
+      subtitle:
+        "Productivity module built specifically for Central Govt. officers",
+      url: "/pages/tools/task-tracker",
+      icon: GoTasklist,
     },
     {
       title: "Resources",
@@ -112,7 +120,7 @@ QuickLinksCarousel.propTypes = {
       subtitle: PropTypes.string,
       url: PropTypes.string.isRequired,
       icon: PropTypes.elementType,
-    })
+    }),
   ),
 };
 

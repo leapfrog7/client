@@ -99,7 +99,7 @@ import ResourceDetail from "./pages/ResourceDetail";
 import PrintEstimate from "./pages/Tools/PrintEstimate";
 import PDFUtility from "./pages/Tools/PDFUtility";
 import TaskTrackerHome from "./pages/Tools/taskTracker/TaskTrackerHome";
-import TaskShareView from "./pages/Tools/taskTracker/TaskShareView";
+import ShareTaskView from "./pages/Tools/taskTracker/TaskShareView";
 
 const App = () => {
   //States
@@ -715,8 +715,8 @@ const App = () => {
               element={<TaskTrackerHome />}
             />
             <Route
-              path="/pages/tools/task-tracker/share/:taskId"
-              element={<TaskShareView />}
+              path="/pages/tools/task-tracker/share/:token"
+              element={<ShareTaskView />}
             />
 
             {/* <Route path="*" element={<Navigate to="/pages/public/resources" />} /> */}

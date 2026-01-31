@@ -20,6 +20,7 @@ import { LuNotebookText } from "react-icons/lu";
 import { MdModeOfTravel } from "react-icons/md";
 import { TbInvoice } from "react-icons/tb";
 import { TbPigMoney } from "react-icons/tb";
+import { GoTasklist } from "react-icons/go";
 
 export const navItems = [
   {
@@ -165,6 +166,11 @@ export const navItems = [
         label: "PDF Tools",
         path: "/pages/public/pdf-utility", // 👈 NEW ENTRY
         icon: LuFileSearch, // You can change this to any relevant icon
+      },
+      {
+        label: "Task Manager",
+        path: "/pages/tools/task-tracker", // 👈 NEW ENTRY
+        icon: GoTasklist, // You can change this to any relevant icon
       },
     ],
   },

@@ -47,15 +47,15 @@ export default function TaskList({
   }, [tasks, q, stageFilter]);
 
   return (
-    <div className="h-full min-h-0 flex flex-col border-r border-slate-200 bg-white overflow-hidden">
+    <div className="h-full min-h-0 flex flex-col border-r border-slate-200 bg-slate-50 overflow-hidden">
       {/* Header (fixed) */}
       <div className="p-4 border-b border-slate-200">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
             <h2 className="text-base font-semibold text-slate-900 truncate">
-              Task Tracker
+              Your Task List
             </h2>
-            <p className="text-xs text-slate-500">Local Phase 0 (offline)</p>
+            {/* <p className="text-xs text-slate-500">Local Phase 0 (offline)</p> */}
           </div>
 
           <button
@@ -106,7 +106,9 @@ export default function TaskList({
                 <li
                   key={t.id}
                   className={`p-4 cursor-pointer hover:bg-slate-50 ${
-                    isSelected ? "bg-slate-50" : "bg-white"
+                    isSelected
+                      ? "bg-gradient-to-tr from-zinc-200 to-white"
+                      : "bg-white"
                   }`}
                   onClick={() => onSelect(t.id)}
                 >
@@ -146,10 +148,10 @@ export default function TaskList({
                         e.stopPropagation();
                         onDelete(t.id);
                       }}
-                      className="shrink-0 text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300 active:scale-[0.99]"
+                      className="shrink-0 text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-white hover:border-slate-300 active:scale-[0.99]"
                       title="Delete"
                     >
-                      Delete
+                      🗑️ Delete
                     </button>
                   </div>
                 </li>

@@ -1,90 +1,98 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  getTaskById,
-  seedIfEmpty,
-} from "../../../components/taskTracker/storage";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getSharedTask } from "../../../components/taskTracker/storage";
 import Timeline from "../../../components/taskTracker/Timeline";
-import { diffDays } from "../../../components/taskTracker/utils";
+import { getStageStyle } from "../../../components/taskTracker/constants";
 
-export default function TaskShareView() {
+export default function ShareTaskView() {
+  const { token } = useParams();
   const [task, setTask] = useState(null);
-
-  const taskId = useMemo(() => {
-    const parts = window.location.pathname.split("/");
-    return parts[parts.length - 1]; // .../share/:taskId
-  }, []);
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    seedIfEmpty();
-    setTask(getTaskById(taskId));
-  }, [taskId]);
+    let alive = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const t = await getSharedTask(token);
+        if (alive) setTask(t);
+      } catch (e) {
+        if (alive) setErr(e.message || "Could not load shared task");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [token]);
 
-  if (!task) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-sm text-slate-600">Loading…</div>
+      </div>
+    );
+  }
+
+  if (err) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="p-6 rounded-xl border border-slate-200 bg-white">
-          <div className="text-base font-semibold text-slate-900">
-            Task not found
+        <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="text-sm font-semibold text-slate-900">
+            Share link not available
           </div>
-          <div className="mt-1 text-sm text-slate-600">
-            This share view is Phase 0 (local). Phase 2 will support true share
-            links.
+          <div className="mt-1 text-sm text-slate-600">{err}</div>
+          <div className="mt-3 text-xs text-slate-500">
+            Ask the owner to generate a fresh link.
           </div>
         </div>
       </div>
     );
   }
 
-  const totalAging = diffDays(task.createdAt, new Date().toISOString());
+  const s = getStageStyle(task.currentStage);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-lg font-semibold text-slate-900">
-                {task.title}
-              </h1>
-              <div className="mt-1 text-sm text-slate-600">
-                <span className="font-medium">Current stage:</span>{" "}
-                <span className="inline-flex px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                  {task.currentStage}
-                </span>
-                <span className="ml-3 text-xs text-slate-500">
-                  Aging: {totalAging}d
-                </span>
-              </div>
-              <div className="mt-2 text-xs text-slate-500">
-                {task.identifiers?.section
-                  ? `${task.identifiers.section} · `
-                  : ""}
-                {task.identifiers?.fileNo
-                  ? `File: ${task.identifiers.fileNo} · `
-                  : ""}
-                {task.identifiers?.receiptNo
-                  ? `Receipt: ${task.identifiers.receiptNo}`
-                  : ""}
-              </div>
-            </div>
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-3xl mx-auto p-4 sm:p-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="text-xs text-slate-500">Read-only share view</div>
 
-            <button
-              onClick={() => window.print()}
-              className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
-              title="Print / Save as PDF"
-            >
-              Print
-            </button>
+          <div className="mt-1 text-lg font-semibold text-slate-900 break-words">
+            {task.title}
           </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className={`text-xs px-2 py-1 rounded-full border ${s.chip}`}>
+              {task.currentStage || "—"}
+            </span>
+
+            <span className="text-xs text-slate-500">
+              Last updated:{" "}
+              {task.updatedAt ? new Date(task.updatedAt).toLocaleString() : "—"}
+            </span>
+
+            {task.dueAt ? (
+              <span className="text-xs text-slate-500">
+                Due: {new Date(task.dueAt).toLocaleDateString()}
+              </span>
+            ) : null}
+          </div>
+
+          {task.shareExpiresAt ? (
+            <div className="mt-3 text-xs text-amber-700">
+              Link expires on:{" "}
+              <span className="font-medium">
+                {new Date(task.shareExpiresAt).toLocaleString()}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-4">
           <Timeline task={task} />
-        </div>
-
-        <div className="mt-4 text-xs text-slate-500">
-          Note: This is a Phase 0 local share view. In Phase 2, this becomes a
-          token-based secure share link.
         </div>
       </div>
     </div>
