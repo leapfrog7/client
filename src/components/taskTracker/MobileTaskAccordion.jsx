@@ -304,7 +304,7 @@ export default function MobileTaskAccordion({
               <div id={`task-${t.id}`} className="border-t border-slate-200">
                 <TaskDetail
                   task={t}
-                  onAddUpdate={onAddUpdate}
+                  onAddUpdate={(payload) => onAddUpdate(t.id, payload)}
                   onOpenShare={() => onOpenShare?.(t.id)}
                   onEditDetails={() => onEditDetails(t.id)}
                   onNotify={onNotify}
