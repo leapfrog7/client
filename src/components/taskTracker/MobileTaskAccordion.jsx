@@ -60,8 +60,8 @@ export default function MobileTaskAccordion({
 
   return (
     <div className=" pb-6 space-y-2">
-      <div className="bg-slate-100 text-center">
-        <p className=" text-base px-2 pt-2 text-center font-extrabold text-slate-600 tracking-wider">
+      <div className="bg-slate-50 text-center">
+        <p className=" text-base px-2 text-center font-extrabold text-slate-600 tracking-wider">
           Your Task List
         </p>
         <p className="px-1 text-[11px] leading-5 text-slate-600 tracking-tight">

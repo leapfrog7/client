@@ -120,8 +120,8 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
         </div>
 
         {/* Compact footer row */}
-        <div className="flex items-center justify-between px-3 py-2  bg-slate-50">
-          <div className="text-[10px] text-slate-400 text-right">
+        <div className="flex items-center justify-end px-3 py-1  bg-slate-50">
+          <div className="text-[10px] text-slate-400">
             Tap to filter your list
           </div>
           {activeView !== "ALL" ? (

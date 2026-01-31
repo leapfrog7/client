@@ -14,7 +14,7 @@ import {
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
 import DashboardStrip from "../../../components/taskTracker/DashboardStrip";
 import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccordion";
-import PageFeedback from "../../../components/PageFeedback";
+// import PageFeedback from "../../../components/PageFeedback";
 import PropTypes from "prop-types";
 
 function daysUntil(dueAt) {
@@ -304,8 +304,8 @@ export default function TaskTrackerHome() {
 
   return (
     <div
-      className="w-full min-h-0 overflow-hidden flex flex-col"
-      style={{ height: "calc(100dvh - 20px)" }} // keep your number, layout now won’t clip
+      className="w-full min-h-0 overflow-hidden flex flex-col mb-8"
+      style={{ height: "calc(100dvh)" }} // keep your number, layout now won’t clip
     >
       {/* CTA header (does not consume scroll space) */}
       <div className="shrink-0 bg-white p-4 shadow-sm text-center mx-auto w-full">
@@ -391,17 +391,12 @@ export default function TaskTrackerHome() {
             </div>
 
             {/* Mobile */}
-            <div className="lg:hidden h-full min-h-0 flex flex-col bg-slate-50 overflow-hidden ">
-              <div className="shrink-0 p-3 bg-white border-b border-slate-200 flex items-end justify-between">
-                <button
-                  onClick={handleCreate}
-                  className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
-                >
-                  + Create New Task
-                </button>
-              </div>
+            {/* Mobile */}
+            <div className="lg:hidden h-full min-h-0 flex flex-col bg-slate-50 overflow-hidden">
+              {/* Keep Create button fixed (recommended) */}
 
-              <div className="shrink-0">
+              {/* ✅ Single scroll container: Dashboard + List + Pagination */}
+              <div className="flex-1 min-h-0 overflow-auto">
                 <DashboardStrip
                   tasks={tasks}
                   activeView={activeView}
@@ -411,79 +406,85 @@ export default function TaskTrackerHome() {
                     setPage(1);
                   }}
                 />
-              </div>
-
-              {/* ONE scroll container */}
-              <div className="flex-1 min-h-0 overflow-auto px-3 py-3">
-                {visibleTasks.length === 0 ? (
-                  <EmptyState
-                    activeView={activeView}
-                    onReset={() => setActiveView("ALL")}
-                    onCreate={handleCreate}
-                  />
-                ) : (
-                  <>
-                    <MobileTaskAccordion
-                      tasks={pageTasks}
-                      expandedTaskId={expandedTaskId}
-                      onToggle={(id) => {
-                        setExpandedTaskId((prev) => (prev === id ? null : id));
-                        setSelectedTaskId(id);
-                      }}
-                      onAddUpdate={(taskId, payload) => {
-                        handleAddUpdateForTask(taskId, payload);
-                      }}
-                      onEditDetails={(taskId) => openEditModalForTask(taskId)}
-                      onDelete={handleDelete}
-                      onOpenShare={(taskId) => openShareView(taskId)} // if you’re using per-task openShare
+                <div className="mr-2 my-1 shrink-0 px-2 flex bg-slate-50">
+                  <button
+                    onClick={handleCreate}
+                    className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
+                  >
+                    + Create New Task
+                  </button>
+                </div>
+                <div className="px-3 py-3">
+                  {visibleTasks.length === 0 ? (
+                    <EmptyState
+                      activeView={activeView}
+                      onReset={() => setActiveView("ALL")}
+                      onCreate={handleCreate}
                     />
+                  ) : (
+                    <>
+                      <MobileTaskAccordion
+                        tasks={pageTasks}
+                        expandedTaskId={expandedTaskId}
+                        onToggle={(id) => {
+                          setExpandedTaskId((prev) =>
+                            prev === id ? null : id,
+                          );
+                          setSelectedTaskId(id);
+                        }}
+                        onAddUpdate={(taskId, payload) => {
+                          handleAddUpdateForTask(taskId, payload);
+                        }}
+                        onEditDetails={(taskId) => openEditModalForTask(taskId)}
+                        onDelete={handleDelete}
+                        onOpenShare={(taskId) => openShareView(taskId)}
+                        onNotify={notify}
+                      />
 
-                    {/* Pagination controls */}
-                    {totalPages > 1 && (
-                      <div className="mt-3 flex items-center justify-between gap-2">
-                        <button
-                          type="button"
-                          disabled={safePage <= 1}
-                          onClick={() => {
-                            setExpandedTaskId(null);
-                            setPage((p) => Math.max(1, p - 1));
-                          }}
-                          className={`px-3 py-2 rounded-lg border text-sm ${
-                            safePage <= 1
-                              ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
-                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                          }`}
-                        >
-                          ← Prev
-                        </button>
+                      {/* Pagination controls */}
+                      {totalPages > 1 && (
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            disabled={safePage <= 1}
+                            onClick={() => {
+                              setExpandedTaskId(null);
+                              setPage((p) => Math.max(1, p - 1));
+                            }}
+                            className={`px-3 py-2 rounded-lg border text-sm ${
+                              safePage <= 1
+                                ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                            }`}
+                          >
+                            ← Prev
+                          </button>
 
-                        <div className="text-xs text-slate-600">
-                          Page <span className="font-semibold">{safePage}</span>{" "}
-                          of <span className="font-semibold">{totalPages}</span>
+                          <div className="text-xs text-slate-600">
+                            Page{" "}
+                            <span className="font-semibold">{safePage}</span> of{" "}
+                            <span className="font-semibold">{totalPages}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={safePage >= totalPages}
+                            onClick={() => {
+                              setExpandedTaskId(null);
+                              setPage((p) => Math.min(totalPages, p + 1));
+                            }}
+                            className={`px-3 py-2 rounded-lg border text-sm ${
+                              safePage >= totalPages
+                                ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                            }`}
+                          >
+                            Next →
+                          </button>
                         </div>
-
-                        <button
-                          type="button"
-                          disabled={safePage >= totalPages}
-                          onClick={() => {
-                            setExpandedTaskId(null);
-                            setPage((p) => Math.min(totalPages, p + 1));
-                          }}
-                          className={`px-3 py-2 rounded-lg border text-sm ${
-                            safePage >= totalPages
-                              ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
-                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                          }`}
-                        >
-                          Next →
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                <div className="w-10/12 mx-auto">
-                  <PageFeedback pageSlug="/task-Manager" />
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
