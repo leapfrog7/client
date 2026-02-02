@@ -122,11 +122,12 @@ export async function getTaskById(taskId) {
   return normalizeItem(payload);
 }
 
-export async function createTask({ title, identifiers, dueAt }) {
+export async function createTask({ title, identifiers, dueAt, currentStage }) {
   const payload = await http("POST", TASK_API, {
     title,
     identifiers,
     dueAt: dueAt || null,
+    currentStage: currentStage || "Pending",
   });
   return normalizeItem(payload);
 }
