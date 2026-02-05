@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import PropTypes from "prop-types";
+import { useEffect, useMemo, useState } from "react"; // ✅ add useEffectimport PropTypes from "prop-types";
 import { QUICK_STAGES } from "./constants";
 import { safeTrim } from "./utils";
+import PropTypes from "prop-types";
 
 function TabButton({ active, onClick, children }) {
   return (
@@ -38,6 +38,15 @@ export default function UpdateComposer({
   const [remark, setRemark] = useState("");
   const [status, setStatus] = useState("idle"); // idle | saving | saved
 
+  useEffect(() => {
+    setQuickStage(currentStage || "Pending");
+
+    // optional but recommended UX: reset carry-over inputs when task changes
+    setCustomStage("");
+    setRemark("");
+    setStatus("idle");
+    setMode("quick");
+  }, [currentStage]);
   const canSubmit = useMemo(() => {
     const r = safeTrim(remark);
 

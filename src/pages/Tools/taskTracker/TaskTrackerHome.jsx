@@ -180,8 +180,11 @@ export default function TaskTrackerHome() {
       } else {
         const targetId = editingTaskId || selectedTaskId;
         if (targetId) {
-          await updateTaskBasics(targetId, values);
-          await refresh();
+          const updatedTask = await updateTaskBasics(targetId, values);
+          // ✅ keep task in same position (no refresh)
+          setTasks((prev) =>
+            prev.map((t) => (t.id === targetId ? updatedTask : t)),
+          );
         }
       }
       setFormOpen(false);
@@ -211,8 +214,10 @@ export default function TaskTrackerHome() {
   async function handleAddUpdateForTask(taskId, payload) {
     if (!taskId) return;
     try {
-      await addTaskEvent(taskId, payload);
-      await refresh();
+      const updatedTask = await addTaskEvent(taskId, payload);
+      //await refresh();
+      // ✅ replace item in-place (order preserved)
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? updatedTask : t)));
     } catch (e) {
       notify(e.message || "Could not add update", "error");
     }
