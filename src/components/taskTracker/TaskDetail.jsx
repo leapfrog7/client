@@ -39,6 +39,9 @@ export default function TaskDetail({
       </div>
     );
   }
+
+  const isArchived =
+    !!task?.archivedAt || task?.isArchived === true || task?.archived === true;
   const s = getStageStyle(task.currentStage);
   const id = task.identifiers || {};
   const title = safeTrim(task.title) || "Untitled";
@@ -231,11 +234,23 @@ export default function TaskDetail({
         )}
 
         <div className="mt-5 grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <UpdateComposer
-            currentStage={task.currentStage}
-            onAddUpdate={onAddUpdate}
-            onNotify={onNotify}
-          />
+          {!isArchived ? (
+            <UpdateComposer
+              currentStage={task?.currentStage}
+              onAddUpdate={onAddUpdate}
+              onNotify={onNotify}
+            />
+          ) : (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="text-sm font-semibold text-slate-900">
+                Archived (read-only)
+              </div>
+              <div className="mt-1 text-sm text-slate-600">
+                Restore this task to add updates or change stage.
+              </div>
+            </div>
+          )}
+
           <Timeline task={task} />
         </div>
       </div>
@@ -256,7 +271,9 @@ TaskDetail.propTypes = {
     createdAt: PropTypes.string.isRequired,
     dueAt: PropTypes.string, // ISO string or nul
     updatedAt: PropTypes.string,
-
+    archivedAt: PropTypes.string,
+    isArchived: PropTypes.bool,
+    archived: PropTypes.bool,
     events: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,

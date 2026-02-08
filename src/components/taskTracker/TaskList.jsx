@@ -9,6 +9,10 @@ export default function TaskList({
   onSelect,
   onCreate,
   onDelete,
+  onArchive, // ✅
+  onUnarchive, // ✅
+  showArchived, // ✅
+  onToggleArchived, // ✅
 }) {
   const [q, setQ] = useState("");
   const [stageFilter, setStageFilter] = useState("ALL");
@@ -38,12 +42,12 @@ export default function TaskList({
           .join(" ")
           .toLowerCase();
         return hay.includes(qq);
-      })
-      .sort((a, b) => {
-        const au = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        const bu = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        return bu - au;
       });
+    // .sort((a, b) => {
+    //   const au = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+    //   const bu = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+    //   return bu - au;
+    // });
   }, [tasks, q, stageFilter]);
 
   return (
@@ -57,14 +61,23 @@ export default function TaskList({
             </h2>
             {/* <p className="text-xs text-slate-500">Local Phase 0 (offline)</p> */}
           </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onCreate}
+              className="shrink-0 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800 active:scale-[0.99]"
+            >
+              Add New +
+            </button>
 
-          <button
-            type="button"
-            onClick={onCreate}
-            className="shrink-0 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800 active:scale-[0.99]"
-          >
-            Create New Task
-          </button>
+            <button
+              type="button"
+              onClick={onToggleArchived}
+              className="shrink-0 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
+            >
+              {showArchived ? "Go Back ❮❮" : "View Archive"}
+            </button>
+          </div>
         </div>
 
         <div className="mt-3 flex gap-2">
@@ -142,17 +155,42 @@ export default function TaskList({
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(t.id);
-                      }}
-                      className="shrink-0 text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-white hover:border-slate-300 active:scale-[0.99]"
-                      title="Delete"
-                    >
-                      🗑️ Delete
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0 flex-col">
+                      {showArchived ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onUnarchive(t.id);
+                          }}
+                          className="text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-700 bg-white hover:border-slate-300"
+                        >
+                          ♻️ Restore
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onArchive(t.id);
+                          }}
+                          className="text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-700 bg-white hover:border-slate-300"
+                        >
+                          📦 Archive
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(t.id);
+                        }}
+                        className="text-xs px-2 py-1 rounded-lg border border-slate-200 text-slate-600 bg-white hover:border-slate-300"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
                   </div>
                 </li>
               );
@@ -184,4 +222,8 @@ TaskList.propTypes = {
   onSelect: PropTypes.func.isRequired,
   onCreate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onArchive: PropTypes.func.isRequired,
+  onUnarchive: PropTypes.func.isRequired,
+  showArchived: PropTypes.bool.isRequired,
+  onToggleArchived: PropTypes.func.isRequired,
 };

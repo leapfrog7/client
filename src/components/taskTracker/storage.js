@@ -112,9 +112,20 @@ function normalizeItem(payload) {
   return payload; // last resort
 }
 
-export async function getTasks() {
-  const payload = await http("GET", TASK_API);
+export async function getTasks({ archived = false } = {}) {
+  const url = archived ? `${TASK_API}?archived=1` : TASK_API;
+  const payload = await http("GET", url);
   return normalizeList(payload);
+}
+
+export async function archiveTask(taskId) {
+  const payload = await http("PATCH", `${TASK_API}/${taskId}/archive`);
+  return normalizeItem(payload);
+}
+
+export async function unarchiveTask(taskId) {
+  const payload = await http("PATCH", `${TASK_API}/${taskId}/unarchive`);
+  return normalizeItem(payload);
 }
 
 export async function getTaskById(taskId) {

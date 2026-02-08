@@ -9,6 +9,8 @@ import {
   updateTaskBasics,
   addTaskEvent,
   createShareLink,
+  archiveTask, // ✅ add
+  unarchiveTask, // ✅ add
 } from "../../../components/taskTracker/storage";
 
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
@@ -29,6 +31,7 @@ export default function TaskTrackerHome() {
   const [tasks, setTasks] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [toast, setToast] = useState(null); // { message, type }
+  const [showArchived, setShowArchived] = useState(false);
 
   // Form (create/edit)
   const [formOpen, setFormOpen] = useState(false);
@@ -63,8 +66,63 @@ export default function TaskTrackerHome() {
   }, []);
 
   async function refresh() {
-    const t = await getTasks();
-    setTasks(t);
+    const t = await getTasks({ archived: showArchived });
+    setTasks(Array.isArray(t) ? t : []);
+  }
+
+  async function toggleArchivedView() {
+    const next = !showArchived;
+    setShowArchived(next);
+    setExpandedTaskId(null);
+    setSelectedTaskId(null);
+    setPage(1);
+
+    const t = await getTasks({ archived: next });
+    setTasks(Array.isArray(t) ? t : []);
+    if (t?.length) setSelectedTaskId(t[0].id);
+  }
+
+  async function handleArchive(taskId) {
+    const ok = confirm(
+      "Archive this task? You can restore it later from Archived.",
+    );
+    if (!ok) return;
+
+    try {
+      await archiveTask(taskId);
+
+      // If viewing active tasks -> remove it from list immediately
+      if (!showArchived) {
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      } else {
+        // if already in archived view, just refresh/replace in-place
+        await refresh();
+      }
+
+      if (selectedTaskId === taskId) setSelectedTaskId(null);
+      if (expandedTaskId === taskId) setExpandedTaskId(null);
+
+      notify("Task archived", "success");
+    } catch (e) {
+      notify(e.message || "Could not archive task", "error");
+    }
+  }
+
+  async function handleUnarchive(taskId) {
+    try {
+      await unarchiveTask(taskId);
+
+      // If viewing archived tasks -> remove it from archived list immediately
+      if (showArchived) {
+        setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      } else {
+        await refresh();
+      }
+
+      notify("Task restored", "success");
+    } catch (e) {
+      notify(e.message || "Could not restore task", "error");
+    }
   }
 
   useEffect(() => {
@@ -228,7 +286,7 @@ export default function TaskTrackerHome() {
     await handleAddUpdateForTask(selectedTaskId, payload);
   }
 
-  function EmptyState({ activeView, onReset, onCreate }) {
+  function EmptyState({ activeView, onReset, onCreate, showArchived, onBack }) {
     const label =
       activeView === "PENDING"
         ? "Pending"
@@ -238,6 +296,32 @@ export default function TaskTrackerHome() {
             ? "Overdue"
             : "All";
 
+    if (showArchived) {
+      return (
+        <div className="p-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="text-sm font-semibold text-slate-900">
+              No archived tasks
+            </div>
+            <div className="mt-1 text-sm text-slate-600">
+              You haven’t archived any tasks yet. Archive a task to see it here.
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={onBack}
+                className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800"
+                type="button"
+              >
+                Back to Active
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // existing active-tasks empty state
     return (
       <div className="p-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -279,6 +363,8 @@ export default function TaskTrackerHome() {
       .isRequired,
     onReset: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
+    showArchived: PropTypes.bool,
+    onBack: PropTypes.func,
   };
 
   // ---------- Share ----------
@@ -371,6 +457,10 @@ export default function TaskTrackerHome() {
                   onSelect={setSelectedTaskId}
                   onCreate={handleCreate}
                   onDelete={handleDelete}
+                  onArchive={handleArchive}
+                  onUnarchive={handleUnarchive}
+                  showArchived={showArchived}
+                  onToggleArchived={toggleArchivedView}
                 />
               </div>
 
@@ -411,12 +501,28 @@ export default function TaskTrackerHome() {
                     setPage(1);
                   }}
                 />
-                <div className="mr-2 my-1 shrink-0 px-2 flex bg-slate-50">
+                <div className="mr-2 my-1 shrink-0 px-2 flex gap-3 bg-slate-50">
                   <button
                     onClick={handleCreate}
                     className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
                   >
                     + Create New Task
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleArchivedView}
+                    className={`px-3 py-2 rounded-lg border text-sm ${
+                      showArchived
+                        ? "bg-teal-100 text-gray-600 border-teal-700"
+                        : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                    }`}
+                    title={
+                      showArchived
+                        ? "Back to active tasks"
+                        : "View archived tasks"
+                    }
+                  >
+                    {showArchived ? "Back to Active 📌" : "See Archive 📦"}
                   </button>
                 </div>
                 <div className="px-3 py-3">
@@ -444,6 +550,11 @@ export default function TaskTrackerHome() {
                         onDelete={handleDelete}
                         onOpenShare={(taskId) => openShareView(taskId)}
                         onNotify={notify}
+                        onArchive={
+                          showArchived ? handleUnarchive : handleArchive
+                        }
+                        archiveLabel={showArchived ? "Restore" : "Archive"}
+                        isArchivedView={showArchived} // ✅ ADD THIS
                       />
 
                       {/* Pagination controls */}

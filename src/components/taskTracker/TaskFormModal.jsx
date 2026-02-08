@@ -137,7 +137,7 @@ export default function TaskFormModal({
               className="px-3 py-2 rounded-lg border border-slate-200 text-sm hover:border-slate-300"
               type="button"
             >
-              Close
+              Close ❌
             </button>
           </div>
 
@@ -164,7 +164,7 @@ export default function TaskFormModal({
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                  placeholder="e.g., CPSE-III"
+                  placeholder="Section"
                 />
               </div>
 
