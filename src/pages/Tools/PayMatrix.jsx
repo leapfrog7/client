@@ -15,7 +15,7 @@ const PayMatrix = () => {
   });
 
   const maxRows = Math.max(
-    ...payLevels.map((level) => payMatrixData[level].length)
+    ...payLevels.map((level) => payMatrixData[level].length),
   );
 
   const [tooltip, setTooltip] = useState(null);
@@ -52,17 +52,86 @@ const PayMatrix = () => {
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
       <Helmet>
+        {/* Primary */}
         <title>
-          7th CPC Pay Matrix Viewer | Central Govt Pay Scales | UnderSigned
+          7th CPC Pay Matrix (Levels 1–18) — Pay Progression & Increments |
+          UnderSigned
         </title>
         <meta
           name="description"
-          content="Explore pay levels and increments under the 7th Central Pay Commission (CPC) using an interactive pay matrix designed for Central Government employees."
+          content="Interactive 7th CPC Pay Matrix for Central Government employees—view pay levels (1–18), cells and increment progression. Quickly check basic pay across levels and estimate next increment values."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/7thCPC-paymatrix"
         />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+        />
+
+        {/* Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph (no images) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="7th CPC Pay Matrix (Levels 1–18) — Pay Progression | UnderSigned"
+        />
+        <meta
+          property="og:description"
+          content="View the 7th CPC Pay Matrix: levels 1–18, cells and increment progression—built for Central Government employees."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/public/7thCPC-paymatrix"
+        />
+
+        {/* Twitter (no images) */}
+        <meta name="twitter:card" content="summary" />
+        <meta
+          name="twitter:title"
+          content="7th CPC Pay Matrix (Levels 1–18) | UnderSigned"
+        />
+        <meta
+          name="twitter:description"
+          content="Interactive 7th CPC Pay Matrix for Central Govt employees—levels 1–18, cells and increment progression."
+        />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/pages/public/7thCPC-paymatrix#webpage",
+        "url": "https://undersigned.in/pages/public/7thCPC-paymatrix",
+        "name": "7th CPC Pay Matrix (Levels 1–18)",
+        "description": "Interactive 7th CPC Pay Matrix for Central Government employees—view pay levels, cells and increment progression.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://undersigned.in/pages/public/7thCPC-paymatrix#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://undersigned.in/" },
+          { "@type": "ListItem", "position": 2, "name": "7th CPC Pay Matrix", "item": "https://undersigned.in/pages/public/7thCPC-paymatrix" }
+        ]
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       <div className="py-3">
@@ -88,7 +157,7 @@ const PayMatrix = () => {
                 <th
                   key={level}
                   className={`sticky top-0 text-center p-2 text-xs md:text-sm lg:text-base z-20 ${getHeaderColor(
-                    level
+                    level,
                   )}`}
                 >
                   Level {level}

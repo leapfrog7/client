@@ -218,15 +218,95 @@ const CghsRatesPublic = () => {
   return (
     <div className="p-2 max-w-6xl mx-auto animate-fade-in">
       <Helmet>
-        <title>Find CGHS Rates | UnderSigned</title>
+        {/* Primary */}
+        <title>
+          Latest CGHS Package Rates | Tier I, II & III | NABH & Non-NABH |
+          UnderSigned
+        </title>
         <meta
           name="description"
-          content="Search and explore CGHS prescribed rates using the latest active dataset."
+          content="Check the latest CGHS package rates for Tier I, II and III cities—Super Speciality, NABH and Non-NABH hospitals. View rates across General, Semi-Private and Private ward categories."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/cghs-rates"
         />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+
+        {/* Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="Latest CGHS Package Rates | UnderSigned"
+        />
+        <meta
+          property="og:description"
+          content="Updated CGHS rates for Tier I/II/III cities—Super Speciality, NABH & Non-NABH, with General/Semi-Private/Private categories."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/public/cghs-rates"
+        />
+        {/* Replace with a real absolute URL image (1200×630 recommended) */}
+        {/* <meta
+          property="og:image"
+          content="https://undersigned.in/og/cghs-rates.png"
+        /> */}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Latest CGHS Package Rates | UnderSigned"
+        />
+        <meta
+          name="twitter:description"
+          content="Updated CGHS rates for Tier I/II/III cities—Super Speciality, NABH & Non-NABH, with General/Semi-Private/Private categories."
+        />
+        <meta
+          name="twitter:image"
+          content="https://undersigned.in/og/cghs-rates.png"
+        />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/pages/public/cghs-rates#webpage",
+        "url": "https://undersigned.in/pages/public/cghs-rates",
+        "name": "Latest CGHS Package Rates (Tier I, II & III)",
+        "description": "Updated CGHS package rates for Tier I/II/III cities across Super Speciality, NABH and Non-NABH hospitals, with General/Semi-Private/Private categories.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://undersigned.in/pages/public/cghs-rates#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://undersigned.in/" },
+          { "@type": "ListItem", "position": 2, "name": "CGHS Rates", "item": "https://undersigned.in/pages/public/cghs-rates" }
+        ]
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-800 mb-2 mt-4">

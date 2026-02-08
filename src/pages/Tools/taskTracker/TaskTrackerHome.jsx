@@ -18,6 +18,7 @@ import DashboardStrip from "../../../components/taskTracker/DashboardStrip";
 import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccordion";
 // import PageFeedback from "../../../components/PageFeedback";
 import PropTypes from "prop-types";
+import { Helmet } from "react-helmet-async";
 
 function daysUntil(dueAt) {
   if (!dueAt) return null;
@@ -52,6 +53,12 @@ export default function TaskTrackerHome() {
   const toastTimerRef = useRef(null);
 
   const [authRequired, setAuthRequired] = useState(false);
+
+  const title = "Task Manager / Task Tracker for Govt. Officers | Undersigned";
+  const description =
+    "Stage-wise task tracking for government office work: milestones, due alerts, aging counters, quick updates, and shareable read-only view. Built for eOffice-style workflows.";
+
+  const canonical = `${window.location.origin}/pages/tools/task-tracker`;
 
   const notify = useCallback((message, type = "success") => {
     setToast({ message, type });
@@ -398,6 +405,34 @@ export default function TaskTrackerHome() {
       className="w-full min-h-0 overflow-hidden flex flex-col mb-8"
       style={{ height: "calc(100dvh)" }} // keep your number, layout now won’t clip
     >
+      <Helmet>
+        <title>{title}</title>
+
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+
+        {/* Indexing */}
+        <meta name="robots" content="index,follow,max-image-preview:large" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Undersigned" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+
+        {/* Optional: add a real image URL if you have one */}
+        {/* <meta property="og:image" content={`${window.location.origin}/og/task-tracker.png`} /> */}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+
+        {/* Optional: add same image for Twitter */}
+        {/* <meta name="twitter:image" content={`${window.location.origin}/og/task-tracker.png`} /> */}
+      </Helmet>
+
       {/* CTA header (does not consume scroll space) */}
       <div className="shrink-0 bg-white p-4 shadow-sm text-center mx-auto w-full">
         <div className="text-lg md:text-2xl font-extrabold tracking-wider text-gray-600">

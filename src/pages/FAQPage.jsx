@@ -89,7 +89,7 @@ const FAQPage = () => {
           "We do not offer refunds once payment is made and the account is activated. We encourage all users to try the free trial and purchase if you find it valuable for your preparation.",
       },
     ],
-    []
+    [],
   );
 
   // Filter by query (question + answer)
@@ -98,7 +98,7 @@ const FAQPage = () => {
     if (!q) return faqs;
     return faqs.filter(
       ({ question, answer }) =>
-        question.toLowerCase().includes(q) || answer.toLowerCase().includes(q)
+        question.toLowerCase().includes(q) || answer.toLowerCase().includes(q),
     );
   }, [faqs, query]);
 
@@ -121,19 +121,46 @@ const FAQPage = () => {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Helmet>
-        <title>FAQ - UnderSigned</title>
+        {/* Primary */}
+        <title>FAQs | UnderSigned</title>
         <meta
           name="description"
-          content="Find answers to frequently asked questions about UnderSigned. How to register, subscribe, pay, and use MCQ tools."
+          content="FAQs for UnderSigned: registration, login, subscription/payment, accessing MCQs and tools, bookmarks, progress tracking, and common troubleshooting."
         />
         <link rel="canonical" href="https://undersigned.in/FAQs" />
-        <meta property="og:title" content="FAQ - UnderSigned" />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+        />
+
+        {/* Open Graph (no images as requested) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta property="og:title" content="FAQs | UnderSigned" />
         <meta
           property="og:description"
-          content="Find answers to frequently asked questions about UnderSigned."
+          content="Find answers about registration, subscription/payment, using MCQs & tools, bookmarks, progress tracking, and troubleshooting on UnderSigned."
         />
         <meta property="og:url" content="https://undersigned.in/FAQs" />
-        <meta property="og:type" content="website" />
+
+        {/* Twitter (no images) */}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="FAQs | UnderSigned" />
+        <meta
+          name="twitter:description"
+          content="Answers about registration, subscription/payment, MCQs & tools, bookmarks, progress tracking, and troubleshooting on UnderSigned."
+        />
+
+        {/* Structured Data (FAQPage) */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": []
+  }
+  `}</script>
       </Helmet>
 
       {/* Header */}

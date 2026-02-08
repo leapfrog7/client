@@ -43,18 +43,95 @@ export default function PDFUtility() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Helmet>
+        {/* Primary */}
         <title>
-          PDF Tools — Split, Merge, Compress, Rotate, Image to PDF (20 MB
-          eOffice Ready) | UnderSigned
+          PDF Tools for eOffice (20 MB Ready) — Split, Merge, Compress, Rotate,
+          Image to PDF | UnderSigned
         </title>
         <meta
           name="description"
-          content="Free client-side PDF tools for Central & State Govt. users: split PDFs by custom page ranges or automatically into 20 MB parts for eOffice, merge multiple files, compress large documents with rasterize & rebuild, and rotate pages. Convert Images to PDF and Nothing is uploaded — all processing happens securely in your browser for complete privacy. Your file stays where it should - with YOU"
+          content="Free privacy-first PDF tools for government work: split PDFs by page range or auto-split into 20 MB eOffice-ready parts, merge files, compress large PDFs (rasterize & rebuild), rotate pages, and convert images to PDF. 100% client-side — nothing is uploaded; processing happens in your browser."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/pdf-utility"
         />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+
+        {/* Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="PDF Tools for eOffice (20 MB Ready) — Split, Merge, Compress, Rotate | UnderSigned"
+        />
+        <meta
+          property="og:description"
+          content="Split into 20 MB eOffice-ready parts, merge PDFs, compress large files, rotate pages, and convert images to PDF — all in your browser. Nothing is uploaded."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/public/pdf-utility"
+        />
+        {/* Replace with a real absolute URL image (1200×630 recommended) */}
+        {/* <meta
+          property="og:image"
+          content="https://undersigned.in/og/pdf-tools.png"
+        /> */}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="PDF Tools for eOffice (20 MB Ready) — Split, Merge, Compress, Rotate"
+        />
+        <meta
+          name="twitter:description"
+          content="Split into 20 MB eOffice-ready parts, merge PDFs, compress, rotate, and convert images to PDF — 100% client-side."
+        />
+        <meta
+          name="twitter:image"
+          content="https://undersigned.in/og/pdf-tools.png"
+        />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/pages/public/pdf-utility#webpage",
+        "url": "https://undersigned.in/pages/public/pdf-utility",
+        "name": "PDF Tools for eOffice (20 MB Ready)",
+        "description": "Client-side PDF tools to split into 20 MB eOffice-ready parts, merge, compress, rotate, and convert images to PDF. Nothing is uploaded; processing happens in your browser.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://undersigned.in/pages/public/pdf-utility#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://undersigned.in/" },
+          { "@type": "ListItem", "position": 2, "name": "PDF Tools", "item": "https://undersigned.in/pages/public/pdf-utility" }
+        ]
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       <h1 className="text-xl sm:text-2xl font-bold text-center mb-2 text-slate-700 ">

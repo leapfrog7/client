@@ -41,8 +41,8 @@ const PublicResources = () => {
         const res = await axios.get(`${BASE_URL}/api/v1/public/resources`);
         setResources(
           res.data.filter(
-            (rule) => rule.description && rule.description.trim().length > 0
-          )
+            (rule) => rule.description && rule.description.trim().length > 0,
+          ),
         );
       } catch (err) {
         console.error("Failed to fetch resources", err);
@@ -66,15 +66,86 @@ const PublicResources = () => {
   return (
     <div className="p-4 md:p-8 md:w-11/12  min-h-screen mx-auto">
       <Helmet>
-        <title>Government Rules & Acts Directory | UnderSigned</title>
+        {/* Primary */}
+        <title>
+          Government Rules & Acts (Free) — Searchable Directory for Govt. Work &
+          LDCE | UnderSigned
+        </title>
         <meta
           name="description"
-          content="Access a centralized hub of government rules, acts, circulars, and manuals including GFR, FRSR, and more. Browse rule-wise explanations and bookmark important sections."
+          content="Free searchable directory of Government Rules, Acts, circulars and manuals for Central/State Government officers. Quickly search sections, view references, and use them for day-to-day office work and LDCE preparation."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/resources"
         />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
+        />
+
+        {/* Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph (no images) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="Government Rules & Acts — Free Searchable Directory | UnderSigned"
+        />
+        <meta
+          property="og:description"
+          content="Search Government Rules, Acts, circulars and manuals with section-wise references—useful for daily government work and LDCE exam preparation. Free for everyone."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/public/resources"
+        />
+
+        {/* Twitter (no images) */}
+        <meta name="twitter:card" content="summary" />
+        <meta
+          name="twitter:title"
+          content="Government Rules & Acts — Free Searchable Directory | UnderSigned"
+        />
+        <meta
+          name="twitter:description"
+          content="Free searchable directory of Government Rules, Acts, circulars and manuals with section-wise references—useful for govt work and LDCE preparation."
+        />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/pages/public/resources#webpage",
+        "url": "https://undersigned.in/pages/public/resources",
+        "name": "Government Rules & Acts Directory",
+        "description": "Free searchable directory of Government Rules, Acts, circulars and manuals with section-wise references for government work and LDCE preparation.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://undersigned.in/pages/public/resources#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://undersigned.in/" },
+          { "@type": "ListItem", "position": 2, "name": "Resources", "item": "https://undersigned.in/pages/public/resources" }
+        ]
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       <div className="py-1">

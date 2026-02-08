@@ -13,6 +13,7 @@ import { Helmet } from "react-helmet-async";
 import PageFeedback from "../../components/PageFeedback";
 import Loading from "../../components/Loading";
 import PropTypes from "prop-types";
+// import { Helmet } from "react-helmet-async";
 
 const validCities = [
   "Delhi",
@@ -98,8 +99,8 @@ function CitySelect({
                 backgroundColor: state.isSelected
                   ? "#e0e7ff"
                   : state.isFocused
-                  ? "#eef2ff"
-                  : "white",
+                    ? "#eef2ff"
+                    : "white",
                 color: state.isSelected ? "#3730a3" : "#111827",
                 cursor: "pointer",
               }),
@@ -127,7 +128,7 @@ CitySelect.propTypes = {
     PropTypes.shape({
       label: PropTypes.string.isRequired,
       value: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   selectedCity: PropTypes.string, // you had the warning here
   setSelectedCity: PropTypes.func.isRequired,
@@ -172,10 +173,10 @@ const CghsUnitPublic = () => {
         (error) => {
           console.error("Geolocation error:", error.message);
           setNearbyError(
-            "📍 Location access denied. Cannot show nearby hospitals."
+            "📍 Location access denied. Cannot show nearby hospitals.",
           );
           setUserLocation(null);
-        }
+        },
       );
     }
   }, [viewMode]);
@@ -186,7 +187,7 @@ const CghsUnitPublic = () => {
   useEffect(() => {
     const filtered = units.filter(
       (unit) =>
-        unit?.address?.city?.toLowerCase() === selectedCity.toLowerCase()
+        unit?.address?.city?.toLowerCase() === selectedCity.toLowerCase(),
     );
     setFilteredUnits(filtered);
     setCurrentPage(1);
@@ -195,7 +196,7 @@ const CghsUnitPublic = () => {
   useEffect(() => {
     const cityFiltered = units.filter(
       (unit) =>
-        unit?.address?.city?.toLowerCase() === selectedCity.toLowerCase()
+        unit?.address?.city?.toLowerCase() === selectedCity.toLowerCase(),
     );
 
     // Apply search if at least 3 characters
@@ -206,7 +207,7 @@ const CghsUnitPublic = () => {
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase());
             const specialtyMatch = unit.empanelledFor?.some((spec) =>
-              spec.toLowerCase().includes(searchTerm.toLowerCase())
+              spec.toLowerCase().includes(searchTerm.toLowerCase()),
             );
             const localityMatch = unit.address?.line1
               ?.toLowerCase()
@@ -272,16 +273,101 @@ const CghsUnitPublic = () => {
 
   return (
     <div className="p-4 md:p-8 md:w-11/12 mx-auto animate-fade-in">
+      {/* ✅ SEO / Social / Rich Results */}
       <Helmet>
-        <title>CGHS Units Directory | UnderSigned</title>
+        {/* Primary */}
+        <title>
+          CGHS Units in Delhi NCR | Hospitals, Labs & Wellness Centres |
+          UnderSigned
+        </title>
         <meta
           name="description"
-          content="Search and explore Central Government Health Scheme (CGHS) hospitals, labs, and wellness centres by city or location."
+          content="Browse CGHS empanelled hospitals, diagnostic labs and wellness centres in Delhi NCR. Filter by city, search by specialty/locality, view details and get Google Maps directions."
         />
         <link
           rel="canonical"
           href="https://undersigned.in/pages/public/cghs-units"
         />
+
+        {/* Indexing */}
+        <meta
+          name="robots"
+          content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+
+        {/* App / Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="CGHS Units in Delhi NCR | UnderSigned"
+        />
+        <meta
+          property="og:description"
+          content="Search CGHS empanelled hospitals, labs and wellness centres in Delhi NCR with directions and detailed information."
+        />
+        <meta
+          property="og:url"
+          content="https://undersigned.in/pages/public/cghs-units"
+        />
+        {/* Replace with a real absolute URL image (1200×630 recommended) */}
+        {/* <meta property="og:image" content="https://undersigned.in/og/cghs-units.png" /> */}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="CGHS Units in Delhi NCR | UnderSigned"
+        />
+        <meta
+          name="twitter:description"
+          content="Browse CGHS empanelled centres in Delhi NCR. Search by city, specialty or locality and get directions."
+        />
+        <meta
+          name="twitter:image"
+          content="https://undersigned.in/og/cghs-units.png"
+        />
+
+        {/* Structured Data: WebPage + Breadcrumb + ItemList (directory page) */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/pages/public/cghs-units#webpage",
+        "url": "https://undersigned.in/pages/public/cghs-units",
+        "name": "CGHS Units in Delhi NCR",
+        "description": "Directory of CGHS empanelled hospitals, labs and wellness centres in Delhi NCR with search and directions.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://undersigned.in/pages/public/cghs-units#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://undersigned.in/" },
+          { "@type": "ListItem", "position": 2, "name": "CGHS Units", "item": "https://undersigned.in/pages/public/cghs-units" }
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://undersigned.in/pages/public/cghs-units#items",
+        "name": "CGHS Empanelled Centres (Delhi NCR)",
+        "itemListOrder": "https://schema.org/ItemListOrderAscending",
+        "numberOfItems": ${filteredUnits?.length ?? 0}
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       <div className="text-center mb-8 px-3">
@@ -487,7 +573,7 @@ const CghsUnitPublic = () => {
                   >
                     {page}
                   </button>
-                )
+                ),
               )}
 
               {/* Next */}

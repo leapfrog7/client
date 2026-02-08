@@ -212,22 +212,73 @@ const Home = ({
   return (
     <div className="bg-white flex flex-col w-full xl:w-4/5 mx-auto">
       <Helmet>
-        <title>Home - UnderSigned</title>
-        <link rel="canonical" href="https://undersigned.in/" />
+        {/* Primary */}
+        <title>
+          UnderSigned — LDCE (SO/PS) MCQs, Govt Rules Directory, CGHS Tools &
+          PDF Utilities
+        </title>
         <meta
           name="description"
-          content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC) for promotion to SO or PS grade"
+          content="UnderSigned helps Central Government employees prepare for LDCE (SO/PS) with MCQ test series and provides free productivity tools—CGHS rates & units, a searchable Govt Rules/Acts directory, and privacy-first PDF utilities."
         />
+        <link rel="canonical" href="https://undersigned.in/" />
+
+        {/* Indexing */}
         <meta
-          name="keywords"
-          content="UnderSigned, LDCE, Limited Departmental, Section Officer, Test Series, CCS CCA, Pension, Conduct, Leave Rules"
+          name="robots"
+          content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
         />
-        <meta property="og:title" content="UnderSigned| Prepare Smartly" />
+
+        {/* Theme */}
+        <meta name="theme-color" content="#1e40af" />
+
+        {/* Open Graph (no images) */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="UnderSigned" />
+        <meta
+          property="og:title"
+          content="UnderSigned — Prepare Smartly for LDCE (SO/PS) + Govt Tools"
+        />
         <meta
           property="og:description"
-          content="Welcome to the home page of UnderSigned. We offer test series in MCQ format for the Limited Departmental Competitive Examination (LDCE) conducted by Union Public Service Commission (UPSC)"
+          content="LDCE (SO/PS) MCQ test series for Central Govt employees + free tools: CGHS rates & units, searchable Govt Rules/Acts directory, and client-side PDF utilities."
         />
-        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://undersigned.in/" />
+
+        {/* Twitter (no images) */}
+        <meta name="twitter:card" content="summary" />
+        <meta
+          name="twitter:title"
+          content="UnderSigned — LDCE (SO/PS) MCQs + Govt Tools"
+        />
+        <meta
+          name="twitter:description"
+          content="Prepare for LDCE (SO/PS) with MCQs and use free govt productivity tools: CGHS, Rules/Acts directory, and PDF utilities."
+        />
+
+        {/* Structured Data */}
+        <script type="application/ld+json">{`
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://undersigned.in/#website",
+        "name": "UnderSigned",
+        "url": "https://undersigned.in",
+        "inLanguage": "en-IN"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://undersigned.in/#webpage",
+        "url": "https://undersigned.in/",
+        "name": "UnderSigned — LDCE (SO/PS) MCQs, Govt Rules Directory, CGHS Tools & PDF Utilities",
+        "description": "UnderSigned helps Central Government employees prepare for LDCE (SO/PS) with MCQ test series and offers free tools like CGHS rates & units, a searchable Govt Rules/Acts directory, and privacy-first PDF utilities.",
+        "isPartOf": { "@id": "https://undersigned.in/#website" }
+      }
+    ]
+  }
+  `}</script>
       </Helmet>
 
       {/* Account activation / payment notice (hidden during trial) */}
