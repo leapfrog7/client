@@ -1,9 +1,11 @@
 import { registerSW } from "virtual:pwa-register";
 
-registerSW({
+const updateSW = registerSW({
+  immediate: true, // check sooner on load (helps on iOS)
   onNeedRefresh() {
     if (confirm("New version available. Refresh?")) {
-      window.location.reload();
+      // this tells the waiting SW to activate (skip waiting) and then reloads
+      updateSW(true);
     }
   },
   onOfflineReady() {

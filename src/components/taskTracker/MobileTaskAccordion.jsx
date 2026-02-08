@@ -738,17 +738,17 @@ export default function MobileTaskAccordion({
                         e.stopPropagation();
                         openQuickMenu(t.id, e.currentTarget);
                       }}
-                      className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
+                      className="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
                       title="Quick update"
                       aria-label="Quick update"
                     >
-                      ⚡ Quick Update
+                      ⚡Quick Update
                     </button>
 
                     <button
                       type="button"
                       onClick={() => onEditDetails(t.id)}
-                      className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
+                      className="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
                       title="Edit details"
                     >
                       ✏️
@@ -760,7 +760,7 @@ export default function MobileTaskAccordion({
                         e.stopPropagation();
                         onArchive?.(t.id);
                       }}
-                      className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
+                      className="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
                       title={archiveLabel || "Archive"}
                     >
                       📦
@@ -773,7 +773,7 @@ export default function MobileTaskAccordion({
                           e.stopPropagation();
                           onOpenShare(t.id);
                         }}
-                        className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
+                        className="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
                         title="Share"
                       >
                         🔗
@@ -786,7 +786,7 @@ export default function MobileTaskAccordion({
                         e.stopPropagation();
                         onDelete(t.id);
                       }}
-                      className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
+                      className="px-2 py-1 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300"
                       title="Delete"
                     >
                       🗑️
