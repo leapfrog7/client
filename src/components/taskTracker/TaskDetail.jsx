@@ -148,11 +148,11 @@ export default function TaskDetail({
             </div>
             {!embedded && (
               <button
-                onClick={onOpenShare}
+                onClick={() => onOpenShare?.(task.id)}
                 className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
                 title="Open read-only share view"
               >
-                Share View
+                Share View 👁
               </button>
             )}
             {!embedded && (
@@ -161,7 +161,7 @@ export default function TaskDetail({
                 className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm hover:border-slate-300"
                 title="Edit title / due date / identifiers"
               >
-                Edit Details
+                Edit Details ✏️
               </button>
             )}
           </div>

@@ -180,6 +180,30 @@ export default function TaskFormModal({
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-medium text-slate-700">
+                  File No (optional)
+                </label>
+                <input
+                  value={fileNo}
+                  onChange={(e) => setFileNo(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  placeholder="File number"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700">
+                  Receipt No (optional)
+                </label>
+                <input
+                  value={receiptNo}
+                  onChange={(e) => setReceiptNo(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
+                  placeholder="Receipt / diary no"
+                />
+              </div>
+
               {/* ✅ Stage only during Create */}
               {mode === "create" ? (
                 <div>
@@ -205,30 +229,6 @@ export default function TaskFormModal({
               ) : (
                 <div className="hidden sm:block" />
               )}
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700">
-                  File No (optional)
-                </label>
-                <input
-                  value={fileNo}
-                  onChange={(e) => setFileNo(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                  placeholder="File number"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700">
-                  Receipt No (optional)
-                </label>
-                <input
-                  value={receiptNo}
-                  onChange={(e) => setReceiptNo(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 rounded-lg border border-slate-200 text-sm"
-                  placeholder="Receipt / diary no"
-                />
-              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
