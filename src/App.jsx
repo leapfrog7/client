@@ -53,6 +53,8 @@ import TopicwisePYQExplorer from "./pages/quiz/previousYear/TopicwisePYQExplorer
 import TopicwisePYQQuiz from "./pages/quiz/previousYear/TopicwisePYQQuiz";
 import EmailOtpReset from "./pages/EmailOtpReset";
 
+import CurrentAffairs from "./pages/currentAffairs/CurrentAffairs";
+
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 const UserManagement = lazy(() => import("./pages/Admin/UserManagement"));
 const MCQManagement = lazy(() => import("./pages/Admin/MCQ_Management"));
@@ -556,6 +558,8 @@ const App = () => {
                 />
               }
             />
+
+            <Route path="/pages/current_affairs" element={<CurrentAffairs />} />
 
             <Route
               path="/pages/quiz/addQuestions"
