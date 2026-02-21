@@ -195,18 +195,18 @@ const CurrentAffairs = () => {
     });
 
     try {
-      const res = await toggleBookmark(payload); // { bookmarked, sanityId }
+      await toggleBookmark(payload);
 
       if (!mountedRef.current) return;
 
-      // trust server truth
-      setBookmarkIds((prev) => {
-        const next = new Set(prev);
-        const id = res?.sanityId || sanityId;
-        if (res?.bookmarked) next.add(id);
-        else next.delete(id);
-        return next;
-      });
+      // ✅ Re-sync from server (authoritative)
+      const list = await fetchBookmarks();
+
+      const ids = (Array.isArray(list) ? list : [])
+        .map((b) => (typeof b === "string" ? b : b?.sanityId))
+        .filter(Boolean);
+
+      setBookmarkIds(new Set(ids));
     } catch (e) {
       console.error(e);
       if (!mountedRef.current) return;

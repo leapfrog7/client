@@ -43,6 +43,8 @@ export const fetchBookmarks = async () => {
   const { data } = await axios.get(`${BASE_URL}/current_affairs/bookmarks`, {
     headers: authHeader(),
   });
+  console.log("BASE_URL:", BASE_URL);
+  console.log("BOOKMARKS API RESPONSE:", data);
   return data.bookmarks || [];
 };
 

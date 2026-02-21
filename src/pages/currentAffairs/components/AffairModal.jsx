@@ -156,6 +156,8 @@ const AffairModal = ({ open, item, onClose }) => {
               "relative w-full overflow-hidden bg-white shadow-2xl",
               "md:max-w-3xl md:rounded-2xl",
               "rounded-t-3xl md:rounded-2xl",
+              // ✅ Mobile: don't reach the very top (address bar / notch safe)
+              "max-h-[calc(100dvh-72px-env(safe-area-inset-top))] md:max-h-none",
             ].join(" ")}
             variants={isMobile ? panelMobile : panelDesktop}
             drag={isMobile ? "y" : false}
@@ -173,7 +175,7 @@ const AffairModal = ({ open, item, onClose }) => {
             </div>
 
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b">
+            <div className="sticky top-0 z-10 bg-slate-200 backdrop-blur border-b">
               <div className="p-4 md:p-5 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -224,7 +226,7 @@ const AffairModal = ({ open, item, onClose }) => {
             </div>
 
             {/* Body */}
-            <div className="p-4 md:p-6 max-h-[78vh] overflow-y-auto">
+            <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(100dvh-220px-env(safe-area-inset-top))] md:max-h-[78vh]">
               {/* Preferred content: Portable Text rich editor */}
               {Array.isArray(item.content) && item.content.length > 0 ? (
                 <div className="prose prose-sm md:prose-base max-w-none">
@@ -249,35 +251,46 @@ const AffairModal = ({ open, item, onClose }) => {
               {/* Sources */}
               {!!(item.sources || []).length && (
                 <>
-                  <h3 className="mt-6 text-sm md:text-base font-bold text-gray-800 mb-2">
+                  <h3 className="mt-6 text-xs md:text-base font-bold text-gray-500 mb-2">
                     Sources
                   </h3>
-                  <div className="space-y-2">
-                    {item.sources.map((s, idx) => (
-                      <a
-                        key={`${item._id || "item"}-src-${idx}`}
-                        href={s.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="group block rounded-2xl border border-gray-200 p-3 md:p-4 hover:bg-gray-50 transition"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="font-semibold text-gray-900 truncate">
-                              {s.label || "Source"}
+
+                  <div className="space-y-2 ">
+                    {item.sources.map((s, idx) => {
+                      const url = typeof s === "string" ? s : s?.url;
+                      // const label =
+                      //   typeof s === "string"
+                      //     ? `Source ${idx + 1}`
+                      //     : s?.label || `Source ${idx + 1}`;
+
+                      if (!url) return null;
+
+                      return (
+                        <a
+                          key={`${item._id || "item"}-src-${idx}`}
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="bg-blue-50 group block rounded-xl border border-blue-200 p-3 md:p-4 hover:bg-blue-100 transition"
+                          title={url}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              {/* <div className="font-semibold text-gray-900 truncate">
+                                {label}
+                              </div> */}
+                              <div className="text-xs text-gray-500 truncate">
+                                {url}
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500 break-all mt-1">
-                              {s.url}
-                            </div>
+                            <FaExternalLinkAlt className="text-blue-300 group-hover:text-gray-600 shrink-0" />
                           </div>
-                          <FaExternalLinkAlt className="text-gray-400 group-hover:text-gray-600 shrink-0" />
-                        </div>
-                      </a>
-                    ))}
+                        </a>
+                      );
+                    })}
                   </div>
                 </>
               )}
-
               {/* Mobile hint */}
               <div className="md:hidden mt-6 text-center text-xs text-gray-500">
                 Tip: swipe down to close
