@@ -5,7 +5,7 @@ import { MdAppRegistration, MdPayment, MdCheckCircle } from "react-icons/md";
 
 const Subscribe = () => {
   const upiLink =
-    "upi://pay?pa=7827097711@ptyes&pn=SeemaBhardwaj&am=999.00&cu=INR&tn=Payment%20for%20Undersigned%20registration";
+    "upi://pay?pa=7827097711@ptyes&pn=SeemaBhardwaj&am=699.00&cu=INR&tn=Payment%20for%20Undersigned%20registration";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-200 to-indigo-200 text-white p-6">
