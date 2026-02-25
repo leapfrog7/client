@@ -1,7 +1,7 @@
 // src/components/pdfTools/PDFSplitter.jsx
 import { useState, useRef, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
-import { pdfjsLib } from "./pdfjsSetup";
+import { pdfjsLib, ensurePdfJsWorker } from "./pdfjsSetup";
 import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFSplitter() {
@@ -54,6 +54,7 @@ export default function PDFSplitter() {
       setTotalPages(loaded.getPageCount());
 
       const previewBytes = bytes.slice(0);
+      ensurePdfJsWorker();
       const loadingTask = pdfjsLib.getDocument({ data: previewBytes });
       const pdfLoaded = await loadingTask.promise;
       setPdf(pdfLoaded);
@@ -182,7 +183,7 @@ export default function PDFSplitter() {
       const segments = parseSegments(range, total);
       if (segments.length === 0) {
         setError(
-          `No pages matched. You entered “${range}”. Document has ${total} pages.`
+          `No pages matched. You entered “${range}”. Document has ${total} pages.`,
         );
         return;
       }
@@ -194,7 +195,7 @@ export default function PDFSplitter() {
 
       const totalPagesToCopy = segments.reduce(
         (acc, s) => acc + s.indices.length,
-        0
+        0,
       );
       let copied = 0;
 
@@ -529,8 +530,8 @@ export default function PDFSplitter() {
               ? "Extracting…"
               : "Splitting…"
             : mode === "pages"
-            ? "Extract Pages"
-            : "Split by Size"}
+              ? "Extract Pages"
+              : "Split by Size"}
         </button>
       </div>
 

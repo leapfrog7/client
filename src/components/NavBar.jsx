@@ -1,10 +1,7 @@
-// className={`absolute left-full top-0 mt-1 w-48 bg-white rounded-md shadow-lg p-2 ${
-//         hoveredSubItem === subIndex ? "block" : "hidden"
-
 import { useState } from "react";
 import { navItems } from "../data/menuItems";
 import { Link } from "react-router-dom";
-import { IoChevronForward } from "react-icons/io5";
+import { IoChevronForward, IoChevronDown } from "react-icons/io5";
 
 export default function NavBar() {
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -12,28 +9,30 @@ export default function NavBar() {
 
   const handleMouseEnter = (index) => {
     setHoveredItem(index);
-    setHoveredSubItem(null); // Reset the hovered sub-item when a new item is hovered
-  };
-
-  const handleSubItemMouseEnter = (subIndex) => {
-    setHoveredSubItem(subIndex);
+    setHoveredSubItem(null);
   };
 
   const renderSubmenu = (submenu, subIndex) => {
+    const open = hoveredSubItem === subIndex;
+
     return (
       <div
-        className={`absolute left-full top-0 mt-1 w-48 bg-white rounded-md shadow-lg p-2 ${
-          hoveredSubItem === subIndex ? "block" : "hidden"
-        }`}
+        className={`absolute left-full top-0 ml-2 min-w-[220px] rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2
+          transition-all duration-150 ${
+            open
+              ? "opacity-100 translate-x-0 visible"
+              : "opacity-0 translate-x-1 invisible"
+          }`}
       >
-        {submenu.map((subItem, index) => (
+        {submenu.map((subItem, i) => (
           <Link
-            key={index}
+            key={i}
             to={subItem.path}
-            className="px-4 py-2 text-gray-700 hover:bg-yellow-200 rounded-md flex gap-2 items-center"
+            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-slate-700
+                       hover:bg-slate-50 hover:text-slate-900"
           >
-            <subItem.icon />
-            {subItem.label}
+            <subItem.icon className="text-slate-500" />
+            <span className="truncate">{subItem.label}</span>
           </Link>
         ))}
       </div>
@@ -41,52 +40,87 @@ export default function NavBar() {
   };
 
   return (
-    <div className="px-4 py-2 hidden md:flex space-x-4  rounded-lg z-20">
-      {navItems.map((item, index) => (
-        <div
-          key={index}
-          className="relative group"
-          onMouseEnter={() => handleMouseEnter(index)}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Link
-            to={item.path}
-            className="text-gray-100 flex items-center space-x-2  hover:text-yellow-400  px-2  py-1 hover:rounded-md"
+    <div className="px-4 py-2 hidden md:flex space-x-4 rounded-lg z-20">
+      {navItems.map((item, index) => {
+        const open = hoveredItem === index;
+        const hasSub = !!item.submenu;
+
+        return (
+          <div
+            key={index}
+            className="relative"
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={() => setHoveredItem(null)}
           >
-            <item.icon />
-            <span>{item.label}</span>
-            {item.submenu && <IoChevronForward className="ml-auto" />}
-          </Link>
-          {item.submenu && (
-            <div
-              className={`absolute left-0 w-48 bg-white rounded-md shadow-lg z-10 pb-2 ${
-                hoveredItem === index ? "block" : "hidden"
-              }`}
-            >
-              {item.submenu.map((subItem, subIndex) => (
-                <div
-                  key={subIndex}
-                  className="relative group"
-                  onMouseEnter={() => handleSubItemMouseEnter(subIndex)}
-                  onMouseLeave={() => setHoveredSubItem(null)}
-                >
-                  <Link
-                    to={subItem.path}
-                    className="px-4 py-2 text-gray-700 hover:bg-yellow-200 rounded-md flex gap-2 items-center"
-                  >
-                    <subItem.icon />
-                    {subItem.label}
-                    {subItem.submenu && (
-                      <IoChevronForward className="ml-auto" />
-                    )}
-                  </Link>
-                  {subItem.submenu && renderSubmenu(subItem.submenu, subIndex)}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+            {/* Top level */}
+            {item.path ? (
+              <Link
+                to={item.path}
+                className="text-gray-100 flex items-center gap-2 hover:text-yellow-400 px-2 py-1 rounded-md"
+              >
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className="text-gray-100 flex items-center gap-2 hover:text-yellow-400 px-2 py-1 rounded-md"
+                aria-haspopup={hasSub ? "menu" : undefined}
+                aria-expanded={hasSub ? open : undefined}
+              >
+                <item.icon />
+                <span>{item.label}</span>
+                {hasSub && (
+                  <IoChevronDown
+                    className={`ml-1 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+                  />
+                )}
+              </button>
+            )}
+
+            {/* First dropdown */}
+            {hasSub && (
+              <div
+                className={`absolute left-0 top-full mt-2 min-w-[230px] rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2
+                  transition-all duration-150 ${
+                    open
+                      ? "opacity-100 translate-y-0 visible"
+                      : "opacity-0 -translate-y-1 invisible"
+                  }`}
+              >
+                {item.submenu.map((subItem, subIndex) => {
+                  const hasNested = !!subItem.submenu;
+                  return (
+                    <div
+                      key={subIndex}
+                      className="relative"
+                      onMouseEnter={() => setHoveredSubItem(subIndex)}
+                      onMouseLeave={() => setHoveredSubItem(null)}
+                    >
+                      <Link
+                        to={subItem.path || "#"}
+                        onClick={(e) => {
+                          if (!subItem.path) e.preventDefault();
+                        }}
+                        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-slate-700
+                                   hover:bg-slate-50 hover:text-slate-900"
+                      >
+                        <subItem.icon className="text-slate-500" />
+                        <span className="truncate">{subItem.label}</span>
+                        {hasNested && (
+                          <IoChevronForward className="ml-auto text-slate-400" />
+                        )}
+                      </Link>
+
+                      {hasNested && renderSubmenu(subItem.submenu, subIndex)}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

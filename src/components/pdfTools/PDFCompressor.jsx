@@ -1,7 +1,7 @@
 // src/components/pdfTools/PDFCompressor.jsx
 import { useEffect, useRef, useState } from "react";
 import { PDFDocument } from "pdf-lib";
-import { pdfjsLib } from "./pdfjsSetup";
+import { pdfjsLib, ensurePdfJsWorker } from "./pdfjsSetup";
 import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFCompressor() {
@@ -98,6 +98,7 @@ export default function PDFCompressor() {
 
   // One full compression pass with given params
   const compressOnce = async ({ dpi, quality, grayscale }, onPage) => {
+    ensurePdfJsWorker();
     const loadingTask = pdfjsLib.getDocument({ data: file.bytes.slice(0) });
     const pdf = await loadingTask.promise;
     const out = await PDFDocument.create();
@@ -126,7 +127,7 @@ export default function PDFCompressor() {
 
       const dataUrl = canvas.toDataURL(
         "image/jpeg",
-        Math.min(0.95, Math.max(0.35, quality))
+        Math.min(0.95, Math.max(0.35, quality)),
       );
       const jpgBytes = dataURLToUint8(dataUrl);
       const jpg = await out.embedJpg(jpgBytes);
@@ -165,7 +166,7 @@ export default function PDFCompressor() {
       const baseName = (file.file.name || "document").replace(/\.pdf$/i, "");
       const bytes = await compressOnce(
         { dpi, quality, grayscale },
-        (i, total) => setProgress(Math.round((i / total) * 100))
+        (i, total) => setProgress(Math.round((i / total) * 100)),
       );
 
       const blob = new Blob([bytes], { type: "application/pdf" });
@@ -177,7 +178,7 @@ export default function PDFCompressor() {
       } else {
         console.error(err);
         setError(
-          "Compression failed. Try a lighter preset or lower DPI/quality."
+          "Compression failed. Try a lighter preset or lower DPI/quality.",
         );
       }
     } finally {
@@ -198,7 +199,7 @@ export default function PDFCompressor() {
     // Try a small quality ladder (fewer re-renders; simple & robust)
     // Start from current quality, then go down.
     const ladder = Array.from(
-      new Set([Number(quality), 0.6, 0.55, 0.5, 0.45, 0.4])
+      new Set([Number(quality), 0.6, 0.55, 0.5, 0.45, 0.4]),
     )
       .filter((q) => q > 0.3 && q <= 0.95)
       .sort((a, b) => b - a);
@@ -221,7 +222,7 @@ export default function PDFCompressor() {
             const pct =
               Math.round((i / total) * (spanEnd - spanStart)) + spanStart;
             setProgress(Math.min(99, pct));
-          }
+          },
         );
 
         if (bytes.byteLength <= targetBytes) {

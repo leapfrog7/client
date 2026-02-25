@@ -7,7 +7,8 @@ import { PDFDocument, degrees } from "pdf-lib";
 //   "pdfjs-dist/build/pdf.worker.min.mjs",
 //   import.meta.url
 // ).toString();
-import { pdfjsLib } from "./pdfjsSetup";
+// import { pdfjsLib } from "./pdfjsSetup";
+import { pdfjsLib, ensurePdfJsWorker } from "./pdfjsSetup";
 import useFileDrop from "../../assets/useFileDrop";
 
 export default function PDFRotator() {
@@ -41,7 +42,7 @@ export default function PDFRotator() {
       setFile({ file: selected, bytes });
       setTotalPages(count);
       setRotations(Array.from({ length: count }, () => 0));
-
+      ensurePdfJsWorker();
       // PDF.js thumbnails (use a COPY to avoid detachment)
       const loadingTask = pdfjsLib.getDocument({ data: bytes.slice(0) });
       const doc = await loadingTask.promise;
@@ -333,8 +334,8 @@ export default function PDFRotator() {
           {isApplying
             ? "Applying rotation…"
             : file
-            ? "Preview shows the final orientation. Click ‘Apply Rotation’ to download."
-            : "Choose a PDF to begin."}
+              ? "Preview shows the final orientation. Click ‘Apply Rotation’ to download."
+              : "Choose a PDF to begin."}
         </div>
 
         <button
