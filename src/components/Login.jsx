@@ -2,7 +2,7 @@ import Input from "./Input";
 import Label from "./Label";
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import Loading from "./Loading";
 import { Helmet } from "react-helmet";
@@ -16,6 +16,9 @@ Login.propTypes = {
 
 export default function Login({ verifyToken }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const returnUrl = params.get("returnUrl") || "/";
 
   const [userInput, setUserInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
@@ -42,7 +45,7 @@ export default function Login({ verifyToken }) {
 
       localStorage.setItem("jwtToken", response.data.token);
       verifyToken?.();
-      navigate("/", { replace: true });
+      navigate(returnUrl, { replace: true });
       // Clear only on success
       setUserInput("");
       setPasswordInput("");

@@ -110,7 +110,7 @@ export const navItems = [
       },
       {
         label: "Conduct Rules",
-        path: "pages/quiz/paper-ii/conduct-rules",
+        path: "/pages/quiz/paper-ii/conduct-rules",
         icon: MdOutlineHandshake,
       },
       { label: "GFR", path: "/pages/quiz/paper-ii/gfr", icon: GiPayMoney },
@@ -121,12 +121,12 @@ export const navItems = [
       },
       {
         label: "TA Rules",
-        path: "pages/quiz/paper-ii/ta-rules",
+        path: "/pages/quiz/paper-ii/ta_rules",
         icon: MdModeOfTravel,
       },
       {
         label: "NPS Rules",
-        path: "pages/quiz/paper-ii/nps-rules",
+        path: "/pages/quiz/paper-ii/nps-rules",
         icon: TbPigMoney,
       },
     ],

@@ -9,6 +9,7 @@ import { useCallback } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InstallAppButton from "./components/InstallAppButton";
+import AuthExpiryHandler from "./components/AuthExpiryHandler";
 
 // import { HelmetProvider } from "react-helmet-async";
 
@@ -222,7 +223,7 @@ const App = () => {
         if (decodedToken.exp < currentTime) {
           // Token is expired
           console.log("Token expired");
-          localStorage.removeItem("token");
+          localStorage.removeItem("jwtToken");
           setIsLoggedIn(false);
         } else {
           setIsLoggedIn(true);
@@ -330,6 +331,7 @@ const App = () => {
         </div>
         {/* Share Popup */}
         {/* <SharePopup /> */}
+        <AuthExpiryHandler />
         <div className="flex-grow min-h-screen">
           <Routes>
             {/* Admin Routes */}
@@ -364,7 +366,7 @@ const App = () => {
             />
             <Route path="/pages/Unauthorized" element={<Unauthorized />} />
             <Route path="/pages/NotLoggedIn" element={<NotLoggedIn />} />
-            <Route path="/pages/TokenExpired" element={<TokenExpired />} />
+            <Route path="/pages/token-expired" element={<TokenExpired />} />
             <Route path="/pages/aobr/complete" element={<AoBR_Full />} />
             <Route path="/pages/aobr/lookup" element={<AoBR_Lookup />} />
 

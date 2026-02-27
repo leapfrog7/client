@@ -37,9 +37,12 @@ const Exam = () => {
     const fetchPapers = async () => {
       try {
         const userId = getUserIdFromToken();
-        const response = await axiosInstance.get("/available-papers", {
-          params: { userId },
-        });
+        const response = await axiosInstance.get(
+          "/prevYearQuiz/available-papers",
+          {
+            params: { userId },
+          },
+        );
         setPapers(response.data);
       } catch (error) {
         console.error("Error fetching papers:", error);
@@ -54,9 +57,12 @@ const Exam = () => {
     try {
       const userId = getUserIdFromToken();
       if (userId) {
-        const { data } = await axiosInstance.get("/available-papers", {
-          params: { userId },
-        });
+        const { data } = await axiosInstance.get(
+          "/prevYearQuiz/available-papers",
+          {
+            params: { userId },
+          },
+        );
         setPapers(data);
       }
     } catch (e) {
@@ -82,7 +88,7 @@ const Exam = () => {
 
   // Filter papers to include only selected years - database can have more but show less
   const filteredPapers = papers.filter((paper) =>
-    yearsToShow.includes(paper.year)
+    yearsToShow.includes(paper.year),
   );
 
   useEffect(() => {
@@ -114,7 +120,7 @@ const Exam = () => {
       ...currentPaper,
       currentQuestionIndex: Math.min(
         currentPaper.currentQuestionIndex + 1,
-        questions.length - 1
+        questions.length - 1,
       ),
     });
   };
@@ -130,7 +136,7 @@ const Exam = () => {
     try {
       // 1) Fetch the paper
       const { data: paper } = await axiosInstance.get(
-        `/prev-year-papers/${year}/${paperType}`
+        `/prevYearQuiz/prev-year-papers/${year}/${paperType}`,
       );
 
       // 2) Reset lightweight flags & load questions
@@ -144,12 +150,12 @@ const Exam = () => {
         // 3) RESUME: fetch saved session and rebuild answers map
         const userId = getUserIdFromToken();
         const { data: session } = await axiosInstance.get(
-          `/exam-sessions/${userId}/${paper._id}`
+          `/prevYearQuiz/exam-sessions/${userId}/${paper._id}`,
         );
 
         const savedRemainingTime = Math.max(
           Number(session.remainingTime || 0),
-          0
+          0,
         );
 
         const restoredAnswers = (session.responses || []).reduce(
@@ -158,7 +164,7 @@ const Exam = () => {
             if (idx >= 0) acc[idx] = userAnswer;
             return acc;
           },
-          {}
+          {},
         );
 
         setRemainingTime(savedRemainingTime);
@@ -222,10 +228,10 @@ const Exam = () => {
       // UPSC-style scoring: +1.25 correct, −1/3 incorrect, 0 for unanswered
       const score = responses.reduce(
         (s, r) => s + (r.isCorrect ? 1.25 : -1 / 3),
-        0
+        0,
       );
 
-      await axiosInstance.post("/exam-sessions", {
+      await axiosInstance.post("/prevYearQuiz/exam-sessions", {
         userId,
         paperId,
         startTime: new Date(),
@@ -236,14 +242,17 @@ const Exam = () => {
 
       // Optimistic update so the row shows "Resume" immediately
       setPapers((prev) =>
-        prev.map((p) => (p._id === paperId ? { ...p, session: true } : p))
+        prev.map((p) => (p._id === paperId ? { ...p, session: true } : p)),
       );
 
       // Soft refresh the papers list from server (keeps SPA feel, no full reload)
       try {
-        const refreshed = await axiosInstance.get("/available-papers", {
-          params: { userId },
-        });
+        const refreshed = await axiosInstance.get(
+          "/prevYearQuiz/available-papers",
+          {
+            params: { userId },
+          },
+        );
         setPapers(refreshed.data);
       } catch (e) {
         // Non-fatal; optimistic state is already applied
@@ -272,7 +281,7 @@ const Exam = () => {
         return q ? [{ questionId: q._id, userAnswer }] : [];
       });
 
-      const response = await axiosInstance.post("/submitQuiz", {
+      const response = await axiosInstance.post("/prevYearQuiz/submitQuiz", {
         userId,
         paperId,
         responses,
@@ -288,8 +297,8 @@ const Exam = () => {
       // Update the papers state to reflect the quiz is completed
       setPapers((prevPapers) =>
         prevPapers.map((paper) =>
-          paper._id === paperId ? { ...paper, session: "completed" } : paper
-        )
+          paper._id === paperId ? { ...paper, session: "completed" } : paper,
+        ),
       );
       setIsCompleted(true); // Mark the quiz as completed
     } catch (error) {
@@ -320,7 +329,7 @@ const Exam = () => {
     try {
       const userId = getUserIdFromToken();
       await axiosInstance.post(
-        `/exam-sessions/${userId}/${paperId}/reset-timer`
+        `/prevYearQuiz/exam-sessions/${userId}/${paperId}/reset-timer`,
       );
 
       // Reset the paper's session status to start a new quiz
@@ -328,8 +337,8 @@ const Exam = () => {
         prevPapers.map((paper) =>
           paper._id === paperId
             ? { ...paper, session: null, remainingTime: 2 * 60 * 60 }
-            : paper
-        )
+            : paper,
+        ),
       );
 
       console.log("Timer reset successfully");
@@ -456,9 +465,9 @@ const Exam = () => {
                         {paper.remainingTime !== null &&
                         paper.remainingTime !== undefined
                           ? `${Math.floor(
-                              paper.remainingTime / 3600
+                              paper.remainingTime / 3600,
                             )}h ${Math.floor(
-                              (paper.remainingTime % 3600) / 60
+                              (paper.remainingTime % 3600) / 60,
                             )}m`
                           : "N/A"}
                         <button
@@ -643,8 +652,8 @@ const Exam = () => {
                             answers[index]
                               ? "bg-yellow-400 text-yellow-800" // Color for attempted questions
                               : index === currentPaper.currentQuestionIndex
-                              ? "bg-blue-200"
-                              : "bg-white"
+                                ? "bg-blue-200"
+                                : "bg-white"
                           } hover:bg-blue-50`}
                           onClick={() => handleQuestionSelect(index)}
                         >
