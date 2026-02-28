@@ -1556,18 +1556,15 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                 </button>
               </div>
             )}
-
             <AIExplanationModal
               open={aiModal.open}
               onClose={() => setAiModal((p) => ({ ...p, open: false }))}
               title={aiModal.title}
-              content={
-                aiModal.loading
-                  ? "⏳ Generating explanation..."
-                  : aiModal.error
-                    ? `❌ ${aiModal.error}`
-                    : aiModal.content
-              }
+              loading={aiModal.loading}
+              error={aiModal.error}
+              content={aiModal.content}
+              question={currentQuestion}
+              userAnswer={userAnswer}
             />
 
             {/* Inline feedback */}
