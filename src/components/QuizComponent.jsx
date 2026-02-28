@@ -474,6 +474,7 @@ import { IoReload } from "react-icons/io5";
 import { MdPreview } from "react-icons/md";
 import { TailSpin } from "react-loader-spinner";
 import QuestionFeedback from "./QuestionFeedback";
+import AIExplanationModal from "./AIExplanationModal";
 
 // ✅ Drop-in: single-file component with client-only upgrades (no backend changes)
 
@@ -488,7 +489,7 @@ const uuid = () =>
     (
       c ^
       (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-    ).toString(16)
+    ).toString(16),
   );
 
 // Local storage helpers
@@ -607,6 +608,57 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const SWIPE_ANGLE = 30; // max degrees off horizontal
   const SWIPE_COOLDOWN = 350; // ms
 
+  // const [aiExplain, setAiExplain] = useState({});
+  // structure: { [questionId]: { open, loading, text, error } }
+  const [aiModal, setAiModal] = useState({
+    open: false,
+    title: "",
+    content: "",
+    loading: false,
+    error: "",
+  });
+
+  const fetchAIExplanation = async (questionId) => {
+    setAiModal({
+      open: true,
+      title: "Generating explanation...",
+      content: "",
+      loading: true,
+      error: "",
+    });
+
+    try {
+      const { data } = await axios.get(
+        `${BASE_URL}/ai/question/${questionId}`,
+        {
+          headers: { Authorization: `Bearer ${TOKEN()}` },
+        },
+      );
+
+      if (data?.source === "pending") {
+        // keep modal open, show spinner text, retry
+        setTimeout(() => fetchAIExplanation(questionId), 1200);
+        return;
+      }
+
+      setAiModal({
+        open: true,
+        title: "AI Explanation (verify with sources)",
+        content: data?.text || "",
+        loading: false,
+        error: "",
+      });
+    } catch (e) {
+      setAiModal({
+        open: true,
+        title: "AI Explanation",
+        content: "",
+        loading: false,
+        error: "Could not load AI explanation.",
+      });
+    }
+  };
+
   const onTouchStart = (e) => {
     const t = e.touches?.[0];
     if (!t) return;
@@ -659,7 +711,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       setTimeout(() => {
         // update index mid-way
         setCurrentQuestionIndex((i) =>
-          Math.min(Math.max(i + dir, 0), quizData.length - 1)
+          Math.min(Math.max(i + dir, 0), quizData.length - 1),
         );
 
         // 2) enter from opposite side
@@ -672,7 +724,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         });
       }, SLIDE_MS);
     },
-    [currentQuestionIndex, quizData.length]
+    [currentQuestionIndex, quizData.length],
   );
 
   const animateJumpTo = useCallback(
@@ -690,7 +742,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         requestAnimationFrame(() => setAnimState("idle"));
       }, SLIDE_MS);
     },
-    [currentQuestionIndex]
+    [currentQuestionIndex],
   );
 
   // auto-scroll current into view on small screens
@@ -779,7 +831,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       setError(
         err?.response?.status === 401 || err?.response?.status === 403
           ? "Session expired. Please sign in again."
-          : "Failed to fetch questions"
+          : "Failed to fetch questions",
       );
     } finally {
       // Only the latest fetch should change the loading flag
@@ -796,11 +848,11 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         headers: { Authorization: `Bearer ${TOKEN()}` },
       });
       const topicBookmark = response.data?.bookmarks?.find(
-        (bookmark) => bookmark.topic?._id === topicId
+        (bookmark) => bookmark.topic?._id === topicId,
       );
       if (topicBookmark) {
         setBookmarkedQuestions(
-          topicBookmark.questions.map((q) => String(q._id))
+          topicBookmark.questions.map((q) => String(q._id)),
         );
       } else {
         setBookmarkedQuestions([]);
@@ -831,7 +883,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   // Derived
   const currentQuestion = useMemo(
     () => quizData[currentQuestionIndex],
-    [quizData, currentQuestionIndex]
+    [quizData, currentQuestionIndex],
   );
 
   // Handlers
@@ -842,7 +894,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         [currentQuestionIndex]: option,
       }));
     },
-    [currentQuestionIndex]
+    [currentQuestionIndex],
   );
 
   const clearSelection = useCallback(() => {
@@ -866,12 +918,12 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         } else {
           // direct set if passed an absolute index
           setCurrentQuestionIndex(() =>
-            Math.max(0, Math.min(directionOrIndex, quizData.length - 1))
+            Math.max(0, Math.min(directionOrIndex, quizData.length - 1)),
           );
         }
       }
     },
-    [quizData.length]
+    [quizData.length],
   );
 
   const toggleFlag = useCallback(() => {
@@ -903,7 +955,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
         await axios.post(
           `${BASE_URL}/quiz/addBookmark`,
           { userId, topicName, questionId: qId },
-          { headers: { Authorization: `Bearer ${TOKEN()}` } }
+          { headers: { Authorization: `Bearer ${TOKEN()}` } },
         );
       } else {
         await axios.delete(`${BASE_URL}/quiz/removeBookmark`, {
@@ -979,7 +1031,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
             timeTakenSec: undefined, // plug in if you track
             submissionId,
           },
-          { headers: { Authorization: `Bearer ${TOKEN()}` } }
+          { headers: { Authorization: `Bearer ${TOKEN()}` } },
         )
         .then(({ data }) => {
           // trust server for authoritative scoring + comparison
@@ -1077,17 +1129,17 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
   const filteredResultsIndexes = !isSubmitted
     ? []
     : filterView === "all"
-    ? quizData.map((_, i) => i)
-    : filterView === "wrong"
-    ? quizData.reduce((acc, q, i) => {
-        if (selectedAnswers[i] !== q.correctAnswer) acc.push(i);
-        return acc;
-      }, [])
-    : /* flagged */
-      quizData.reduce((acc, q, i) => {
-        if (flagged.has(String(q._id))) acc.push(i);
-        return acc;
-      }, []);
+      ? quizData.map((_, i) => i)
+      : filterView === "wrong"
+        ? quizData.reduce((acc, q, i) => {
+            if (selectedAnswers[i] !== q.correctAnswer) acc.push(i);
+            return acc;
+          }, [])
+        : /* flagged */
+          quizData.reduce((acc, q, i) => {
+            if (flagged.has(String(q._id))) acc.push(i);
+            return acc;
+          }, []);
 
   // ---- Render states
   if (loading) {
@@ -1378,13 +1430,13 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                       const bg = isCurrent
                         ? "bg-blue-600 text-white border-blue-600 shadow-lg scale-105"
                         : answered
-                        ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-                        : "bg-white text-gray-800 border-gray-300";
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                          : "bg-white text-gray-800 border-gray-300";
                       const ring = bookmarked
                         ? "ring-2 ring-yellow-400"
                         : flg
-                        ? "ring-2 ring-pink-400"
-                        : "";
+                          ? "ring-2 ring-pink-400"
+                          : "";
                       const hover = isCurrent
                         ? ""
                         : "hover:-translate-y-0.5 hover:shadow";
@@ -1415,7 +1467,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                       width: `${Math.round(
                         (Object.keys(selectedAnswers).length /
                           Math.max(quizData.length, 1)) *
-                          100
+                          100,
                       )}%`,
                     }}
                   />
@@ -1448,13 +1500,34 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
               {showExplanation[currentQuestionIndex] && (
                 <div className="mt-4 text-gray-700 text-sm md:text-base space-y-3">
-                  <div className="flex items-center gap-2 bg-green-50 border-l-4 border-green-500 rounded-md px-3 py-2 shadow-sm">
-                    <span className="font-semibold text-green-800">
-                      Answer: <br />
-                      <span className="text-green-700 font-bold px-1 py-1 rounded-md shadow-sm">
-                        {currentQuestion.correctAnswer}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 px-4 py-3 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-0.5 inline-flex h-7 w-7 items-center justify-center  text-emerald-700 ">
+                        ✓
                       </span>
-                    </span>
+
+                      <div className="leading-tight">
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* <span className="inline-flex items-center px-2 py-1 text-[11px] font-semibold text-emerald-800 ">
+                            Answer
+                          </span> */}
+
+                          <span className="inline-flex items-center rounded-lg bg-white px-2.5 py-1 text-sm font-bold text-emerald-800 ring-1 ring-emerald-200 shadow-sm">
+                            {currentQuestion.correctAnswer}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => fetchAIExplanation(currentQuestion._id)}
+                      className="group inline-flex items-center justify-center gap-1.5 rounded-full bg-amber-200 border border-white px-3 py-2 text-xs font-semibold text-emerald-900 shadow-sm backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5  hover:shadow-md active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-emerald-400 max-w-48 text-center"
+                    >
+                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full ">
+                        ✦
+                      </span>
+                      Get AI Insight
+                    </button>
                   </div>
 
                   <div className="bg-blue-50 border-l-4 border-blue-400 rounded-md px-3 py-2 shadow-sm">
@@ -1484,6 +1557,19 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               </div>
             )}
 
+            <AIExplanationModal
+              open={aiModal.open}
+              onClose={() => setAiModal((p) => ({ ...p, open: false }))}
+              title={aiModal.title}
+              content={
+                aiModal.loading
+                  ? "⏳ Generating explanation..."
+                  : aiModal.error
+                    ? `❌ ${aiModal.error}`
+                    : aiModal.content
+              }
+            />
+
             {/* Inline feedback */}
             <div className="mt-2">
               <QuestionFeedback questionId={currentQuestion._id} />
@@ -1500,8 +1586,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
               finalScore >= quizData.length * 0.7
                 ? "bg-green-100 text-green-700"
                 : finalScore >= quizData.length * 0.4
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-red-100 text-red-700"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700"
             }`}
           >
             🎯 Your Score: {finalScore} / {quizData.length}
@@ -1567,10 +1653,10 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                   serverComparison?.avgBefore == null
                     ? "bg-gray-50 border-gray-200"
                     : serverComparison?.deltaFromAvgBefore > 0
-                    ? "bg-green-50 border-green-200"
-                    : serverComparison?.deltaFromAvgBefore < 0
-                    ? "bg-rose-50 border-rose-200"
-                    : "bg-gray-50 border-gray-200"
+                      ? "bg-green-50 border-green-200"
+                      : serverComparison?.deltaFromAvgBefore < 0
+                        ? "bg-rose-50 border-rose-200"
+                        : "bg-gray-50 border-gray-200"
                 }`}
                 title="How this attempt compares to your previous average"
                 aria-label="Change versus average"
@@ -1587,10 +1673,10 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                       {serverComparison.deltaFromAvgBefore > 0
                         ? "▲"
                         : serverComparison.deltaFromAvgBefore < 0
-                        ? "▼"
-                        : "—"}{" "}
+                          ? "▼"
+                          : "—"}{" "}
                       {Math.abs(
-                        Number(serverComparison.deltaFromAvgBefore || 0)
+                        Number(serverComparison.deltaFromAvgBefore || 0),
                       ).toFixed(1)}
                       %
                     </>
@@ -1602,8 +1688,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                     {serverComparison.deltaFromAvgBefore > 0
                       ? "Up from your average"
                       : serverComparison.deltaFromAvgBefore < 0
-                      ? "Down from your average"
-                      : "Same as your average"}
+                        ? "Down from your average"
+                        : "Same as your average"}
                   </div>
                 )}
               </div>

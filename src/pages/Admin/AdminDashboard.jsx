@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import Unauthorized from "../Unauthorized";
 // Icons
 import {
   FaUsers,
@@ -153,16 +154,7 @@ const AdminDashboard = () => {
   }, []);
 
   if (!isAdmin) {
-    return (
-      <div className="p-8 mx-auto flex flex-col text-center gap-4">
-        <span className="text-3xl bg-red-100 text-red-800 py-6 px-4 rounded-lg">
-          Unauthorized Access
-        </span>
-        <Link to="/" className="text-blue-600 text-xl underline">
-          Go Home
-        </Link>
-      </div>
-    );
+    return <Unauthorized />;
   }
 
   const isAtAdminRoot = /\/admin\/?$/.test(location.pathname);
