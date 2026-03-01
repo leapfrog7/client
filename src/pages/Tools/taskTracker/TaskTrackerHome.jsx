@@ -265,8 +265,8 @@ export default function TaskTrackerHome() {
 
     try {
       await deleteTask(taskId);
-      const t = await getTasks();
-      setTasks(t);
+      const t = await getTasks({ archived: showArchived });
+      setTasks(Array.isArray(t) ? t : []);
 
       if (selectedTaskId === taskId) setSelectedTaskId(t[0]?.id || null);
       if (expandedTaskId === taskId) setExpandedTaskId(null);
@@ -484,7 +484,12 @@ export default function TaskTrackerHome() {
         <>
           <div className="flex-1 min-h-0 overflow-hidden">
             {/* Desktop */}
-            <div className="hidden lg:grid h-full min-h-0 grid-cols-[380px_minmax(0,1fr)] overflow-hidden">
+            <div
+              className="hidden lg:grid h-full min-h-0
+  grid-cols-[minmax(420px,520px)_minmax(0,1fr)]
+  2xl:grid-cols-[minmax(460px,620px)_minmax(0,1fr)]
+"
+            >
               <div className="h-full min-h-0 overflow-hidden">
                 <TaskList
                   tasks={visibleTasks}
