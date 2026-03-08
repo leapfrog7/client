@@ -265,8 +265,8 @@ const Dashboard = ({ userStats, userId, onStatsUpdate }) => {
   };
 
   return (
-    <div className="bg-white flex flex-col p-4 mt-2 text-gray-700 md:rounded-md">
-      <DashboardHeader />
+    <div className="bg-white flex flex-col p-0 mt-2 text-gray-700 md:rounded-md">
+      <DashboardHeader userId={userId} />
 
       {!hasAnyTopics && (
         <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-center text-sm text-slate-600 shadow-sm">

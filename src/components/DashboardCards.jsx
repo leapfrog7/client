@@ -343,7 +343,7 @@ const DashboardCard = ({
   const avgWidth = avgValue == null ? "0%" : `${avgValue}%`;
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+    <div className="bg-white p-2 rounded-lg shadow-md flex flex-col items-center">
       <h3 className="text-base md:text-lg font-semibold mb-4 text-center text-gray-600">
         {title}
       </h3>
