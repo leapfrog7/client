@@ -1,32 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import { PiSignInLight } from "react-icons/pi";
 
-import PropTypes from "prop-types";
-
 const SignInButton = () => {
-  //console.log("inside SignIn");
   const navigate = useNavigate();
-  //When User Clicks on Sign Out button
-  const handleSignIn = () => {
-    //console.log("inside SignIn");
-    navigate("/login");
-
-    //verifyToken();
-  };
-
   return (
     <button
-      onClick={handleSignIn}
-      className={`bg-yellow-500 text-gray-900 px-4 text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-2 `}
+      onClick={() => navigate("/login")}
+      className="
+        inline-flex items-center justify-center gap-2
+        h-10 px-3 rounded-xl
+        border border-slate-200 bg-white text-slate-700
+        hover:bg-slate-50 transition
+        focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2
+      "
+      title="Sign in"
+      aria-label="Sign in"
     >
-      <span> Sign In</span>
-      <PiSignInLight className="text-yellow-700 text-xl" />
+      <PiSignInLight className="text-xl" />
+      <span className="hidden sm:inline text-sm font-semibold">Sign in</span>
     </button>
   );
-};
-SignInButton.propTypes = {
-  isSideBarOpen: PropTypes.bool,
-  toggleSideBar: PropTypes.func,
 };
 
 export default SignInButton;

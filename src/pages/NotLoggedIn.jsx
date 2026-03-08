@@ -12,7 +12,10 @@ import {
 
 const NotLoggedIn = () => {
   const location = useLocation();
-  const returnUrl = `${location.pathname}${location.search || ""}`;
+  const returnUrl =
+    location.state?.from ||
+    new URLSearchParams(location.search).get("returnUrl") ||
+    "/";
 
   const features = [
     {

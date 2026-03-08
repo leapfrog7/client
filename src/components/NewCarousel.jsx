@@ -64,7 +64,7 @@ const NewCarousel = () => {
   };
 
   return (
-    <div className="mt-4 relative w-full lg:w-11/12 mx-auto overflow-hidden rounded-lg">
+    <div className="mt-4 relative w-full  mx-auto overflow-hidden rounded-lg">
       <div
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}

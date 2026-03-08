@@ -49,13 +49,23 @@ AxiosInstance.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
 
-    if (status === 401 || status === 403) {
-      // Clear token so UI can react
+    if (status === 401) {
       localStorage.removeItem("jwtToken");
-
-      // Broadcast a global event (Step 2 will listen to this)
       window.dispatchEvent(
         new CustomEvent("auth:expired", {
+          detail: {
+            status,
+            url: error?.config?.url,
+            method: error?.config?.method,
+          },
+        }),
+      );
+    }
+
+    if (status === 403) {
+      // keep token (they are logged in), just not allowed
+      window.dispatchEvent(
+        new CustomEvent("auth:forbidden", {
           detail: {
             status,
             url: error?.config?.url,

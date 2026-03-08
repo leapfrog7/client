@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import Loading from "./Loading";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { IoIosPhonePortrait } from "react-icons/io";
 import { FaUserPlus, FaSignInAlt } from "react-icons/fa";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
@@ -18,8 +18,11 @@ export default function Login({ verifyToken }) {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const returnUrl = params.get("returnUrl") || "/";
-
+  const returnUrl =
+    params.get("returnUrl") ||
+    location.state?.from ||
+    "/" ||
+    "/pages/tools/task-tracker"; // or "/"
   const [userInput, setUserInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [msg, setMsg] = useState("");

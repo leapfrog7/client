@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import TaskList from "../../../components/taskTracker/TaskList";
 import TaskDetail from "../../../components/taskTracker/TaskDetail";
 import {
@@ -16,6 +17,7 @@ import {
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
 import DashboardStrip from "../../../components/taskTracker/DashboardStrip";
 import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccordion";
+import TaskTrackerTutorial from "../../../components/taskTracker/TaskTrackerTutorial";
 // import PageFeedback from "../../../components/PageFeedback";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
@@ -33,6 +35,9 @@ export default function TaskTrackerHome() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [toast, setToast] = useState(null); // { message, type }
   const [showArchived, setShowArchived] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Form (create/edit)
   const [formOpen, setFormOpen] = useState(false);
@@ -464,7 +469,9 @@ export default function TaskTrackerHome() {
             <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => (window.location.href = "/login")}
+                onClick={() =>
+                  navigate("/login", { state: { from: location.pathname } })
+                }
                 className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800"
               >
                 Go to Login Page
@@ -522,6 +529,18 @@ export default function TaskTrackerHome() {
                     onNotify={notify}
                   />
                 </div>
+                {/* <div>
+                  <button
+                    type="button"
+                    onClick={() => setTutorialOpen(true)}
+                    className="mx-auto flex w-1/3 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition
+             hover:bg-blue-700 hover:text-white hover:border-blue-700
+             focus:outline-none focus:ring-4 focus:ring-blue-200"
+                  >
+                    <span aria-hidden="true">📘</span>
+                    Learn how to use
+                  </button>
+                </div> */}
               </div>
             </div>
 
@@ -541,7 +560,7 @@ export default function TaskTrackerHome() {
                     setPage(1);
                   }}
                 />
-                <div className="mr-2 my-1 shrink-0 px-2 flex gap-3 bg-slate-50">
+                <div className="mr-2 my-1 shrink-0 px-2 flex gap-2 bg-slate-50">
                   <button
                     onClick={handleCreate}
                     className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
@@ -563,6 +582,16 @@ export default function TaskTrackerHome() {
                     }
                   >
                     {showArchived ? "Back to Active 📌" : "See Archive 📦"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTutorialOpen(true)}
+                    className="mx-auto   items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition
+             hover:bg-blue-700 hover:text-white hover:border-blue-700
+             focus:outline-none focus:ring-blue-200"
+                  >
+                    {/* <span aria-hidden="true">📘</span> */}
+                    📘
                   </button>
                 </div>
                 <div className="px-3 py-3">
@@ -647,7 +676,10 @@ export default function TaskTrackerHome() {
           </div>
         </>
       )}
-
+      <TaskTrackerTutorial
+        open={tutorialOpen}
+        onClose={() => setTutorialOpen(false)}
+      />
       {toast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999]">
           <div

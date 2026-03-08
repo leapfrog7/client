@@ -564,7 +564,7 @@ export default function TaskList({
   const [stageFilter, setStageFilter] = useState("ALL"); // ALL | CORE:<stage> | CUSTOM
   const [dueFilter, setDueFilter] = useState("ANY"); // ANY | HAS | NONE | DUE_SOON | OVERDUE
   const [updatedFilter, setUpdatedFilter] = useState("ANY"); // ANY | 7D | 30D
-  const [sortBy, setSortBy] = useState("UPDATED_DESC"); // UPDATED_DESC | CREATED_DESC | DUE_ASC | TITLE_ASC
+  const [sortBy, setSortBy] = useState("MANUAL"); // UPDATED_DESC | CREATED_DESC | DUE_ASC | TITLE_ASC
 
   // Auto compact for smaller laptops
   useEffect(() => {
@@ -644,25 +644,28 @@ export default function TaskList({
       list = list.filter((t) => withinDays(t.updatedAt, 30));
 
     // Sort
-    list.sort((a, b) => {
-      const au = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const bu = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      const ac = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bc = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      const ad = a.dueAt
-        ? new Date(a.dueAt).getTime()
-        : Number.POSITIVE_INFINITY;
-      const bd = b.dueAt
-        ? new Date(b.dueAt).getTime()
-        : Number.POSITIVE_INFINITY;
+    // AFTER: only sort when user chooses
+    if (sortBy !== "MANUAL") {
+      list.sort((a, b) => {
+        const au = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const bu = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        const ac = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bc = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        const ad = a.dueAt
+          ? new Date(a.dueAt).getTime()
+          : Number.POSITIVE_INFINITY;
+        const bd = b.dueAt
+          ? new Date(b.dueAt).getTime()
+          : Number.POSITIVE_INFINITY;
 
-      if (sortBy === "UPDATED_DESC") return bu - au;
-      if (sortBy === "CREATED_DESC") return bc - ac;
-      if (sortBy === "DUE_ASC") return ad - bd;
-      if (sortBy === "TITLE_ASC")
-        return (a.title || "").localeCompare(b.title || "");
-      return bu - au;
-    });
+        if (sortBy === "UPDATED_DESC") return bu - au;
+        if (sortBy === "CREATED_DESC") return bc - ac;
+        if (sortBy === "DUE_ASC") return ad - bd;
+        if (sortBy === "TITLE_ASC")
+          return (a.title || "").localeCompare(b.title || "");
+        return 0;
+      });
+    }
 
     return list;
   }, [tasks, q, stageFilter, dueFilter, updatedFilter, sortBy, coreStageSet]);
@@ -824,6 +827,7 @@ export default function TaskList({
                   onChange={(e) => setSortBy(e.target.value)}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs"
                 >
+                  <option value="MANUAL">Keep current order</option>
                   <option value="UPDATED_DESC">Recently updated</option>
                   <option value="CREATED_DESC">Recently created</option>
                   <option value="DUE_ASC">Due date (earliest)</option>

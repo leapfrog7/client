@@ -1,9 +1,14 @@
 import PropTypes from "prop-types";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDate } from "../utils/formatDate";
 import { PortableText } from "@portabletext/react";
-import { FaTimes, FaExternalLinkAlt } from "react-icons/fa";
+import {
+  FaTimes,
+  FaExternalLinkAlt,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 
 const typeLabel = (type) => {
   if (!type) return "Misc";
@@ -73,11 +78,39 @@ const portableComponents = {
   },
 };
 
-const AffairModal = ({ open, item, onClose }) => {
+const SWIPE_THRESHOLD = 70; // px
+const SWIPE_VELOCITY = 650;
+
+const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
   const isMobile = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 767px)").matches;
   }, []);
+
+  // direction: -1 (prev) | +1 (next) for slide animation
+  const [direction, setDirection] = useState(0);
+
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const currentIndex = useMemo(() => {
+    if (!item?._id) return -1;
+    return safeItems.findIndex((x) => x?._id === item._id);
+  }, [safeItems, item?._id]);
+
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < safeItems.length - 1;
+
+  const goPrev = useCallback(() => {
+    if (!hasPrev) return;
+    setDirection(-1);
+    onChangeItem?.(safeItems[currentIndex - 1]);
+  }, [hasPrev, onChangeItem, safeItems, currentIndex]);
+
+  const goNext = useCallback(() => {
+    if (!hasNext) return;
+    setDirection(1);
+    onChangeItem?.(safeItems[currentIndex + 1]);
+  }, [hasNext, onChangeItem, safeItems, currentIndex]);
 
   // Lock background scroll
   useEffect(() => {
@@ -89,20 +122,22 @@ const AffairModal = ({ open, item, onClose }) => {
     };
   }, [open]);
 
-  // ESC close
+  // ESC close + Arrow navigation
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [open, onClose, goPrev, goNext]);
 
   if (!item) return null;
 
-  const subtitle =
-    `${typeLabel(item.type)} • ${item.date ? formatDate(item.date) : ""}`.trim();
+  // const subtitle =
+  //   `${typeLabel(item.type)} • ${item.date ? formatDate(item.date) : ""}`.trim();
 
   // Motion variants
   const backdrop = {
@@ -132,6 +167,19 @@ const AffairModal = ({ open, item, onClose }) => {
     exit: { y: 10, scale: 0.98, opacity: 0, transition: { duration: 0.15 } },
   };
 
+  // Inner "page flip" animation for item changes
+  const pageVariants = {
+    enter: (dir) => ({
+      x: dir === 0 ? 0 : dir > 0 ? 40 : -40,
+      opacity: 0,
+    }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir) => ({
+      x: dir === 0 ? 0 : dir > 0 ? -40 : 40,
+      opacity: 0,
+    }),
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -156,7 +204,6 @@ const AffairModal = ({ open, item, onClose }) => {
               "relative w-full overflow-hidden bg-white shadow-2xl",
               "md:max-w-3xl md:rounded-2xl",
               "rounded-t-3xl md:rounded-2xl",
-              // ✅ Mobile: don't reach the very top (address bar / notch safe)
               "max-h-[calc(100dvh-72px-env(safe-area-inset-top))] md:max-h-none",
             ].join(" ")}
             variants={isMobile ? panelMobile : panelDesktop}
@@ -175,126 +222,250 @@ const AffairModal = ({ open, item, onClose }) => {
             </div>
 
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-slate-200 backdrop-blur border-b">
-              <div className="p-4 md:p-5 flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
-                        item.type,
-                      )}`}
+            <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur">
+              <div className="p-3 md:p-5">
+                {/* Mobile top row: close + counter + compact nav */}
+                <div className="md:hidden flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-gray-200 bg-white text-gray-700 active:scale-[0.98] transition"
+                    aria-label="Close"
+                    title="Close"
+                  >
+                    <FaTimes />
+                  </button>
+
+                  {currentIndex >= 0 && safeItems.length ? (
+                    <div className="px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-700">
+                      {currentIndex + 1}/{safeItems.length}
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={goPrev}
+                      disabled={!hasPrev}
+                      className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-gray-200 bg-white text-gray-700 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      aria-label="Previous"
+                      title="Previous"
                     >
-                      {typeLabel(item.type)}
-                    </span>
+                      <FaChevronLeft />
+                    </button>
 
-                    {item.date ? (
-                      <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">
-                        {formatDate(item.date)}
-                      </span>
-                    ) : null}
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      disabled={!hasNext}
+                      className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-gray-200 bg-white text-gray-700 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      aria-label="Next"
+                      title="Next"
+                    >
+                      <FaChevronRight />
+                    </button>
+                  </div>
+                </div>
 
-                    {item.priority ? (
-                      <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                        Priority: {item.priority}
+                {/* Desktop top row: chips left, actions right (your original style) */}
+                <div className="hidden md:flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
+                          item.type,
+                        )}`}
+                      >
+                        {typeLabel(item.type)}
                       </span>
-                    ) : null}
+
+                      {item.date ? (
+                        <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">
+                          {formatDate(item.date)}
+                        </span>
+                      ) : null}
+
+                      {item.priority ? (
+                        <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                          Priority: {item.priority}
+                        </span>
+                      ) : null}
+
+                      {currentIndex >= 0 && safeItems.length ? (
+                        <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
+                          {currentIndex + 1}/{safeItems.length}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
 
-                  <h2 className="mt-2 text-lg md:text-2xl font-extrabold text-gray-900 leading-snug break-words">
-                    {item.title}
-                  </h2>
+                  <div className="shrink-0 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={goPrev}
+                      disabled={!hasPrev}
+                      className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="Previous (←)"
+                    >
+                      Prev
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      disabled={!hasNext}
+                      className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="Next (→)"
+                    >
+                      Next
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition"
+                      title="Close (Esc)"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
 
-                  {subtitle ? (
-                    <p className="mt-1 text-xs md:text-sm text-gray-500">
-                      {/* kept for future */}
-                    </p>
+                {/* Title */}
+                <h2 className="mt-2 text-lg md:text-2xl font-extrabold text-gray-900 leading-snug break-words">
+                  {item.title}
+                </h2>
+
+                {/* Mobile chips (below title) */}
+                <div className="md:hidden mt-2 flex flex-wrap items-center gap-2">
+                  <span
+                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
+                      item.type,
+                    )}`}
+                  >
+                    {typeLabel(item.type)}
+                  </span>
+
+                  {item.date ? (
+                    <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">
+                      {formatDate(item.date)}
+                    </span>
+                  ) : null}
+
+                  {item.priority ? (
+                    <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                      Priority: {item.priority}
+                    </span>
                   ) : null}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition"
-                  aria-label="Close"
-                >
-                  <span className="hidden md:inline">Close</span>
-                  <span className="md:hidden inline-flex items-center justify-center">
-                    <FaTimes />
-                  </span>
-                </button>
+                {/* Tiny hint (optional) */}
+                <div className="md:hidden mt-2 text-center text-[11px] text-gray-500">
+                  Swipe left/right to navigate
+                </div>
               </div>
             </div>
 
-            {/* Body */}
+            {/* Body (with item-flip transition) */}
             <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(100dvh-220px-env(safe-area-inset-top))] md:max-h-[78vh]">
-              {/* Preferred content: Portable Text rich editor */}
-              {Array.isArray(item.content) && item.content.length > 0 ? (
-                <div className="prose prose-sm md:prose-base max-w-none">
-                  <PortableText
-                    value={item.content}
-                    components={portableComponents}
-                  />
-                </div>
-              ) : (
-                <>
-                  <h3 className="text-sm md:text-base font-bold text-gray-800 mb-2">
-                    Key Points
-                  </h3>
-                  <ul className="list-disc pl-5 text-sm md:text-base text-gray-800 space-y-1">
-                    {(item.keyPoints || []).map((p, idx) => (
-                      <li key={`${item._id || "item"}-kp-${idx}`}>{p}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={item._id}
+                  custom={direction}
+                  variants={pageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.18 }}
+                  // ✅ swipe left/right to move (content area only)
+                  drag={isMobile ? "x" : false}
+                  dragConstraints={isMobile ? { left: 0, right: 0 } : undefined}
+                  dragElastic={isMobile ? 0.12 : undefined}
+                  onDragEnd={(e, info) => {
+                    if (!isMobile) return;
+                    const swipe = info.offset.x;
+                    const v = info.velocity.x;
 
-              {/* Sources */}
-              {!!(item.sources || []).length && (
-                <>
-                  <h3 className="mt-6 text-xs md:text-base font-bold text-gray-500 mb-2">
-                    Sources
-                  </h3>
+                    // swipe left => next
+                    if (
+                      (swipe < -SWIPE_THRESHOLD || v < -SWIPE_VELOCITY) &&
+                      hasNext
+                    ) {
+                      goNext();
+                      return;
+                    }
+                    // swipe right => prev
+                    if (
+                      (swipe > SWIPE_THRESHOLD || v > SWIPE_VELOCITY) &&
+                      hasPrev
+                    ) {
+                      goPrev();
+                    }
+                  }}
+                >
+                  {/* Preferred content: Portable Text rich editor */}
+                  {Array.isArray(item.content) && item.content.length > 0 ? (
+                    <div className="prose prose-sm md:prose-base max-w-none">
+                      <PortableText
+                        value={item.content}
+                        components={portableComponents}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="text-sm md:text-base font-bold text-gray-800 mb-2">
+                        Key Points
+                      </h3>
+                      <ul className="list-disc pl-5 text-sm md:text-base text-gray-800 space-y-1">
+                        {(item.keyPoints || []).map((p, idx) => (
+                          <li key={`${item._id || "item"}-kp-${idx}`}>{p}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
 
-                  <div className="space-y-2 ">
-                    {item.sources.map((s, idx) => {
-                      const url = typeof s === "string" ? s : s?.url;
-                      // const label =
-                      //   typeof s === "string"
-                      //     ? `Source ${idx + 1}`
-                      //     : s?.label || `Source ${idx + 1}`;
+                  {/* Sources */}
+                  {!!(item.sources || []).length && (
+                    <>
+                      <h3 className="mt-6 text-xs md:text-base font-bold text-gray-500 mb-2">
+                        Sources
+                      </h3>
 
-                      if (!url) return null;
+                      <div className="space-y-2">
+                        {item.sources.map((s, idx) => {
+                          const url = typeof s === "string" ? s : s?.url;
+                          if (!url) return null;
 
-                      return (
-                        <a
-                          key={`${item._id || "item"}-src-${idx}`}
-                          href={url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="bg-blue-50 group block rounded-xl border border-blue-200 p-3 md:p-4 hover:bg-blue-100 transition"
-                          title={url}
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="min-w-0">
-                              {/* <div className="font-semibold text-gray-900 truncate">
-                                {label}
-                              </div> */}
-                              <div className="text-xs text-gray-500 truncate">
-                                {url}
+                          return (
+                            <a
+                              key={`${item._id || "item"}-src-${idx}`}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="bg-blue-50 group block rounded-xl border border-blue-200 p-3 md:p-4 hover:bg-blue-100 transition"
+                              title={url}
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="text-xs text-gray-500 truncate">
+                                    {url}
+                                  </div>
+                                </div>
+                                <FaExternalLinkAlt className="text-blue-300 group-hover:text-gray-600 shrink-0" />
                               </div>
-                            </div>
-                            <FaExternalLinkAlt className="text-blue-300 group-hover:text-gray-600 shrink-0" />
-                          </div>
-                        </a>
-                      );
-                    })}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Mobile hint */}
+                  <div className="md:hidden mt-6 text-center text-xs text-gray-500">
+                    Tip: swipe left/right for next/prev • swipe down to close
                   </div>
-                </>
-              )}
-              {/* Mobile hint */}
-              <div className="md:hidden mt-6 text-center text-xs text-gray-500">
-                Tip: swipe down to close
-              </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
@@ -306,6 +477,8 @@ const AffairModal = ({ open, item, onClose }) => {
 AffairModal.propTypes = {
   open: PropTypes.bool.isRequired,
   item: PropTypes.object,
+  items: PropTypes.array, // ✅ new
+  onChangeItem: PropTypes.func, // ✅ new
   onClose: PropTypes.func.isRequired,
 };
 

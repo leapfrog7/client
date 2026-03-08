@@ -1,87 +1,62 @@
-// import { useNavigate } from "react-router-dom";
-// import { PiSignOutLight } from "react-icons/pi";
-// import PropTypes from "prop-types";
-
-// const SignOutButton = ({ isLoggedIn, verifyToken }) => {
-//   //console.log("inside Signout");
-//   const navigate = useNavigate();
-//   //When User Clicks on Sign Out button
-//   const handleSignOut = () => {
-
-//     localStorage.removeItem("jwtToken");
-//     console.log(isLoggedIn);
-//     verifyToken();
-//     navigate("/");
-
-//   };
-
-//   return (
-//     <button
-//       onClick={handleSignOut}
-//       className="bg-yellow-500 text-gray-900 px-2 text-xs md:text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-1 mx-auto"
-//     >
-//       <span> Sign Out</span>
-//       <PiSignOutLight className="text-yellow-800 text-lg" />
-//     </button>
-//   );
-// };
-// SignOutButton.propTypes = {
-//   verifyToken: PropTypes.func,
-//   isLoggedIn: PropTypes.bool,
-// };
-
-// export default SignOutButton;
-// //
-
 import { useNavigate } from "react-router-dom";
 import { PiSignOutLight } from "react-icons/pi";
-import { jwtDecode } from "jwt-decode"; // 👈 Correct import
+import { jwtDecode } from "jwt-decode";
 import PropTypes from "prop-types";
 
 const SignOutButton = ({ verifyToken }) => {
   const navigate = useNavigate();
 
-  // Decode token to get userType
   let isAdmin = false;
   const token = localStorage.getItem("jwtToken");
   if (token) {
     try {
       const decoded = jwtDecode(token);
-      isAdmin = decoded.userType === "Admin";
+      isAdmin = String(decoded?.userType || "").toLowerCase() === "admin"; // ✅ FIX
     } catch (err) {
       console.error("Error decoding token:", err);
     }
   }
 
-  // Sign out handler
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
-    verifyToken();
-    navigate("/");
-  };
-
-  // Navigate to admin dashboard
-  const handleAdminClick = () => {
-    navigate("/adminDashboard");
+    verifyToken?.();
+    navigate("/", { replace: true });
   };
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex items-center gap-2">
       {isAdmin && (
         <button
-          onClick={handleAdminClick}
-          className="bg-black text-white px-2 text-xs md:text-sm py-2 rounded hover:bg-gray-600 flex items-center space-x-1 "
+          onClick={() => navigate("/adminDashboard")}
+          className="
+            inline-flex items-center justify-center
+            h-10 px-3 rounded-xl
+            border border-purple-200 bg-purple-50 text-purple-800
+            hover:bg-purple-100 transition
+            focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2
+          "
+          title="Admin dashboard"
+          aria-label="Admin dashboard"
         >
-          Admin 👨‍💼
+          <span className="text-sm font-semibold hidden sm:inline">Admin</span>
+          <span className="sm:hidden text-base">👨‍💼</span>
         </button>
       )}
 
       <button
         onClick={handleSignOut}
-        className="bg-yellow-500 text-gray-900 px-2 text-xs md:text-sm py-2 rounded hover:bg-yellow-400 flex items-center space-x-1"
+        className="
+          inline-flex items-center justify-center gap-2
+          h-10 px-3 rounded-xl
+          border border-slate-200 bg-white text-slate-700
+          hover:bg-slate-50 transition
+          focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2
+        "
+        title="Sign out"
+        aria-label="Sign out"
       >
-        <span>Sign Out</span>
-        <PiSignOutLight className="text-yellow-800 text-lg" />
+        <PiSignOutLight className="text-xl" />
+        <span className="hidden sm:inline text-sm font-semibold">Sign out</span>
       </button>
     </div>
   );
@@ -89,7 +64,6 @@ const SignOutButton = ({ verifyToken }) => {
 
 SignOutButton.propTypes = {
   verifyToken: PropTypes.func,
-  isLoggedIn: PropTypes.bool,
 };
 
 export default SignOutButton;

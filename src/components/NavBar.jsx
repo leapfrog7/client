@@ -17,7 +17,7 @@ export default function NavBar() {
 
     return (
       <div
-        className={`absolute left-full top-0 ml-2 min-w-[220px] rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2
+        className={`z-20 absolute left-full top-0 ml-2 min-w-[220px] rounded-xl bg-white shadow-xl ring-1 ring-black/5 p-2
           transition-all duration-150 ${
             open
               ? "opacity-100 translate-x-0 visible"

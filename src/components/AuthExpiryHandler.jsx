@@ -34,5 +34,29 @@ export default function AuthExpiryHandler() {
     return () => window.removeEventListener("auth:expired", handler);
   }, [location.pathname, location.search, navigate]);
 
+  useEffect(() => {
+    const onExpired = () => {
+      if (!isProtectedPath(location.pathname)) return;
+      const returnUrl = `${location.pathname}${location.search || ""}`;
+      navigate(
+        `/pages/token-expired?returnUrl=${encodeURIComponent(returnUrl)}`,
+        { replace: true },
+      );
+    };
+
+    const onForbidden = () => {
+      // only redirect if they're in protected/admin areas (your choice)
+      navigate("/pages/Unauthorized", { replace: true });
+    };
+
+    window.addEventListener("auth:expired", onExpired);
+    window.addEventListener("auth:forbidden", onForbidden);
+
+    return () => {
+      window.removeEventListener("auth:expired", onExpired);
+      window.removeEventListener("auth:forbidden", onForbidden);
+    };
+  }, [location.pathname, location.search, navigate]);
+
   return null;
 }
