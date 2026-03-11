@@ -1,196 +1,250 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-// import Pagination from "./Pagination";
 import { jwtDecode } from "jwt-decode";
 import { FaTrash, FaRedo, FaEdit, FaSearch } from "react-icons/fa";
 
+const USERS_PER_PAGE = 10;
+const MAX_PAGE_BUTTONS = 5;
+
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [filter, setFilter] = useState("all");
-  const [editingUser, setEditingUser] = useState(null);
-  const [newPassword] = useState("Undersigned@123");
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  const [showEmail, setShowEmail] = useState(false);
-  const [showMobile, setShowMobile] = useState(false);
-  const [showBatch, setShowBatch] = useState(false);
-  // ✅ Search Input State
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 10;
-
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/"; //This is the Server Base URL
+  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
   // const BASE_URL = "http://localhost:5000/api/v1/";
 
   const token = localStorage.getItem("jwtToken");
 
+  const authHeaders = useMemo(
+    () => ({
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    [token],
+  );
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
+
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState("all"); // all | paid | unpaid
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [showEmail, setShowEmail] = useState(false);
+  const [showMobile, setShowMobile] = useState(false);
+  const [showBatch, setShowBatch] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [editingUser, setEditingUser] = useState(null);
+
+  const DEFAULT_RESET_PASSWORD = "Undersigned@123";
+
+  // ---- Admin check ----
   useEffect(() => {
-    checkAdminStatus();
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}userManagement`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching users", error);
+    const t = localStorage.getItem("jwtToken");
+    if (!t) {
+      setIsAdmin(false);
+      return;
     }
-  };
-
-  const checkAdminStatus = () => {
-    const token = localStorage.getItem("jwtToken");
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      if (decodedToken.userType === "Admin") {
-        setIsAdmin(true);
-      } else {
-        setIsAdmin(false);
-      }
-    } else {
+    try {
+      const decoded = jwtDecode(t);
+      setIsAdmin(decoded?.userType === "Admin");
+    } catch {
       setIsAdmin(false);
     }
-  };
+  }, []);
 
-  // ✅ Function to Handle Search Input
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset pagination when searching
-  };
+  // ---- Fetch Users ----
+  useEffect(() => {
+    if (!isAdmin) return;
 
-  const handleFilterChange = (e) => {
-    setFilter(e.target.value);
-  };
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${BASE_URL}userManagement`,
+          authHeaders,
+        );
+        setUsers(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching users", error);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredUsers = users.filter((user) => {
-    if (
-      filter !== "all" &&
-      (filter === "paid" ? !user.paymentMade : user.paymentMade)
-    ) {
-      return false;
-    }
+    fetchUsers();
+  }, [isAdmin, BASE_URL, authHeaders]);
 
-    // ✅ Search by Name, Email, or Mobile
-    return (
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.mobile.includes(searchQuery)
-    );
-  });
+  // ---- Derived: filtered & searched ----
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
 
-  //For Pagination
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+    return (users || []).filter((user) => {
+      // Filter paid/unpaid
+      if (filter === "paid" && !user.paymentMade) return false;
+      if (filter === "unpaid" && user.paymentMade) return false;
 
-  // ✅ Number of Page Numbers to Show
-  const maxPageButtons = 3;
+      if (!q) return true;
 
-  // ✅ Function to Generate Page Range
+      const name = (user.name || "").toLowerCase();
+      const email = (user.email || "").toLowerCase();
+      const mobile = String(user.mobile || "");
+
+      return (
+        name.includes(q) ||
+        email.includes(q) ||
+        mobile.includes(searchQuery.trim()) // keep numeric search friendly
+      );
+    });
+  }, [users, filter, searchQuery]);
+
+  // ---- Pagination ----
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredUsers.length / USERS_PER_PAGE)),
+    [filteredUsers.length],
+  );
+
+  // Reset page on filter/search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, searchQuery]);
+
+  // Clamp page if list shrinks
+  useEffect(() => {
+    setCurrentPage((p) => Math.min(Math.max(1, p), totalPages));
+  }, [totalPages]);
+
+  const indexOfLastUser = currentPage * USERS_PER_PAGE;
+  const indexOfFirstUser = indexOfLastUser - USERS_PER_PAGE;
+  const currentUsers = useMemo(
+    () => filteredUsers.slice(indexOfFirstUser, indexOfLastUser),
+    [filteredUsers, indexOfFirstUser, indexOfLastUser],
+  );
+
   const getPageNumbers = () => {
-    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+    const half = Math.floor(MAX_PAGE_BUTTONS / 2);
+    let start = Math.max(1, currentPage - half);
+    let end = Math.min(totalPages, start + MAX_PAGE_BUTTONS - 1);
 
-    if (endPage - startPage + 1 < maxPageButtons) {
-      startPage = Math.max(1, endPage - maxPageButtons + 1);
+    if (end - start + 1 < MAX_PAGE_BUTTONS) {
+      start = Math.max(1, end - MAX_PAGE_BUTTONS + 1);
     }
 
-    return Array.from(
-      { length: endPage - startPage + 1 },
-      (_, i) => startPage + i
-    );
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   };
 
-  // ✅ Function to Navigate Pages
   const paginate = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
+    setCurrentPage((p) => {
+      const next = Math.min(Math.max(1, pageNumber), totalPages);
+      return next === p ? p : next;
+    });
   };
 
-  const handleEditUser = (user) => {
-    setEditingUser({ ...user });
-  };
+  // ---- Handlers ----
+  const handleEditUser = (user) => setEditingUser({ ...user });
 
-  const handleDeleteUser = async (userId) => {
-    try {
-      await axios.delete(`${BASE_URL}userManagement/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      fetchUsers();
-    } catch (error) {
-      console.error("Error deleting user", error);
-    }
+  const handleInputChange = (e) => {
+    setEditingUser((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleUpdateUser = async (user) => {
+    if (!user?._id) return;
+
+    setActionLoadingId(user._id);
     try {
-      await axios.patch(`${BASE_URL}userManagement/${user._id}`, user, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.patch(
+        `${BASE_URL}userManagement/${user._id}`,
+        user,
+        authHeaders,
+      );
+
+      // ✅ Update local state instead of refetching everything
+      setUsers((prev) =>
+        prev.map((u) => (u._id === user._id ? { ...u, ...user } : u)),
+      );
       setEditingUser(null);
-      fetchUsers();
     } catch (error) {
       console.error("Error updating user", error);
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
   const handleResetPassword = async (userId) => {
+    if (!userId) return;
+
+    setActionLoadingId(userId);
     try {
       await axios.patch(
         `${BASE_URL}userManagement/${userId}/reset-password`,
-        {
-          password: newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { password: DEFAULT_RESET_PASSWORD },
+        authHeaders,
       );
-      fetchUsers();
+      // no need to refetch users
     } catch (error) {
       console.error("Error resetting password", error);
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
   const handleChangePaymentStatus = async (user) => {
+    if (!user?._id) return;
+
     const newPaymentStatus = !user.paymentMade;
+
+    setActionLoadingId(user._id);
     try {
       await axios.patch(
         `${BASE_URL}userManagement/${user._id}`,
-        {
-          paymentMade: newPaymentStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { paymentMade: newPaymentStatus },
+        authHeaders,
       );
-      fetchUsers();
+
+      // ✅ Update local state for smooth UI
+      setUsers((prev) =>
+        prev.map((u) =>
+          u._id === user._id
+            ? {
+                ...u,
+                paymentMade: newPaymentStatus,
+                // keep date if server sets it; otherwise leave as-is
+                paymentMadeDate: newPaymentStatus
+                  ? u.paymentMadeDate || new Date().toISOString()
+                  : u.paymentMadeDate,
+              }
+            : u,
+        ),
+      );
     } catch (error) {
       console.error("Error changing payment status", error);
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
-  const handleInputChange = (e) => {
-    setEditingUser({ ...editingUser, [e.target.name]: e.target.value });
+  // Delete is currently disabled in your UI; kept here for future
+  const handleDeleteUser = async (userId) => {
+    if (!userId) return;
+
+    setActionLoadingId(userId);
+    try {
+      await axios.delete(`${BASE_URL}userManagement/${userId}`, authHeaders);
+      setUsers((prev) => prev.filter((u) => u._id !== userId));
+    } catch (error) {
+      console.error("Error deleting user", error);
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
-  //To throw Unauthorized Access information is user is Not Admin
+  // ---- Unauthorized ----
   if (!isAdmin) {
     return (
-      <div className="p-8 mx-auto flex flex-col text-center gap-4 ">
+      <div className="p-8 mx-auto flex flex-col text-center gap-4">
         <span className="text-3xl bg-red-100 text-red-800 py-6">
           Unauthorized Access
         </span>
@@ -201,85 +255,115 @@ const UserManagement = () => {
     );
   }
 
+  // ---- UI ----
   return (
-    <div>
-      <h2 className="text-lg md:text-xl font-bold mb-4 pl-4 text-center text-blue-700 tracking-wide">
+    <div className=" md:px-4">
+      <h2 className="text-lg md:text-xl font-bold mb-4 text-center text-blue-700 tracking-wide">
         User Management
       </h2>
-      <div className="mb-4 flex items-center justify-center gap-3 text-sm">
-        <div className="mb-2 flex flex-col items-center justify-center gap-2">
-          <label className="mr-0 font-semibold">Filter : </label>
-          <select
-            value={filter}
-            onChange={handleFilterChange}
-            className="p-1 border rounded"
-          >
-            <option value="all">All</option>
-            <option value="paid">Paid</option>
-            <option value="unpaid">Unpaid</option>
-          </select>
+
+      {/* Controls */}
+      <div className="mx-auto max-w-5xl rounded-2xl border bg-white p-3 md:p-4 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
+          {/* Search */}
+          <div className="w-full md:w-[360px]">
+            <label className="block text-xs font-semibold text-gray-600 mb-1">
+              Search
+            </label>
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-3 text-gray-500" />
+              <input
+                type="text"
+                placeholder="Name, email, mobile"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="text-sm w-full pl-10 pr-3 py-2 border rounded-xl shadow-sm focus:ring-2 focus:ring-blue-400 outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Filter */}
+          <div className="w-full md:w-[180px]">
+            <label className="block text-xs font-semibold text-gray-600 mb-1">
+              Filter
+            </label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="w-full p-2 border rounded-xl shadow-sm"
+            >
+              <option value="all">All</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
+
+          {/* Columns */}
+          <div className="w-full md:w-auto">
+            <label className="block text-xs font-semibold text-gray-600 mb-1">
+              Columns
+            </label>
+            <div className="flex flex-wrap gap-3 items-center">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={showEmail}
+                  onChange={() => setShowEmail((v) => !v)}
+                />
+                Email
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={showMobile}
+                  onChange={() => setShowMobile((v) => !v)}
+                />
+                Mobile
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={showBatch}
+                  onChange={() => setShowBatch((v) => !v)}
+                />
+                Batch
+              </label>
+            </div>
+          </div>
         </div>
-        <div className="mb-4 ml-3 gap-2 text-center flex flex-col md:flex-row">
-          <label className="mr-2 font-semibold">Show Columns: </label>
-          <div className="flex gap-2 items-center justify-center">
-            <label className="mr-2 text-xs md:text-sm lg:text-base">
-              <input
-                type="checkbox"
-                checked={showEmail}
-                onChange={() => setShowEmail(!showEmail)}
-              />{" "}
-              Email
-            </label>
-            <label className="mr-2 text-xs md:text-sm lg:text-base">
-              <input
-                type="checkbox"
-                checked={showMobile}
-                onChange={() => setShowMobile(!showMobile)}
-              />{" "}
-              Mobile
-            </label>
-            <label className="mr-2 text-xs md:text-sm lg:text-base">
-              <input
-                type="checkbox"
-                checked={showBatch}
-                onChange={() => setShowBatch(!showBatch)}
-              />{" "}
-              Batch
-            </label>
+
+        {/* Summary row */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-600">
+          <div>
+            Showing{" "}
+            <span className="font-semibold text-gray-800">
+              {filteredUsers.length}
+            </span>{" "}
+            users
+            {searchQuery.trim() ? (
+              <>
+                {" "}
+                • search:{" "}
+                <span className="font-semibold text-gray-800">
+                  “{searchQuery.trim()}”
+                </span>
+              </>
+            ) : null}
+          </div>
+
+          <div>
+            Page{" "}
+            <span className="font-semibold text-gray-800">{currentPage}</span>{" "}
+            of <span className="font-semibold text-gray-800">{totalPages}</span>
           </div>
         </div>
       </div>
 
-      {/* ✅ Search & Filter Section */}
-      <div className="flex flex-wrap items-center justify-center gap-4 my-4">
-        {/* Search Input */}
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search by name, email, or mobile"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="text-sm pl-10 pr-3 py-2 border rounded-lg shadow-sm w-64 focus:ring-2 focus:ring-blue-400"
-          />
-        </div>
-
-        {/* Filter Dropdown */}
-        <select
-          value={filter}
-          onChange={handleFilterChange}
-          className="p-2 border rounded shadow-sm"
-        >
-          <option value="all">All</option>
-          <option value="paid">Paid</option>
-          <option value="unpaid">Unpaid</option>
-        </select>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border text-center text-sm md:text-base px-1">
+      {/* Table */}
+      <div className="mt-4 overflow-x-auto">
+        <table className="min-w-full bg-white border text-center text-sm md:text-base">
           <thead>
-            <tr>
+            <tr className="bg-gray-50">
               <th className="py-2 px-2 md:px-4 border">Name</th>
               {showEmail && <th className="py-2 px-2 md:px-4 border">Email</th>}
               {showMobile && (
@@ -287,101 +371,153 @@ const UserManagement = () => {
               )}
               {showBatch && <th className="py-2 px-2 md:px-4 border">Batch</th>}
               <th className="py-2 px-2 md:px-4 border">Status</th>
-              <th className="py-2 px-2 md:px-4 *:border">Actions</th>
+              <th className="py-2 px-2 md:px-4 border">Actions</th>
             </tr>
           </thead>
+
           <tbody>
-            {currentUsers.map((user) => {
-              const activationDate = user.paymentMadeDate
-                ? new Date(user.paymentMadeDate)
-                : null;
-              const today = new Date();
-              const daysSinceActivation = activationDate
-                ? Math.floor((today - activationDate) / (1000 * 60 * 60 * 24))
-                : 0;
+            {loading ? (
+              <tr>
+                <td
+                  className="py-6 px-4 text-gray-600"
+                  colSpan={
+                    3 +
+                    (showEmail ? 1 : 0) +
+                    (showMobile ? 1 : 0) +
+                    (showBatch ? 1 : 0)
+                  }
+                >
+                  Loading users…
+                </td>
+              </tr>
+            ) : currentUsers.length ? (
+              currentUsers.map((user) => {
+                const activationDate = user.paymentMadeDate
+                  ? new Date(user.paymentMadeDate)
+                  : null;
+                const today = new Date();
+                const daysSinceActivation = activationDate
+                  ? Math.floor((today - activationDate) / (1000 * 60 * 60 * 24))
+                  : 0;
 
-              return (
-                <tr key={user._id}>
-                  <td className="py-2 px-2 md:px-4 border">{user.name}</td>
-                  {showEmail && (
-                    <td className="py-2 px-2 md:px-4 border">{user.email}</td>
-                  )}
-                  {showMobile && (
-                    <td className="py-2 px-2 md:px-4 border">{user.mobile}</td>
-                  )}
-                  {showBatch && (
-                    <td className="py-2 px-2 md:px-4 border">{user.batch}</td>
-                  )}
-                  <td className="py-2 px-4 border">
-                    {user.paymentMade ? "Paid" : "Unpaid"}
+                const isRowBusy = actionLoadingId === user._id;
 
-                    {/* ✅ Payment Activation Date (Only if Paid) */}
-                    {user.paymentMade && user.paymentMadeDate && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Activated on:{" "}
-                        <span className="font-semibold text-green-700">
-                          {activationDate.toLocaleDateString()}
-                        </span>
-                        {/* ✅ Days Since Activation */}
-                        <div
-                          className={`mt-1 ${
-                            daysSinceActivation > 365
-                              ? "text-red-600 font-semibold"
-                              : "text-gray-600"
-                          }`}
+                return (
+                  <tr key={user._id} className={isRowBusy ? "opacity-70" : ""}>
+                    <td className="py-2 px-2 md:px-4 border">{user.name}</td>
+
+                    {showEmail && (
+                      <td className="py-2 px-2 md:px-4 border">{user.email}</td>
+                    )}
+
+                    {showMobile && (
+                      <td className="py-2 px-2 md:px-4 border">
+                        {user.mobile}
+                      </td>
+                    )}
+
+                    {showBatch && (
+                      <td className="py-2 px-2 md:px-4 border">{user.batch}</td>
+                    )}
+
+                    <td className="py-2 px-2 md:px-4 border">
+                      <div className="font-semibold">
+                        {user.paymentMade ? (
+                          <span className="text-green-700">Paid</span>
+                        ) : (
+                          <span className="text-red-700">Unpaid</span>
+                        )}
+                      </div>
+
+                      {user.paymentMade && activationDate ? (
+                        <div className="text-xs text-gray-500 mt-1">
+                          Activated on:{" "}
+                          <span className="font-semibold text-green-700">
+                            {activationDate.toLocaleDateString()}
+                          </span>
+                          <div
+                            className={`mt-1 ${
+                              daysSinceActivation > 365
+                                ? "text-red-600 font-semibold"
+                                : "text-gray-600"
+                            }`}
+                          >
+                            {daysSinceActivation} days since activation
+                          </div>
+                        </div>
+                      ) : null}
+                    </td>
+
+                    <td className="py-2 px-2 md:px-4 border">
+                      <div className="flex flex-col md:flex-row items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleChangePaymentStatus(user)}
+                          disabled={isRowBusy}
+                          className={`text-xs md:text-sm px-3 py-2 rounded-lg transition duration-200 border
+                            ${
+                              user.paymentMade
+                                ? "bg-green-50 hover:bg-green-100 text-green-800 border-green-200"
+                                : "bg-red-50 hover:bg-red-100 text-red-800 border-red-200"
+                            } disabled:opacity-60 disabled:cursor-not-allowed`}
                         >
-                          {daysSinceActivation} days since activation
+                          {user.paymentMade ? "Mark Unpaid" : "Mark Paid"}
+                        </button>
+
+                        <div className="flex gap-2 items-center justify-center">
+                          <button
+                            onClick={() => handleEditUser(user)}
+                            disabled={isRowBusy}
+                            className="bg-yellow-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-yellow-200 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="bg-gray-200 text-gray-500 px-3 py-2 rounded-lg"
+                            disabled
+                            title="Delete (disabled)"
+                          >
+                            <FaTrash />
+                          </button>
+
+                          <button
+                            onClick={() => handleResetPassword(user._id)}
+                            disabled={isRowBusy}
+                            className="bg-gray-700 text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                            title="Reset password"
+                          >
+                            <FaRedo />
+                          </button>
                         </div>
                       </div>
-                    )}
-                  </td>
-                  <td className="py-2 px-2 md:px-4 border text-center flex gap-2 flex-col md:flex-row">
-                    <div>
-                      <button
-                        onClick={() => handleChangePaymentStatus(user)}
-                        className={` text-xs md:text-sm lg:text-base px-2 py-2 md:px-4 rounded ml-2 transition duration-200 ${
-                          user.paymentMade
-                            ? "bg-green-200 hover:bg-green-300 text-green-800"
-                            : "bg-red-200 hover:bg-red-300 text-red-800"
-                        } `}
-                      >
-                        {user.paymentMade ? `Mark as Unpaid ` : `Mark as Paid `}
-                      </button>
-                    </div>
-                    <div className="flex gap-1 text-center items-center justify-center text-xs md:text-sm lg:text-base">
-                      <button
-                        onClick={() => handleEditUser(user)}
-                        className="bg-yellow-200 text-slate-500 px-4 py-2 rounded hover:bg-yellow-300 transition duration-200"
-                      >
-                        <FaEdit />
-                      </button>
-
-                      <button
-                        onClick={() => handleDeleteUser(user._id)}
-                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-500 transition duration-200"
-                        disabled
-                      >
-                        <FaTrash />
-                      </button>
-                      <button
-                        onClick={() => handleResetPassword(user._id)}
-                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 transition duration-200"
-                      >
-                        <FaRedo />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  className="py-6 px-4 text-gray-600"
+                  colSpan={
+                    3 +
+                    (showEmail ? 1 : 0) +
+                    (showMobile ? 1 : 0) +
+                    (showBatch ? 1 : 0)
+                  }
+                >
+                  No users found for the current filter/search.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* ✅ Compact Pagination UI */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-4 text-sm">
-          {/* First Button */}
+        <div className="flex flex-wrap justify-center items-center gap-2 mt-4 text-sm">
           <button
             onClick={() => paginate(1)}
             disabled={currentPage === 1}
@@ -390,7 +526,6 @@ const UserManagement = () => {
             First
           </button>
 
-          {/* Previous Button */}
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
@@ -399,7 +534,6 @@ const UserManagement = () => {
             Prev
           </button>
 
-          {/* Dynamic Page Numbers */}
           {getPageNumbers().map((page) => (
             <button
               key={page}
@@ -414,7 +548,6 @@ const UserManagement = () => {
             </button>
           ))}
 
-          {/* Next Button */}
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -423,7 +556,6 @@ const UserManagement = () => {
             Next
           </button>
 
-          {/* Last Button */}
           <button
             onClick={() => paginate(totalPages)}
             disabled={currentPage === totalPages}
@@ -434,82 +566,97 @@ const UserManagement = () => {
         </div>
       )}
 
+      {/* Edit modal/panel */}
       {editingUser && (
-        <div className="mt-4 p-4 bg-white border rounded-lg shadow-lg">
-          <h3 className="text-xl font-bold mb-2">Edit User</h3>
+        <div className="mt-6 mx-auto max-w-3xl p-4 bg-white border rounded-2xl shadow-lg">
+          <h3 className="text-xl font-bold mb-3">Edit User</h3>
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleUpdateUser(editingUser);
             }}
+            className="space-y-3"
           >
-            <div className="mb-2">
-              <label className="block text-gray-700">Name:</label>
+            <div>
+              <label className="block text-gray-700 font-semibold">Name</label>
               <input
                 type="text"
                 name="name"
-                value={editingUser.name}
+                value={editingUser.name || ""}
                 onChange={handleInputChange}
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-xl w-full"
               />
             </div>
-            <div className="mb-2">
-              <label className="block text-gray-700">Email:</label>
+
+            <div>
+              <label className="block text-gray-700 font-semibold">Email</label>
               <input
                 type="email"
                 name="email"
-                value={editingUser.email}
+                value={editingUser.email || ""}
                 onChange={handleInputChange}
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-xl w-full"
               />
             </div>
-            <div className="mb-2">
-              <label className="block text-gray-700">Mobile:</label>
+
+            <div>
+              <label className="block text-gray-700 font-semibold">
+                Mobile
+              </label>
               <input
                 type="text"
                 name="mobile"
-                value={editingUser.mobile}
+                value={editingUser.mobile || ""}
                 onChange={handleInputChange}
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-xl w-full"
               />
             </div>
-            <div className="mb-2">
-              <label className="block text-gray-700">Batch:</label>
+
+            <div>
+              <label className="block text-gray-700 font-semibold">Batch</label>
               <input
                 type="text"
                 name="batch"
-                value={editingUser.batch}
+                value={editingUser.batch || ""}
                 onChange={handleInputChange}
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-xl w-full"
               />
             </div>
-            <div className="mb-2">
-              <label className="block text-gray-700">Payment Status:</label>
+
+            <div>
+              <label className="block text-gray-700 font-semibold">
+                Payment Status
+              </label>
               <select
                 name="paymentMade"
-                value={editingUser.paymentMade}
+                value={String(!!editingUser.paymentMade)}
                 onChange={(e) =>
-                  setEditingUser({
-                    ...editingUser,
+                  setEditingUser((prev) => ({
+                    ...prev,
                     paymentMade: e.target.value === "true",
-                  })
+                  }))
                 }
-                className="p-2 border rounded w-full"
+                className="p-2 border rounded-xl w-full"
               >
                 <option value="true">Paid</option>
                 <option value="false">Unpaid</option>
               </select>
             </div>
-            <div className="flex justify-end mt-2">
+
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="submit"
-                className="bg-green-700 text-green-100 px-4 py-2 rounded hover:bg-green-200 transition duration-200"
+                className="bg-green-700 text-white px-4 py-2 rounded-xl hover:bg-green-800 transition duration-200"
+                disabled={actionLoadingId === editingUser._id}
               >
                 Update
               </button>
+
               <button
+                type="button"
                 onClick={() => setEditingUser(null)}
-                className="bg-red-700 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700 transition duration-200"
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl hover:bg-gray-300 transition duration-200"
               >
                 Cancel
               </button>

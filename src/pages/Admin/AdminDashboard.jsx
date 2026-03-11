@@ -109,7 +109,7 @@ function AdminHeader() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm mb-4 px-4 py-3 flex items-center justify-between">
+    <div className="bg-white rounded-lg shadow-sm mb-4 px-2 py-3 flex items-center justify-between">
       <h1 className="text-xl lg:text-2xl font-semibold text-gray-800">
         Admin Dashboard
       </h1>
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
   const isAtAdminRoot = /\/admin\/?$/.test(location.pathname);
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
+    <div className="p-2 bg-gray-100 min-h-screen">
       {/* Optional gradient banner (keep if you like the color) */}
       <div className="bg-gradient-to-r from-green-200 to-teal-500 rounded-lg shadow-md my-4 p-4">
         <h2 className="text-lg lg:text-xl font-semibold text-center text-gray-800 tracking-wider">
