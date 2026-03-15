@@ -1,67 +1,58 @@
 import { Link } from "react-router-dom";
 
-{
-  /* PYQ: Yearwise + Topicwise */
-}
-
 export default function PrevYearCTA() {
   return (
     <section
       aria-label="Previous Year Questions"
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-100 via-gray-100 text-gray-700 shadow-xl my-6"
+      className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 shadow-sm"
     >
-      {/* subtle decorative blobs */}
-      <div className="pointer-events-none absolute -top-16 -left-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-      <div className="pointer-events-none absolute -bottom-16 -right-10 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-12 -right-10 h-36 w-36 rounded-full bg-cyan-100/60 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-amber-100/60 blur-3xl" />
 
-      <div className="relative p-5 md:p-7">
-        {/* Header + Badge */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-          <div>
-            <h2 className="text-lg md:text-xl lg:text-2xl font-semibold tracking-tight">
-              Previous Year Questions (PYQ)
+      <div className="relative p-3 sm:p-6 lg:p-7">
+        <div className="flex flex-col px-3 gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center rounded-full border border-cyan-100 bg-cyan-50 px-3 py-1 text-xs font-semibold tracking-wide text-cyan-700">
+              Previous Year Questions
+            </div>
+
+            <h2 className="mt-3 text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
+              Practice actual exam patterns with PYQ-based preparation
             </h2>
-            <p className="mt-1 text-gray-600 max-w-2xl text-sm">
-              Practice actual exam questions. Take Topic wise tests to firm up
-              preparation and gain confidence.
+
+            <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-[15px]">
+              Strengthen your preparation using previous year questions in two
+              simple ways. Attempt full yearwise sets for exam-like practice or
+              focus topicwise to sharpen weak areas.
             </p>
           </div>
 
-          {/* <span
-            className="inline-flex items-center gap-2 self-start md:self-center rounded-full bg-white/15 px-3 py-1 text-xs md:text-sm font-semibold ring-1 ring-white/25"
-            title="Latest update"
-          >
-            <span className="inline-block h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
-            2024 PYQ added
-          </span> */}
+          <div className="grid grid-cols-2 gap-2 self-start text-xs sm:flex sm:flex-wrap">
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-600">
+              Yearwise sets
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-600">
+              Topicwise practice
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-600">
+              Exam-oriented
+            </span>
+            <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 font-medium text-slate-600">
+              Immediate Insights
+            </span>
+          </div>
         </div>
 
-        {/* Paper quick chips */}
-        {/* <div className="mt-4 flex flex-wrap items-center gap-2 text-[13px]">
-          <span className="px-2.5 py-1 rounded-full bg-white/15 ring-1 ring-white/20">
-            Paper&nbsp;I: Constitution, RTI, DFPR…
-          </span>
-          <span className="px-2.5 py-1 rounded-full bg-white/15 ring-1 ring-white/20">
-            Paper&nbsp;II: FR-SR, Leave, Pension, CSMOP…
-          </span>
-          <span className="px-2.5 py-1 rounded-full bg-white/15 ring-1 ring-white/20">
-            Topicwise & Yearwise practice modes
-          </span>
-        </div> */}
-
-        {/* CTA row */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Yearwise CTA */}
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Link
             to="/pages/quiz/previousYear/Exam"
-            className="group inline-flex items-center justify-between gap-3 rounded-xl bg-amber-100 text-amber-700 px-4 py-3 ring-1 ring-white/40 shadow hover:shadow-md transition"
+            className="group rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="flex items-center gap-3">
-              <div className="grid place-items-center h-9 w-9 rounded-lg bg-amber-50 ring-1 ring-amber-200">
-                {/* calendar icon */}
+            <div className="flex items-start gap-4">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white ring-1 ring-amber-200">
                 <svg
-                  width="18"
-                  height="18"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   className="text-amber-600"
                 >
@@ -71,51 +62,67 @@ export default function PrevYearCTA() {
                   />
                 </svg>
               </div>
-              <div>
-                <div className="font-semibold">Browse by Year</div>
-                <p className="text-xs text-gray-600">
-                  Attempt full Paper&nbsp;I/II sets yearwise
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    Browse by Year
+                  </h3>
+                  <span className="text-sm font-medium text-amber-700 transition group-hover:translate-x-0.5">
+                    Explore →
+                  </span>
+                </div>
+
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Attempt Paper I and Paper II sets yearwise to get a more
+                  exam-like practice experience.
                 </p>
               </div>
             </div>
-            <span className="text-indigo-600 group-hover:translate-x-0.5 transition">
-              →
-            </span>
           </Link>
 
-          {/* Topicwise CTA */}
           <Link
             to="/pages/quiz/pyq/topic"
-            className="group inline-flex items-center justify-between gap-3 rounded-xl bg-cyan-600 text-white px-4 py-3 ring-1 ring-cyan-600/40 shadow hover:bg-cyan-600 transition"
+            className="group rounded-lg border border-cyan-200 bg-gradient-to-br from-cyan-50 to-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="flex items-center gap-3">
-              <div className="grid place-items-center h-9 w-9 rounded-lg bg-white/15 ring-1 ring-white/30">
-                {/* target icon */}
-                <svg width="18" height="18" viewBox="0 0 24 24" className="">
+            <div className="flex items-start gap-4">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white ring-1 ring-cyan-200">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  className="text-cyan-700"
+                >
                   <path
                     fill="currentColor"
                     d="M12 2a1 1 0 0 1 1 1v1.055A8.002 8.002 0 0 1 20.945 11H22a1 1 0 1 1 0 2h-1.055A8.002 8.002 0 0 1 13 20.945V22a1 1 0 1 1-2 0v-1.055A8.002 8.002 0 0 1 3.055 13H2a1 1 0 1 1 0-2h1.055A8.002 8.002 0 0 1 11 3.055V2a1 1 0 0 1 1-1Zm0 5a5 5 0 1 0 0 10a5 5 0 0 0 0-10Zm0 3a2 2 0 1 1 0 4a2 2 0 0 1 0-4Z"
                   />
                 </svg>
               </div>
-              <div>
-                <div className="font-semibold">Practice by Topic</div>
-                <p className="text-xs text-cyan-50/90">
-                  Customize PYQ by Topic and Year
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-base font-semibold text-slate-900">
+                    Practice by Topic
+                  </h3>
+                  <span className="text-sm font-medium text-cyan-700 transition group-hover:translate-x-0.5">
+                    Start →
+                  </span>
+                </div>
+
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Choose a topic and narrow your practice area so you can revise
+                  strategically and improve faster.
                 </p>
               </div>
             </div>
-            <span className="text-white group-hover:translate-x-0.5 transition">
-              →
-            </span>
           </Link>
         </div>
 
-        {/* Footnote / trust hint */}
-        {/* <p className="mt-4 text-[12px] text-cyan-900/90">
-          Tip: Start with the last 5 years, then broaden. Explanations show
-          after you submit.
-        </p> */}
+        <div className="mt-5 rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-xs leading-5 text-slate-500 sm:text-sm">
+          A practical approach is to attempt yearwise papers first for overall
+          readiness and then use topicwise practice to strengthen weaker areas.
+        </div>
       </div>
     </section>
   );
