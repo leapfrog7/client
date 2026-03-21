@@ -40,7 +40,7 @@ export default function NavBar() {
   };
 
   return (
-    <div className="px-4 py-2 hidden md:flex space-x-4 rounded-lg z-20">
+    <div className="px-4 py-2 hidden md:flex lg:space-x-4 space-x-1 rounded-lg z-20 items-center text-sm lg:text-base">
       {navItems.map((item, index) => {
         const open = hoveredItem === index;
         const hasSub = !!item.submenu;
@@ -56,7 +56,7 @@ export default function NavBar() {
             {item.path ? (
               <Link
                 to={item.path}
-                className="text-gray-100 flex items-center gap-2 hover:text-yellow-400 px-2 py-1 rounded-md"
+                className="text-white flex items-center gap-2 hover:text-yellow-400 px-1 py-1 rounded-md"
               >
                 <item.icon />
                 <span>{item.label}</span>
@@ -64,7 +64,7 @@ export default function NavBar() {
             ) : (
               <button
                 type="button"
-                className="text-gray-100 flex items-center gap-2 hover:text-yellow-400 px-2 py-1 rounded-md"
+                className="text-white flex items-center gap-2 hover:text-yellow-400 px-2 py-1 rounded-md"
                 aria-haspopup={hasSub ? "menu" : undefined}
                 aria-expanded={hasSub ? open : undefined}
               >

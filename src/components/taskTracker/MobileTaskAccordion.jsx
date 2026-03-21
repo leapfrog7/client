@@ -234,8 +234,8 @@ export default function MobileTaskAccordion({
               </button>
             </div>
 
-            <div className="p-4 max-h-[70vh] overflow-auto">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="p-3 max-h-[70vh] overflow-auto">
+              <div className="grid grid-cols-3 gap-2">
                 {QUICK_MOBILE.map((st) => {
                   const active = (quickTask.currentStage || "") === st;
                   const isSaving = savingFor === quickTask.id;
@@ -263,26 +263,26 @@ export default function MobileTaskAccordion({
                           setSavingFor(null);
                         }
                       }}
-                      className={`text-xs px-3 py-3 rounded-xl border transition text-left
+                      className={`text-[11px] sm:text-xs p-2 rounded-xl border transition text-center
                         ${
                           active
-                            ? "bg-amber-100 text-slate-700 border-yellow-400"
+                            ? "bg-amber-100 text-slate-700 border-yellow-400 font-semibold"
                             : "bg-white text-slate-800 border-slate-200 hover:bg-slate-50"
                         }
                         ${isSaving ? "opacity-60 cursor-not-allowed" : ""}
                       `}
                       title={`Set stage to ${st}`}
                     >
-                      <div className="font-semibold">{st}</div>
-                      <div className="text-[11px] opacity-70">
-                        {active ? "Current stage" : "Tap to set"}
+                      <div>{st}</div>
+                      <div className="text-[10px] sm:text-xs font-thin sm:font-normal text-amber-800 opacity-70">
+                        {active ? "Current stage" : ""}
                       </div>
                     </button>
                   );
                 })}
               </div>
 
-              <div className="mt-3 text-[11px] text-slate-500">
+              <div className="mt-3 font-thin sm:font-normal text-[11px] text-slate-500">
                 Tip: tap outside to close.
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function MobileTaskAccordion({
           aria-label="More actions"
         >
           <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
-            <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800">
                   Actions
@@ -333,10 +333,10 @@ export default function MobileTaskAccordion({
                       setMoreMenu(null);
                       onEditDetails?.(moreTask.id);
                     }}
-                    className="px-3 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-left"
+                    className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
                   >
-                    <div className="font-semibold">✏️ Edit</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="font-normal text-xs">✏️ Edit</div>
+                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-slate-500">
                       title / due / identifiers
                     </div>
                   </button>
@@ -347,9 +347,9 @@ export default function MobileTaskAccordion({
                       setMoreMenu(null);
                       onArchive?.(moreTask.id);
                     }}
-                    className="px-3 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-left"
+                    className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
                   >
-                    <div className="font-semibold">↩️ Restore</div>
+                    <div className="font-normal text-xs">↩️ Restore</div>
                     <div className="text-[11px] text-slate-500">
                       back to active
                     </div>
@@ -362,10 +362,12 @@ export default function MobileTaskAccordion({
                     setMoreMenu(null);
                     onOpenShare?.(moreTask.id);
                   }}
-                  className="px-3 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-left"
+                  className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
                 >
-                  <div className="font-semibold">🔗 Share</div>
-                  <div className="text-[11px] text-slate-500">read-only</div>
+                  <div className="font-normal text-xs">🔗 Share</div>
+                  <div className="text-[11px] sm:font-xs font-light sm:font-normal text-slate-500">
+                    read-only
+                  </div>
                 </button>
 
                 {!isArchivedView ? (
@@ -375,9 +377,9 @@ export default function MobileTaskAccordion({
                       setMoreMenu(null);
                       onArchive?.(moreTask.id);
                     }}
-                    className="px-3 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-left"
+                    className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
                   >
-                    <div className="font-semibold">
+                    <div className="font-normal text-xs">
                       📦 {archiveLabel || "Archive"}
                     </div>
                     <div className="text-[11px] text-slate-500">
@@ -391,10 +393,12 @@ export default function MobileTaskAccordion({
                       setMoreMenu(null);
                       onDelete(moreTask.id);
                     }}
-                    className="px-3 py-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-left"
+                    className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-centre"
                   >
-                    <div className="font-semibold">🗑️ Delete</div>
-                    <div className="text-[11px] text-rose-700">permanent</div>
+                    <div className="font-normal text-xs ">🗑️ Delete</div>
+                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-rose-700">
+                      permanent
+                    </div>
                   </button>
                 )}
 
@@ -405,10 +409,12 @@ export default function MobileTaskAccordion({
                       setMoreMenu(null);
                       onDelete(moreTask.id);
                     }}
-                    className="px-3 py-3 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-left"
+                    className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-centre"
                   >
-                    <div className="font-semibold">🗑️ Delete</div>
-                    <div className="text-[11px] text-rose-700">permanent</div>
+                    <div className="font-normal text-xs">🗑️ Delete</div>
+                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-rose-700">
+                      permanent
+                    </div>
                   </button>
                 ) : (
                   <button
@@ -440,9 +446,9 @@ export default function MobileTaskAccordion({
         <p className="text-base px-2 font-extrabold text-slate-600 tracking-wider">
           Your Task List
         </p>
-        <p className="px-1 text-[11px] leading-5 text-slate-600 tracking-tight">
-          Tap a task to expand. Use{" "}
-          <span className="font-medium">⚡ Quick</span> to update stage fast.
+        <p className="px-1 text-[11px] font-light leading-5 text-slate-600">
+          Tap a task to expand. Use <span className="font-light">⚡ Quick</span>{" "}
+          to update stage fast.
         </p>
       </div>
 
@@ -484,7 +490,7 @@ export default function MobileTaskAccordion({
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
                 "
               >
-                <div className="text-sm font-semibold text-slate-900 break-words">
+                <div className="text-xs sm:text-sm font-semibold text-slate-900 break-words">
                   <span title={t.title}>
                     {displayTitle(t.title, 100) || "Untitled"}
                   </span>
@@ -493,17 +499,19 @@ export default function MobileTaskAccordion({
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <div className="min-w-0 flex flex-wrap items-center gap-2">
                     <span
-                      className={`text-xs px-2 py-1 rounded-full border ${s.chip}`}
+                      className={`text-[10px] font-light sm:text-xs px-2 py-1 rounded-full border ${s.chip}`}
                       title="Current stage"
                     >
                       {t.currentStage || "—"}
                     </span>
 
-                    <span className="text-[11px] text-slate-500">{aging}d</span>
+                    <span className="text-[10px] font-light sm:text-xs text-slate-500">
+                      {aging}d
+                    </span>
 
                     {dueText ? (
                       <span
-                        className={`text-[11px] px-2 py-0.5 rounded-full border ${dueCls}`}
+                        className={`text-[10px] font-light sm:text-xs px-2 py-0.5 rounded-full border ${dueCls}`}
                         title={
                           t.dueAt ? new Date(t.dueAt).toLocaleDateString() : ""
                         }
@@ -524,13 +532,13 @@ export default function MobileTaskAccordion({
                           e.stopPropagation();
                           openQuickMenu(t.id, e.currentTarget);
                         }}
-                        className="px-2.5 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300 active:scale-[0.99]
+                        className="pl-2.5 pr-2 py-1 sm:py-2 font-light sm:font-normal rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300 active:scale-[0.99]
                           focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
                         "
                         aria-label="Quick update"
                         title="Quick update"
                       >
-                        ⚡ Quick
+                        Quick⚡
                       </button>
                     ) : null}
 
@@ -540,7 +548,7 @@ export default function MobileTaskAccordion({
                         e.stopPropagation();
                         openMoreMenu(t.id, e.currentTarget);
                       }}
-                      className="px-2.5 py-2 rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300 active:scale-[0.99]
+                      className="px-2.5 py-1 sm:py-2 font-light rounded-lg border border-slate-200 bg-white text-[11px] text-slate-700 hover:border-slate-300 active:scale-[0.99]
                         focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
                       "
                       aria-label="More actions"

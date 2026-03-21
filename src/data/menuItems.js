@@ -21,6 +21,7 @@ import { MdModeOfTravel } from "react-icons/md";
 import { TbInvoice } from "react-icons/tb";
 import { TbPigMoney } from "react-icons/tb";
 import { GoTasklist } from "react-icons/go";
+import { VscSettings } from "react-icons/vsc";
 
 export const navItems = [
   {
@@ -70,11 +71,7 @@ export const navItems = [
           },
         ],
       },
-      {
-        label: "FR",
-        path: "/pages/quiz/paper-ii/fr_sr",
-        icon: TfiAgenda,
-      },
+
       {
         label: "Economy",
         path: "/pages/quiz/paper-i/CA_Economy",
@@ -120,6 +117,11 @@ export const navItems = [
         icon: FiBriefcase,
       },
       {
+        label: "FR",
+        path: "/pages/quiz/paper-ii/fr_sr",
+        icon: TfiAgenda,
+      },
+      {
         label: "TA Rules",
         path: "/pages/quiz/paper-ii/ta_rules",
         icon: MdModeOfTravel,
@@ -128,6 +130,11 @@ export const navItems = [
         label: "NPS Rules",
         path: "/pages/quiz/paper-ii/nps-rules",
         icon: TbPigMoney,
+      },
+      {
+        label: "Allowances",
+        path: "/pages/quiz/paper-ii/allowances",
+        icon: VscSettings,
       },
     ],
   },

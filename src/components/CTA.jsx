@@ -314,9 +314,7 @@ const item = (delay = 0) => ({
 });
 
 export default function CTA({ isLoggedIn = false, onStartTrial }) {
-  const primaryLabel = isLoggedIn
-    ? "Start Free Trial (24h)"
-    : "Register & Start Free Trial";
+  const primaryLabel = isLoggedIn ? "Start Free Trial (24h)" : "Register";
 
   return (
     <section aria-labelledby="cta-heading" className="w-full bg-white">
@@ -327,10 +325,10 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
             LDCE preparation for Central Govt employees
           </p> */}
 
-          <div className="mt-2 lg:mt-4">
+          <div className="mt-0 lg:mt-4">
             <h1
               id="cta-heading"
-              className="text-3xl lg:text-5xl font-extrabold text-gray-800 leading-tight tracking-tight"
+              className="text-4xl lg:text-5xl font-extrabold text-gray-800 leading-tight tracking-tight"
             >
               Prepare smarter for
               <span className="block mt-1">
@@ -346,7 +344,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
             </h1>
           </div>
 
-          <p className="mt-2 text-gray-700 text-sm lg:text-lg max-w-xl leading-relaxed">
+          <p className="mt-2 text-gray-700 text-sm lg:text-lg max-w-xl leading-relaxed font-medium">
             Get full access to topic-wise quizzes, previous year questions,
             analytics, bookmarks and smart revision support — all in one place.
           </p>
@@ -365,7 +363,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               <span className="flex-shrink-0 flex items-center justify-center text-2xl lg:text-3xl">
                 ✨
               </span>
-              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left">
+              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left ">
                 Exam-focused MCQs designed around actual LDCE preparation needs
               </p>
             </motion.li>
@@ -377,7 +375,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               <span className="flex-shrink-0 flex items-center justify-center text-2xl lg:text-3xl">
                 📈
               </span>
-              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left">
+              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left ">
                 Track progress topic-wise and revisit bookmarked questions fast
               </p>
             </motion.li>
@@ -389,7 +387,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               <span className="flex-shrink-0 flex items-center justify-center text-2xl lg:text-3xl">
                 🎯
               </span>
-              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left">
+              <p className="flex-1 text-sm lg:text-lg text-gray-700 font-medium leading-snug text-left ">
                 Practice PYQs and focused quizzes without wasting time on
                 clutter
               </p>
@@ -409,7 +407,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
                     shadow-lg transition active:scale-[0.99]
                     ${
                       onStartTrial
-                        ? "bg-cyan-800 text-white hover:bg-cyan-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+                        ? "bg-blue-800 text-white hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                         : "bg-slate-200 text-slate-500 cursor-not-allowed"
                     }`}
                 >
@@ -420,9 +418,9 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
                   to="/register"
                   aria-label="Register and start free trial"
                   className="group inline-flex items-center justify-center gap-2
-                    w-full rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold
-                    bg-cyan-800 text-white shadow-lg transition
-                    hover:bg-cyan-700 hover:shadow-xl
+                    w-full rounded-xl px-3 lg:px-8 lg:py-4 text-base lg:text-lg font-semibold
+                    bg-customBlue text-white shadow-lg transition
+                    hover:bg-blue-800 hover:shadow-xl
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500
                     active:scale-[0.99]"
                 >
@@ -437,7 +435,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               <a
                 href="#pricing-section"
                 className="group inline-flex items-center justify-center gap-2
-                  w-full rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold
+                  w-full rounded-xl px-3 lg:px-8 py-3 lg:py-4 text-base lg:text-lg font-semibold
                   bg-white text-gray-800 border border-gray-200 shadow-sm transition
                   hover:bg-gray-50 hover:shadow
                   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300
@@ -460,7 +458,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               </a>
             </div>
 
-            <p className="mt-2 text-center text-xs sm:text-sm text-gray-500">
+            <p className="mt-2 font-thin text-center text-xs lg:text-sm text-gray-500">
               No payment needed to start the trial · Ends automatically after 24
               hours
             </p>

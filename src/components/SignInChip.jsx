@@ -9,10 +9,10 @@ export default function SignInChip() {
       type="button"
       onClick={() => navigate("/login")}
       className="
-        inline-flex items-center gap-2
-        h-9 px-3 rounded-full
+        inline-flex items-center gap-1
+        h-10 px-3 rounded-lg lg:rounded-full
         border border-white/25 bg-white/10 text-white
-        hover:bg-white/15 hover:border-white/35
+        hover:bg-white/15 hover:border-white/45
         active:scale-[0.98]
         transition
         focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-customBlue
@@ -20,8 +20,10 @@ export default function SignInChip() {
       aria-label="Sign in"
       title="Sign in"
     >
-      <PiSignInLight className="text-lg" />
-      <span className="hidden sm:inline text-sm font-semibold">Sign in</span>
+      <PiSignInLight className="text-xl" />
+      <span className="hidden lg:inline text-xs lg:text-sm font-semibold">
+        Sign in
+      </span>
     </button>
   );
 }
