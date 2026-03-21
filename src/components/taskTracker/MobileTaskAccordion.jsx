@@ -173,7 +173,7 @@ export default function MobileTaskAccordion({
   }, [expandedTaskId]);
 
   if (!tasks?.length) {
-    return <div className="p-4 text-sm text-slate-600">No tasks found.</div>;
+    return <div className="p-4 text-sm text-slate-800">No tasks found.</div>;
   }
 
   return (
@@ -443,10 +443,10 @@ export default function MobileTaskAccordion({
 
       {/* Header */}
       <div className="bg-slate-50 text-center">
-        <p className="text-base px-2 font-extrabold text-slate-600 tracking-wider">
+        <p className="text-base px-2 font-extrabold text-slate-800 tracking-wider">
           Your Task List
         </p>
-        <p className="px-1 text-[11px] font-light leading-5 text-slate-600">
+        <p className="px-1 text-[11px] font-light leading-5 text-slate-800">
           Tap a task to expand. Use <span className="font-light">⚡ Quick</span>{" "}
           to update stage fast.
         </p>

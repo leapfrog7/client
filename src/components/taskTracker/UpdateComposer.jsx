@@ -8,7 +8,7 @@ function TabButton({ active, onClick, children }) {
     <button
       onClick={onClick}
       className={`px-3 py-2 text-xs font-thin lg:font-medium transition
-        ${active ? "text-slate-900" : "text-slate-700 hover:text-slate-900"}
+        ${active ? "text-black" : "text-black hover:text-black"}
       `}
       type="button"
       aria-pressed={active}
@@ -16,7 +16,7 @@ function TabButton({ active, onClick, children }) {
       {children}
       <div
         className={`mt-1 h-0.5 rounded-full transition ${
-          active ? "bg-slate-900" : "bg-transparent"
+          active ? "bg-black" : "bg-transparent"
         }`}
       />
     </button>
@@ -106,18 +106,16 @@ export default function UpdateComposer({
       <div className="px-4 pt-4 pb-2">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-slate-900">
-              Add update
-            </div>
-            <div className="mt-0.5 text-xs font-thin lg:font-normal text-slate-500">
+            <div className="text-sm font-semibold text-black">Add update</div>
+            <div className="mt-0.5 text-xs font-thin lg:font-normal text-black">
               Each update becomes a milestone in the timeline.
             </div>
           </div>
 
           {/* Tiny status */}
-          <div className="text-[11px] text-slate-500">
+          <div className="text-[11px] text-black">
             Current Stage:{" "}
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-black">
               {currentStage || "—"}
             </span>
           </div>
@@ -149,7 +147,7 @@ export default function UpdateComposer({
           {/* QUICK: chips become a calm horizontal scroll row */}
           {mode === "quick" && (
             <div className="min-w-0">
-              <div className="text-xs text-slate-700 mb-2 font-thin lg:font-normal">
+              <div className="text-xs text-black mb-2 font-thin lg:font-normal">
                 Pick the next stage:
               </div>
 
@@ -173,8 +171,8 @@ export default function UpdateComposer({
                         className={`text-xs font-thin lg:font-normal px-3 py-1.5 rounded-full border transition
             ${
               active
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                ? "bg-black text-white border-black"
+                : "bg-white text-black border-slate-200 hover:bg-slate-50"
             }`}
                         aria-pressed={active}
                       >
@@ -185,18 +183,16 @@ export default function UpdateComposer({
                 </div>
               </div>
 
-              <div className="mt-1 font-thin lg:font-normal text-[11px] text-slate-500">
+              <div className="mt-1 font-thin lg:font-normal text-[11px] text-black">
                 Selected:{" "}
-                <span className="font-semibold text-slate-700 ">
-                  {quickStage}
-                </span>
+                <span className="font-semibold text-black ">{quickStage}</span>
               </div>
             </div>
           )}
 
           {mode === "custom" && (
             <div>
-              <div className="text-xs text-slate-700 mb-2 font-thin lg:font-normal">
+              <div className="text-xs text-black mb-2 font-thin lg:font-normal">
                 Type a custom stage:
               </div>
               <input
@@ -205,7 +201,7 @@ export default function UpdateComposer({
                 placeholder="e.g., Draft para-wise comments"
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300 font-thin lg:font-normal"
               />
-              <div className="mt-1 text-[11px] text-slate-500 font-thin lg:font-normal">
+              <div className="mt-1 text-[11px] text-black font-thin lg:font-normal">
                 Tip: keep it short and action-based.
               </div>
             </div>
@@ -213,7 +209,7 @@ export default function UpdateComposer({
 
           {/* Remark textarea always visible (but calmer) */}
           <div>
-            <div className="text-xs text-slate-700 mb-2 font-thin lg:font-normal">
+            <div className="text-xs text-black mb-2 font-thin lg:font-normal">
               {mode === "remark"
                 ? "Remark (required)"
                 : "Remark (optional but useful)"}
@@ -233,7 +229,7 @@ export default function UpdateComposer({
 
           {/* Footer */}
           <div className="flex items-center justify-between gap-3 pt-1">
-            <div className="text-[10px] text-slate-500">
+            <div className="text-[10px] text-black">
               Shortcut: add small remarks frequently.
             </div>
 
@@ -244,12 +240,12 @@ export default function UpdateComposer({
               className={`px-3 lg:px-4 py-2 rounded-xl text-xs lg:text-sm font-normal lg:font-semibold transition active:scale-[0.99]
                 ${
                   status === "saving"
-                    ? "bg-slate-300 text-slate-700 cursor-not-allowed"
+                    ? "bg-slate-300 text-black cursor-not-allowed"
                     : status === "saved"
                       ? "bg-emerald-600 text-white"
                       : canSubmit
-                        ? "bg-slate-900 text-white hover:bg-slate-800"
-                        : "bg-slate-200 text-slate-500 cursor-not-allowed"
+                        ? "bg-black text-white hover:bg-black"
+                        : "bg-slate-200 text-black cursor-not-allowed"
                 }`}
             >
               {status === "saving" ? (
