@@ -23,10 +23,10 @@ function dueLabel(d) {
 }
 
 function dueTone(d) {
-  if (d === null) return "text-black bg-slate-100 border-slate-200 font-thin";
-  if (d < 0) return "text-rose-800 bg-rose-50 border-rose-200 font-thin";
-  if (d <= 3) return "text-amber-800 bg-amber-50 border-amber-200 font-thin";
-  return "text-black bg-slate-100 border-slate-200 font-thin";
+  if (d === null) return "text-slate-700 bg-slate-100 border-slate-200 ";
+  if (d < 0) return "text-rose-800 bg-rose-50 border-rose-200 ";
+  if (d <= 3) return "text-amber-800 bg-amber-50 border-amber-200 ";
+  return "text-slate-700 bg-slate-100 border-slate-200 ";
 }
 
 export default function TaskDetail({
@@ -60,10 +60,10 @@ export default function TaskDetail({
     return (
       <div className="h-full flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="text-base font-semibold text-black">
+          <div className="text-base font-semibold text-slate-700">
             Select a task
           </div>
-          <div className="mt-1 text-sm text-black">
+          <div className="mt-1 text-sm text-slate-700">
             Choose from the left panel or create a new one.
           </div>
         </div>
@@ -148,23 +148,23 @@ export default function TaskDetail({
             {dueText}
           </span>
 
-          <span className="text-xs text-black">
+          <span className="text-xs text-slate-700">
             Total:{" "}
-            <span className="font-semibold text-black">
+            <span className="font-semibold text-slate-700">
               {stats?.totalAging ?? "—"}d
             </span>
           </span>
 
-          <span className="text-xs  text-black">
+          <span className="text-xs  text-slate-700">
             In stage:{" "}
-            <span className="font-semibold text-black">
+            <span className="font-semibold text-slate-700">
               {stats?.inStageDays ?? "—"}d
             </span>
           </span>
 
-          <span className="text-xs text-black">
+          <span className="text-xs text-slate-700">
             Last updated:{" "}
-            <span className="font-medium text-black">
+            <span className="font-medium text-slate-700">
               {task.updatedAt
                 ? new Date(task.updatedAt).toLocaleDateString()
                 : "—"}
@@ -184,7 +184,7 @@ export default function TaskDetail({
           className={`px-3 py-1.5 rounded-full text-sm border transition ${
             tab === "UPDATES"
               ? "bg-black text-white border-black"
-              : "bg-white text-black border-slate-200 hover:border-slate-300"
+              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
           }`}
         >
           Updates
@@ -195,14 +195,14 @@ export default function TaskDetail({
           className={`px-3 py-1.5 rounded-full text-sm border transition ${
             tab === "HISTORY"
               ? "bg-black text-white border-black"
-              : "bg-white text-black border-slate-200 hover:border-slate-300"
+              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
           }`}
         >
           History
         </button>
 
         {isArchived ? (
-          <span className="ml-2 text-xs px-2 py-1 rounded-full bg-slate-100 text-black border border-slate-200">
+          <span className="ml-2 text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
             Archived (read-only)
           </span>
         ) : null}
@@ -221,11 +221,11 @@ export default function TaskDetail({
         {!embedded && (
           <div className="flex items-start justify-between gap-3 mt-2">
             <div className="min-w-0">
-              <h1 className="text-sm lg:text-lg font-semibold text-black md:text-black truncate">
+              <h1 className="text-sm lg:text-lg font-semibold text-slate-700 md:text-slate-700 truncate">
                 {title}
               </h1>
 
-              <div className="mt-2 text-xs text-black">
+              <div className="mt-2 text-xs text-slate-700">
                 {id.section ? `${id.section} · ` : ""}
                 {id.fileNo ? `eFile No: ${id.fileNo} · ` : ""}
                 {id.receiptNo ? `Receipt: ${id.receiptNo}` : ""}
@@ -262,25 +262,21 @@ export default function TaskDetail({
           <div className="mt-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
             <div className="flex flex-wrap items-center gap-2">
               {/* Total age */}
-              <span className="text-[11px] px-2 py-1 rounded-full bg-slate-50 font-thin text-black border border-slate-200">
+              <span className="text-[11px] px-2 py-1 rounded-full bg-slate-50  text-slate-700 border border-slate-200">
                 Total:{" "}
-                <span className="font-thin lg:font-semibold">
-                  {stats.totalAging}d
-                </span>
+                <span className=" lg:font-semibold">{stats.totalAging}d</span>
               </span>
 
               {/* In-stage */}
-              <span className="text-[11px] font-thin px-2 py-1 rounded-full bg-slate-50 text-black border border-slate-200">
+              <span className="text-[11px]  px-2 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200">
                 In stage:{" "}
-                <span className="font-thin lg:font-semibold">
-                  {stats.inStageDays}d
-                </span>
+                <span className=" lg:font-semibold">{stats.inStageDays}d</span>
               </span>
 
               {/* Updated */}
-              <span className="text-[11px] font-thin px-2 py-1 rounded-full bg-slate-50 text-black border border-slate-200">
+              <span className="text-[11px]  px-2 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200">
                 Updated:{" "}
-                <span className="font-thin lg:font-semibold">
+                <span className=" lg:font-semibold">
                   {task.updatedAt
                     ? new Date(task.updatedAt).toLocaleDateString()
                     : "—"}
@@ -290,7 +286,7 @@ export default function TaskDetail({
               {/* Due (only if present) */}
               {task?.dueAt ? (
                 <span
-                  className={`text-[11px] font-thin px-2 py-1 rounded-full border ${
+                  className={`text-[11px]  px-2 py-1 rounded-full border ${
                     new Date(task.dueAt) < new Date()
                       ? "bg-rose-50 text-rose-800 border-rose-200"
                       : "bg-amber-50 text-amber-800 border-amber-200"
@@ -298,14 +294,13 @@ export default function TaskDetail({
                   title={new Date(task.dueAt).toLocaleDateString()}
                 >
                   {new Date(task.dueAt) < new Date() ? "Overdue" : "Due"}:{" "}
-                  <span className="font-thin">
+                  <span className="">
                     {new Date(task.dueAt).toLocaleDateString()}
                   </span>
                 </span>
               ) : (
-                <span className="text-[11px] font-thin px-2 py-1 rounded-full bg-slate-50 text-black border border-slate-200">
-                  Due:{" "}
-                  <span className="font-thin lg:font-semibold">Not Set</span>
+                <span className="text-[11px]  px-2 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200">
+                  Due: <span className=" lg:font-semibold">Not Set</span>
                 </span>
               )}
             </div>
@@ -327,10 +322,10 @@ export default function TaskDetail({
               />
             ) : (
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-sm font-semibold text-black">
+                <div className="text-sm font-semibold text-slate-700">
                   Archived (read-only)
                 </div>
-                <div className="mt-1 text-sm text-black">
+                <div className="mt-1 text-sm text-slate-700">
                   Restore this task to add updates or change stage.
                 </div>
               </div>
@@ -350,10 +345,10 @@ export default function TaskDetail({
                   />
                 ) : (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <div className="text-sm font-semibold text-black">
+                    <div className="text-sm font-semibold text-slate-700">
                       Archived (read-only)
                     </div>
-                    <div className="mt-1 text-sm text-black">
+                    <div className="mt-1 text-sm text-slate-700">
                       Restore this task to add updates or change stage.
                     </div>
                   </div>

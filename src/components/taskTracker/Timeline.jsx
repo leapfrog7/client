@@ -37,10 +37,10 @@ export default function Timeline({ task, defaultLimit = 5 }) {
   return (
     <div className="p-4 rounded-xl border border-slate-200 bg-white">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-black">Milestones</h3>
+        <h3 className="text-sm font-semibold text-slate-700">Milestones</h3>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-thin lg:font-normal md:text-sm text-black">
+          <span className="text-xs  lg:font-normal md:text-sm text-slate-700">
             {total} updates
           </span>
 
@@ -48,7 +48,7 @@ export default function Timeline({ task, defaultLimit = 5 }) {
             <button
               type="button"
               onClick={() => setShowAll((v) => !v)}
-              className="text-xs md:text-sm font-thin lg:font-normal text-black hover:text-black underline underline-offset-4"
+              className="text-xs md:text-sm  lg:font-normal text-slate-700 hover:text-slate-700 underline underline-offset-4"
             >
               {showAll ? "Show recent" : `Show all (${hiddenCount}+ more)`}
             </button>
@@ -99,19 +99,19 @@ export default function Timeline({ task, defaultLimit = 5 }) {
                 className={`rounded-xl border bg-white p-2 sm:p-3 ${
                   isCurrent
                     ? "border-slate-300 ring-1 ring-slate-200"
-                    : "border-slate-200 font-thin"
+                    : "border-slate-200 "
                 }`}
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="text-[11px] sm:text-sm font-semibold lg:font-semibold text-black">
+                  <div className="text-[11px] sm:text-sm font-semibold lg:font-semibold text-slate-700">
                     {title}
                   </div>
 
-                  <span className="text-[11px] font-thin lg:font-normal lg:text-sm px-2 py-0.5 rounded-full bg-slate-100 text-black">
+                  <span className="text-[11px]  lg:font-normal lg:text-sm px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
                     +{gap}d
                   </span>
 
-                  <span className="text-[11px] lg:text-sm text-black">
+                  <span className="text-[11px] lg:text-sm text-slate-700">
                     {formatDateTime(e.at)}
                   </span>
 
@@ -122,14 +122,14 @@ export default function Timeline({ task, defaultLimit = 5 }) {
                   )}
 
                   {e.actor ? (
-                    <span className="text-[11px] lg:text-sm text-black">
+                    <span className="text-[11px] lg:text-sm text-slate-700">
                       • {e.actor}
                     </span>
                   ) : null}
                 </div>
 
                 {e.remark ? (
-                  <div className="mt-1 text-xs font-thin lg:font-normal lg:text-sm text-black whitespace-pre-wrap break-words">
+                  <div className="mt-1 text-xs  lg:font-normal lg:text-sm text-slate-700 whitespace-pre-wrap break-words">
                     {e.remark}
                   </div>
                 ) : null}
@@ -139,7 +139,7 @@ export default function Timeline({ task, defaultLimit = 5 }) {
         })}
 
         {total === 0 && (
-          <div className="text-sm text-black">No updates yet.</div>
+          <div className="text-sm text-slate-700">No updates yet.</div>
         )}
       </div>
     </div>
