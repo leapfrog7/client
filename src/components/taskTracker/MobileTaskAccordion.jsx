@@ -29,10 +29,12 @@ function dueTone(d) {
 const QUICK_MOBILE = [
   "Pending",
   "Under submission",
-  "Sent to IFD",
+  "To be discussed",
   "Comments awaited",
+  "Sent to IFD",
   "Approved",
   "Completed",
+  "In Abeyance",
 ];
 
 const MENU_W = 340;
@@ -214,7 +216,7 @@ export default function MobileTaskAccordion({
           role="menu"
           aria-label="Quick stage menu"
         >
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
+          <div className="rounded-xl border border-slate-200 bg-white shadow-2xl overflow-hidden">
             <div className="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="min-w-0">
                 <div className="text-xs font-semibold text-slate-800">
@@ -466,12 +468,8 @@ export default function MobileTaskAccordion({
         return (
           <div
             key={t.id}
-            className={`relative rounded-xl bg-white border overflow-visible transition
-              ${
-                open
-                  ? "border-slate-300 shadow-sm ring-1 ring-slate-200"
-                  : "border-slate-200"
-              }`}
+            className={`relative border rounded-md bg-white  overflow-visible transition
+              ${open ? "border-slate-200 shadow-sm " : "border-slate-100"}`}
           >
             <div
               className={`absolute left-0 top-0 h-full w-1 ${s.dot} opacity-80`}
@@ -485,7 +483,7 @@ export default function MobileTaskAccordion({
                 onClick={() => onToggle(t.id)}
                 aria-expanded={open}
                 aria-controls={`task-${t.id}`}
-                className="w-full text-left rounded-xl p-2 -m-2 transition
+                className="w-full text-left p-2 -m-2 transition
                   hover:bg-slate-100/70 active:bg-slate-100 active:scale-[0.995]
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
                 "
