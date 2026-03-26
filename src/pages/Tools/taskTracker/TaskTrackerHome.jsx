@@ -17,7 +17,7 @@ import {
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
 import DashboardStrip from "../../../components/taskTracker/DashboardStrip";
 import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccordion";
-import TaskTrackerTutorial from "../../../components/taskTracker/TaskTrackerTutorial";
+// import TaskTrackerTutorial from "../../../components/taskTracker/TaskTrackerTutorial";
 // import PageFeedback from "../../../components/PageFeedback";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
@@ -35,7 +35,7 @@ export default function TaskTrackerHome() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [toast, setToast] = useState(null); // { message, type }
   const [showArchived, setShowArchived] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  // const [tutorialOpen, setTutorialOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -51,8 +51,8 @@ export default function TaskTrackerHome() {
   // Mobile accordion
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   // Mobile pagination
-  const PAGE_SIZE = 10;
-  const [page, setPage] = useState(1);
+  // const PAGE_SIZE = 10;
+  // const [page, setPage] = useState(1);
 
   // Toast timer
   const toastTimerRef = useRef(null);
@@ -87,7 +87,7 @@ export default function TaskTrackerHome() {
     setShowArchived(next);
     setExpandedTaskId(null);
     setSelectedTaskId(null);
-    setPage(1);
+    // setPage(1);
 
     const t = await getTasks({ archived: next });
     setTasks(Array.isArray(t) ? t : []);
@@ -192,23 +192,33 @@ export default function TaskTrackerHome() {
         return d !== null && d < 0;
       });
     }
+    if (activeView === "TO_BE_DISCUSSED") {
+      return tasks.filter((t) => t.currentStage === "To be discussed");
+    }
+    if (activeView === "COMMENTS_AWAITED") {
+      return tasks.filter((t) => t.currentStage === "Comments awaited");
+    }
 
     return tasks;
   }, [tasks, activeView]);
 
-  const totalPages = Math.max(1, Math.ceil(visibleTasks.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pageStart = (safePage - 1) * PAGE_SIZE;
-  const pageTasks = visibleTasks.slice(pageStart, pageStart + PAGE_SIZE);
+  // const totalPages = Math.max(1, Math.ceil(visibleTasks.length / PAGE_SIZE));
+  // const safePage = Math.min(page, totalPages);
+  // const pageStart = (safePage - 1) * PAGE_SIZE;
+  // const pageTasks = visibleTasks.slice(pageStart, pageStart + PAGE_SIZE);
+
+  // useEffect(() => {
+  //   // If list shrinks (delete/filter), keep page in range
+  //   setPage((p) =>
+  //     Math.min(p, Math.max(1, Math.ceil(visibleTasks.length / PAGE_SIZE))),
+  //   );
+  //   // Also collapse any expanded accordion because it may not exist on new page
+  //   setExpandedTaskId(null);
+  // }, [activeView, visibleTasks.length]);
 
   useEffect(() => {
-    // If list shrinks (delete/filter), keep page in range
-    setPage((p) =>
-      Math.min(p, Math.max(1, Math.ceil(visibleTasks.length / PAGE_SIZE))),
-    );
-    // Also collapse any expanded accordion because it may not exist on new page
     setExpandedTaskId(null);
-  }, [activeView, visibleTasks.length]);
+  }, [activeView, visibleTasks.length, showArchived]);
 
   const selectedTask = useMemo(
     () => tasks.find((t) => t.id === selectedTaskId) || null,
@@ -302,11 +312,13 @@ export default function TaskTrackerHome() {
     const label =
       activeView === "PENDING"
         ? "Pending"
-        : activeView === "DUE_SOON"
-          ? "Due in 3 days"
-          : activeView === "OVERDUE"
-            ? "Overdue"
-            : "All";
+        : activeView === "TO_BE_DISCUSSED"
+          ? "To be discussed"
+          : activeView === "DUE_SOON"
+            ? "Due in 3 days"
+            : activeView === "OVERDUE"
+              ? "Overdue"
+              : "All";
 
     if (showArchived) {
       return (
@@ -371,8 +383,13 @@ export default function TaskTrackerHome() {
   }
 
   EmptyState.propTypes = {
-    activeView: PropTypes.oneOf(["ALL", "PENDING", "DUE_SOON", "OVERDUE"])
-      .isRequired,
+    activeView: PropTypes.oneOf([
+      "ALL",
+      "PENDING",
+      "TO_BE_DISCUSSED",
+      "DUE_SOON",
+      "OVERDUE",
+    ]).isRequired,
     onReset: PropTypes.func.isRequired,
     onCreate: PropTypes.func.isRequired,
     showArchived: PropTypes.bool,
@@ -550,125 +567,93 @@ export default function TaskTrackerHome() {
               {/* Keep Create button fixed (recommended) */}
 
               {/* ✅ Single scroll container: Dashboard + List + Pagination */}
-              <div className="flex-1 min-h-0 overflow-auto">
+              <div className="flex-1 min-h-0 overflow-auto bg-slate-50">
                 <DashboardStrip
                   tasks={tasks}
                   activeView={activeView}
                   onSelectView={(v) => {
                     setActiveView(v);
                     setExpandedTaskId(null);
-                    setPage(1);
                   }}
                 />
-                <div className="mr-2 my-1 shrink-0 px-2 flex gap-2 bg-slate-50">
-                  <button
-                    onClick={handleCreate}
-                    className="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm"
-                  >
-                    + Create New Task
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleArchivedView}
-                    className={`px-3 py-2 rounded-lg border text-sm ${
-                      showArchived
-                        ? "bg-teal-100 text-gray-600 border-teal-700"
-                        : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
-                    }`}
-                    title={
-                      showArchived
-                        ? "Back to active tasks"
-                        : "View archived tasks"
-                    }
-                  >
-                    {showArchived ? "Back to Active 📌" : "See Archive 📦"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTutorialOpen(true)}
-                    className="mx-auto   items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-800 shadow-sm transition
-             hover:bg-blue-700 hover:text-white hover:border-blue-700
-             focus:outline-none focus:ring-blue-200"
-                  >
-                    {/* <span aria-hidden="true">📘</span> */}
-                    📘
-                  </button>
+
+                {/* Mobile action panel */}
+                <div className="px-3 pt-2">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm backdrop-blur-sm">
+                    <div className="p-3">
+                      <button
+                        type="button"
+                        onClick={handleCreate}
+                        className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.99]"
+                      >
+                        + Create New Task
+                      </button>
+
+                      <div className="mt-2 grid grid-cols-[1fr_auto] gap-2">
+                        <button
+                          type="button"
+                          onClick={toggleArchivedView}
+                          className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition active:scale-[0.99] ${
+                            showArchived
+                              ? "border-teal-200 bg-teal-50 text-teal-800"
+                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                          }`}
+                          title={
+                            showArchived
+                              ? "Back to active tasks"
+                              : "View archived tasks"
+                          }
+                        >
+                          {showArchived
+                            ? "📌 Back to Active"
+                            : "📦 See Archive"}
+                        </button>
+                        {/* 
+                        <button
+                          type="button"
+                          onClick={() => setTutorialOpen(true)}
+                          className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100 active:scale-[0.99]"
+                          title="How to use"
+                        >
+                          📘 Help
+                        </button> */}
+                      </div>
+
+                      {/* <div className="mt-2 px-1 text-[11px] text-slate-500">
+                        Track office work by stage, due date, and milestones.
+                      </div> */}
+                    </div>
+                  </div>
                 </div>
+
                 <div className="px-3 py-3">
                   {visibleTasks.length === 0 ? (
                     <EmptyState
                       activeView={activeView}
                       onReset={() => setActiveView("ALL")}
                       onCreate={handleCreate}
+                      showArchived={showArchived}
+                      onBack={() => toggleArchivedView()}
                     />
                   ) : (
-                    <>
-                      <MobileTaskAccordion
-                        tasks={pageTasks}
-                        expandedTaskId={expandedTaskId}
-                        onToggle={(id) => {
-                          setExpandedTaskId((prev) =>
-                            prev === id ? null : id,
-                          );
-                          setSelectedTaskId(id);
-                        }}
-                        onAddUpdate={(taskId, payload) => {
-                          handleAddUpdateForTask(taskId, payload);
-                        }}
-                        onEditDetails={(taskId) => openEditModalForTask(taskId)}
-                        onDelete={handleDelete}
-                        onOpenShare={(taskId) => openShareView(taskId)}
-                        onNotify={notify}
-                        onArchive={
-                          showArchived ? handleUnarchive : handleArchive
-                        }
-                        archiveLabel={showArchived ? "Restore" : "Archive"}
-                        isArchivedView={showArchived} // ✅ ADD THIS
-                      />
-
-                      {/* Pagination controls */}
-                      {totalPages > 1 && (
-                        <div className="mt-3 flex items-center justify-between gap-2">
-                          <button
-                            type="button"
-                            disabled={safePage <= 1}
-                            onClick={() => {
-                              setExpandedTaskId(null);
-                              setPage((p) => Math.max(1, p - 1));
-                            }}
-                            className={`px-3 py-2 rounded-lg border text-sm ${
-                              safePage <= 1
-                                ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                            }`}
-                          >
-                            ← Prev
-                          </button>
-
-                          <div className="text-xs text-slate-600">
-                            Page{" "}
-                            <span className="font-semibold">{safePage}</span> of{" "}
-                            <span className="font-semibold">{totalPages}</span>
-                          </div>
-
-                          <button
-                            type="button"
-                            disabled={safePage >= totalPages}
-                            onClick={() => {
-                              setExpandedTaskId(null);
-                              setPage((p) => Math.min(totalPages, p + 1));
-                            }}
-                            className={`px-3 py-2 rounded-lg border text-sm ${
-                              safePage >= totalPages
-                                ? "border-slate-200 text-slate-400 bg-slate-100 cursor-not-allowed"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                            }`}
-                          >
-                            Next →
-                          </button>
-                        </div>
-                      )}
-                    </>
+                    <MobileTaskAccordion
+                      tasks={visibleTasks}
+                      expandedTaskId={expandedTaskId}
+                      onToggle={(id) => {
+                        setExpandedTaskId((prev) => (prev === id ? null : id));
+                        setSelectedTaskId(id);
+                      }}
+                      onAddUpdate={(taskId, payload) => {
+                        handleAddUpdateForTask(taskId, payload);
+                      }}
+                      onEditDetails={(taskId) => openEditModalForTask(taskId)}
+                      onDelete={handleDelete}
+                      onOpenShare={(taskId) => openShareView(taskId)}
+                      onNotify={notify}
+                      onArchive={showArchived ? handleUnarchive : handleArchive}
+                      archiveLabel={showArchived ? "Restore" : "Archive"}
+                      isArchivedView={showArchived}
+                    />
                   )}
                 </div>
               </div>
@@ -676,10 +661,10 @@ export default function TaskTrackerHome() {
           </div>
         </>
       )}
-      <TaskTrackerTutorial
+      {/* <TaskTrackerTutorial
         open={tutorialOpen}
         onClose={() => setTutorialOpen(false)}
-      />
+      /> */}
       {toast && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999]">
           <div

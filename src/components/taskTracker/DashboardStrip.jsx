@@ -1,351 +1,3 @@
-// import { useMemo } from "react";
-// import PropTypes from "prop-types";
-
-// function daysUntil(dueAt) {
-//   if (!dueAt) return null;
-//   const now = new Date();
-//   const due = new Date(dueAt);
-//   const ms = due.getTime() - now.getTime();
-//   return Math.ceil(ms / (1000 * 60 * 60 * 24));
-// }
-
-// function accentFor(id) {
-//   if (id === "OVERDUE") return "bg-rose-500";
-//   if (id === "DUE_SOON") return "bg-amber-500";
-//   if (id === "PENDING") return "bg-sky-500";
-//   return "bg-slate-400";
-// }
-
-// function textFor(id) {
-//   if (id === "OVERDUE") return "text-rose-700";
-//   if (id === "DUE_SOON") return "text-amber-700";
-//   if (id === "PENDING") return "text-sky-700";
-//   return "text-slate-900";
-// }
-
-// function labelFor(id) {
-//   if (id === "ALL") return "All";
-//   if (id === "PENDING") return "Pending";
-//   if (id === "DUE_SOON") return "Due ≤3d";
-//   return "Overdue";
-// }
-
-// function subFor(id, metrics) {
-//   if (id === "ALL") return `No due: ${metrics.noDue}`;
-//   if (id === "PENDING") return "Needs action";
-//   if (id === "DUE_SOON") return "Today–3 days";
-//   return "Past due";
-// }
-
-// export default function DashboardStrip({ tasks, activeView, onSelectView }) {
-//   const metrics = useMemo(() => {
-//     const total = tasks.length;
-//     const pending = tasks.filter((t) => t.currentStage === "Pending").length;
-
-//     const overdue = tasks.filter((t) => {
-//       const d = daysUntil(t.dueAt);
-//       return d !== null && d < 0;
-//     }).length;
-
-//     const dueSoon = tasks.filter((t) => {
-//       const d = daysUntil(t.dueAt);
-//       return d !== null && d >= 0 && d <= 3;
-//     }).length;
-
-//     const noDue = tasks.filter((t) => !t.dueAt).length;
-
-//     return { total, pending, overdue, dueSoon, noDue };
-//   }, [tasks]);
-
-//   const items = [
-//     { id: "ALL", value: metrics.total },
-//     { id: "PENDING", value: metrics.pending },
-//     { id: "DUE_SOON", value: metrics.dueSoon },
-//     { id: "OVERDUE", value: metrics.overdue },
-//   ];
-
-//   return (
-//     <div className="px-3 pt-2 pb-2 bg-slate-50">
-//       {/* Single segmented card */}
-//       <div className="rounded-md border border-slate-50 bg-white overflow-hidden shadow-sm">
-//         <div className="grid grid-cols-4">
-//           {items.map((it, idx) => {
-//             const active = activeView === it.id;
-
-//             return (
-//               <button
-//                 key={it.id}
-//                 type="button"
-//                 onClick={() => onSelectView(it.id)}
-//                 className={`text-center relative px-2.5 py-2 transition active:scale-[0.99]
-//                   ${idx !== 0 ? "border-l border-slate-200" : ""}
-//                   ${active ? "bg-slate-50" : "bg-white hover:bg-slate-50"}
-//                 `}
-//                 title={labelFor(it.id)}
-//               >
-//                 {/* Top accent */}
-//                 <div
-//                   className={`absolute left-0 top-0 h-1 w-full ${accentFor(it.id)} ${
-//                     active ? "opacity-100" : "opacity-60"
-//                   }`}
-//                   aria-hidden="true"
-//                 />
-
-//                 <div className="pt-1">
-//                   <div className="text-sm md:text-base leading-4 text-slate-600">
-//                     {labelFor(it.id)}
-//                   </div>
-
-//                   <div
-//                     className={`mt-0.5 text-base leading-5 font-semibold ${textFor(it.id)}`}
-//                   >
-//                     {it.value}
-//                   </div>
-
-//                   <div className="mt-0.5 text-[10px] leading-4 text-slate-500">
-//                     {subFor(it.id, metrics)}
-//                   </div>
-//                 </div>
-
-//                 {/* Active ring (subtle) */}
-//                 {active ? (
-//                   <div
-//                     className="absolute inset-0 ring-2 ring-slate-200 pointer-events-none"
-//                     aria-hidden="true"
-//                   />
-//                 ) : null}
-//               </button>
-//             );
-//           })}
-//         </div>
-
-//         {/* Compact footer row */}
-//         <div className="flex items-center justify-end px-3 py-1  bg-slate-50">
-//           <div className="text-[10px] text-slate-400">
-//             Tap to filter your list
-//           </div>
-//           {activeView !== "ALL" ? (
-//             <button
-//               type="button"
-//               onClick={() => onSelectView("ALL")}
-//               className="text-[11px] font-medium text-slate-700 hover:text-slate-900"
-//             >
-//               Reset
-//             </button>
-//           ) : (
-//             <span className="text-[11px] text-slate-400"> </span>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// DashboardStrip.propTypes = {
-//   tasks: PropTypes.array.isRequired,
-//   activeView: PropTypes.oneOf(["ALL", "PENDING", "DUE_SOON", "OVERDUE"])
-//     .isRequired,
-//   onSelectView: PropTypes.func.isRequired,
-// };
-
-// import { useMemo } from "react";
-// import PropTypes from "prop-types";
-
-// function daysUntil(dueAt) {
-//   if (!dueAt) return null;
-//   const now = new Date();
-//   const due = new Date(dueAt);
-//   const ms = due.getTime() - now.getTime();
-//   return Math.ceil(ms / (1000 * 60 * 60 * 24));
-// }
-
-// function accentFor(id) {
-//   if (id === "OVERDUE") return "bg-rose-500";
-//   if (id === "DUE_SOON") return "bg-amber-500";
-//   if (id === "PENDING") return "bg-sky-500";
-//   return "bg-slate-400";
-// }
-
-// function labelFor(id) {
-//   if (id === "ALL") return "All";
-//   if (id === "PENDING") return "Pending";
-//   if (id === "DUE_SOON") return "Due ≤3d";
-//   return "Overdue";
-// }
-
-// function subFor(id, metrics) {
-//   if (id === "ALL") return `No due: ${metrics.noDue}`;
-//   if (id === "PENDING") return "Needs action";
-//   if (id === "DUE_SOON") return "Today–3 days";
-//   return "Past due";
-// }
-
-// export default function DashboardStrip({
-//   tasks,
-//   activeView,
-//   onSelectView,
-//   variant = "mobile", // ✅ "mobile" keeps your current design
-// }) {
-//   const metrics = useMemo(() => {
-//     const total = tasks.length;
-//     const pending = tasks.filter((t) => t.currentStage === "Pending").length;
-
-//     const overdue = tasks.filter((t) => {
-//       const d = daysUntil(t.dueAt);
-//       return d !== null && d < 0;
-//     }).length;
-
-//     const dueSoon = tasks.filter((t) => {
-//       const d = daysUntil(t.dueAt);
-//       return d !== null && d >= 0 && d <= 3;
-//     }).length;
-
-//     const noDue = tasks.filter((t) => !t.dueAt).length;
-
-//     return { total, pending, overdue, dueSoon, noDue };
-//   }, [tasks]);
-
-//   const items = [
-//     { id: "ALL", value: metrics.total },
-//     { id: "PENDING", value: metrics.pending },
-//     { id: "DUE_SOON", value: metrics.dueSoon },
-//     { id: "OVERDUE", value: metrics.overdue },
-//   ];
-
-//   // ✅ Desktop variant: calm pill tabs
-//   if (variant === "desktop") {
-//     return (
-//       <div className="px-3 py-2 bg-white border-b border-slate-200">
-//         <div className="flex items-center gap-2 flex-wrap">
-//           {items.map((it) => {
-//             const active = activeView === it.id;
-//             return (
-//               <button
-//                 key={it.id}
-//                 type="button"
-//                 onClick={() => onSelectView(it.id)}
-//                 className={`relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm transition
-//                   ${
-//                     active
-//                       ? "bg-slate-900 text-white border-slate-900"
-//                       : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
-//                   }`}
-//                 title={labelFor(it.id)}
-//               >
-//                 <span
-//                   className={`h-2.5 w-2.5 rounded-full ${
-//                     active ? "bg-white/90" : accentFor(it.id)
-//                   }`}
-//                   aria-hidden="true"
-//                 />
-//                 <span className="font-medium">{labelFor(it.id)}</span>
-//                 <span
-//                   className={`text-xs px-2 py-0.5 rounded-full ${
-//                     active
-//                       ? "bg-white/15 text-white"
-//                       : "bg-slate-100 text-slate-700"
-//                   }`}
-//                 >
-//                   {it.value}
-//                 </span>
-//               </button>
-//             );
-//           })}
-
-//           {activeView !== "ALL" ? (
-//             <button
-//               type="button"
-//               onClick={() => onSelectView("ALL")}
-//               className="ml-1 text-xs text-slate-600 hover:text-slate-900 underline underline-offset-4"
-//             >
-//               Reset
-//             </button>
-//           ) : null}
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   // ✅ Mobile/default variant: your existing segmented card
-//   return (
-//     <div className="px-3 pt-2 pb-2 bg-slate-50">
-//       <div className="rounded-md border border-slate-50 bg-white overflow-hidden shadow-sm">
-//         <div className="grid grid-cols-4">
-//           {items.map((it, idx) => {
-//             const active = activeView === it.id;
-
-//             return (
-//               <button
-//                 key={it.id}
-//                 type="button"
-//                 onClick={() => onSelectView(it.id)}
-//                 className={`text-center relative px-2.5 py-2 transition active:scale-[0.99]
-//                   ${idx !== 0 ? "border-l border-slate-200" : ""}
-//                   ${active ? "bg-slate-50" : "bg-white hover:bg-slate-50"}
-//                 `}
-//                 title={labelFor(it.id)}
-//               >
-//                 <div
-//                   className={`absolute left-0 top-0 h-1 w-full ${accentFor(it.id)} ${
-//                     active ? "opacity-100" : "opacity-60"
-//                   }`}
-//                   aria-hidden="true"
-//                 />
-
-//                 <div className="pt-1">
-//                   <div className="text-sm md:text-base leading-4 text-slate-600">
-//                     {labelFor(it.id)}
-//                   </div>
-
-//                   <div className="mt-0.5 text-base leading-5 font-semibold text-slate-900">
-//                     {it.value}
-//                   </div>
-
-//                   <div className="mt-0.5 text-[10px] leading-4 text-slate-500">
-//                     {subFor(it.id, metrics)}
-//                   </div>
-//                 </div>
-
-//                 {active ? (
-//                   <div
-//                     className="absolute inset-0 ring-2 ring-slate-200 pointer-events-none"
-//                     aria-hidden="true"
-//                   />
-//                 ) : null}
-//               </button>
-//             );
-//           })}
-//         </div>
-
-//         <div className="flex items-center justify-between px-3 py-1 bg-slate-50">
-//           <div className="text-[10px] text-slate-400">
-//             Tap to filter your list
-//           </div>
-//           {activeView !== "ALL" ? (
-//             <button
-//               type="button"
-//               onClick={() => onSelectView("ALL")}
-//               className="text-[11px] font-medium text-slate-700 hover:text-slate-900"
-//             >
-//               Reset
-//             </button>
-//           ) : (
-//             <span className="text-[11px] text-slate-400"> </span>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// DashboardStrip.propTypes = {
-//   tasks: PropTypes.array.isRequired,
-//   activeView: PropTypes.oneOf(["ALL", "PENDING", "DUE_SOON", "OVERDUE"])
-//     .isRequired,
-//   onSelectView: PropTypes.func.isRequired,
-//   variant: PropTypes.oneOf(["mobile", "desktop"]),
-// };
-
 import { useMemo } from "react";
 import PropTypes from "prop-types";
 
@@ -361,27 +13,33 @@ function accentFor(id) {
   if (id === "OVERDUE") return "bg-rose-500";
   if (id === "DUE_SOON") return "bg-amber-500";
   if (id === "PENDING") return "bg-sky-500";
+  if (id === "TO_BE_DISCUSSED") return "bg-violet-500";
+  if (id === "COMMENTS_AWAITED") return "bg-cyan-500";
   return "bg-slate-400";
 }
 
 function labelFor(id) {
   if (id === "ALL") return "All";
   if (id === "PENDING") return "Pending";
+  if (id === "TO_BE_DISCUSSED") return "To be discussed";
+  if (id === "COMMENTS_AWAITED") return "Comments awaited";
   if (id === "DUE_SOON") return "Due ≤3d";
   return "Overdue";
-}
-
-function subFor(id, metrics) {
-  if (id === "ALL") return `No due: ${metrics.noDue}`;
-  if (id === "PENDING") return "Needs action";
-  if (id === "DUE_SOON") return "Today–3 days";
-  return "Past due";
 }
 
 export default function DashboardStrip({ tasks, activeView, onSelectView }) {
   const metrics = useMemo(() => {
     const total = tasks.length;
+
     const pending = tasks.filter((t) => t.currentStage === "Pending").length;
+
+    const toBeDiscussed = tasks.filter(
+      (t) => t.currentStage === "To be discussed",
+    ).length;
+
+    const commentsAwaited = tasks.filter(
+      (t) => t.currentStage === "Comments awaited",
+    ).length;
 
     const overdue = tasks.filter((t) => {
       const d = daysUntil(t.dueAt);
@@ -393,120 +51,125 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
       return d !== null && d >= 0 && d <= 3;
     }).length;
 
-    const noDue = tasks.filter((t) => !t.dueAt).length;
-
-    return { total, pending, overdue, dueSoon, noDue };
+    return {
+      total,
+      pending,
+      toBeDiscussed,
+      commentsAwaited,
+      overdue,
+      dueSoon,
+    };
   }, [tasks]);
 
   const items = [
     { id: "ALL", value: metrics.total },
     { id: "PENDING", value: metrics.pending },
+    { id: "TO_BE_DISCUSSED", value: metrics.toBeDiscussed },
+    { id: "COMMENTS_AWAITED", value: metrics.commentsAwaited },
     { id: "DUE_SOON", value: metrics.dueSoon },
     { id: "OVERDUE", value: metrics.overdue },
   ];
 
   return (
     <>
-      {/* ===== Mobile / Tablet (unchanged) ===== */}
+      {/* ===== Mobile ===== */}
       <div className="lg:hidden px-3 pt-2 pb-2 bg-slate-50">
-        <div className="rounded-md border border-slate-50 bg-white overflow-hidden shadow-sm">
-          <div className="grid grid-cols-4">
-            {items.map((it, idx) => {
-              const active = activeView === it.id;
-
-              return (
-                <button
-                  key={it.id}
-                  type="button"
-                  onClick={() => onSelectView(it.id)}
-                  className={`text-center relative px-2.5 py-2 transition active:scale-[0.99]
-                    ${idx !== 0 ? "border-l border-slate-200" : ""}
-                    ${active ? "bg-slate-50" : "bg-white hover:bg-slate-50"}
-                  `}
-                  title={labelFor(it.id)}
-                >
-                  <div
-                    className={`absolute left-0 top-0 h-1 w-full ${accentFor(it.id)} ${
-                      active ? "opacity-100" : "opacity-60"
-                    }`}
-                    aria-hidden="true"
-                  />
-
-                  <div className="pt-1">
-                    <div className="text-sm md:text-base leading-4 text-slate-600">
-                      {labelFor(it.id)}
-                    </div>
-
-                    <div className="mt-0.5 text-base leading-5 font-semibold text-slate-900">
-                      {it.value}
-                    </div>
-
-                    <div className="mt-0.5 text-[10px] leading-4 text-slate-500">
-                      {subFor(it.id, metrics)}
-                    </div>
-                  </div>
-
-                  {active ? (
-                    <div
-                      className="absolute inset-0 ring-2 ring-slate-200 pointer-events-none"
-                      aria-hidden="true"
-                    />
-                  ) : null}
-                </button>
-              );
-            })}
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-[11px] font-medium text-slate-500">
+            Filter tasks
           </div>
 
-          <div className="flex items-center justify-between px-3 py-1 bg-slate-50">
-            <div className="text-[10px] text-slate-400">
-              Tap to filter your list
-            </div>
-            {activeView !== "ALL" ? (
-              <button
-                type="button"
-                onClick={() => onSelectView("ALL")}
-                className="text-[11px] font-medium text-slate-700 hover:text-slate-900"
-              >
-                Reset
-              </button>
-            ) : (
-              <span className="text-[11px] text-slate-400"> </span>
-            )}
-          </div>
+          {activeView !== "ALL" && (
+            <button
+              type="button"
+              onClick={() => onSelectView("ALL")}
+              className="text-[11px] font-medium text-slate-700"
+            >
+              Reset
+            </button>
+          )}
         </div>
-      </div>
 
-      {/* ===== Desktop (compact, professional) ===== */}
-      <div className="hidden lg:block bg-white border-b border-slate-200 px-3 py-2">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="grid grid-cols-2 gap-2">
           {items.map((it) => {
             const active = activeView === it.id;
+
             return (
               <button
                 key={it.id}
                 type="button"
                 onClick={() => onSelectView(it.id)}
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition
+                className={`rounded-2xl border px-3 py-2.5 text-left transition
+                  ${
+                    active
+                      ? "border-slate-300 bg-white shadow-sm"
+                      : "border-slate-200 bg-white/80"
+                  }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${accentFor(it.id)}`}
+                    />
+                    <span
+                      className={`text-xs ${
+                        active
+                          ? "font-semibold text-slate-900"
+                          : "text-slate-600"
+                      }`}
+                    >
+                      {labelFor(it.id)}
+                    </span>
+                  </div>
+
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold
+                      ${
+                        active
+                          ? "bg-slate-900 text-white"
+                          : "bg-slate-100 text-slate-700"
+                      }`}
+                  >
+                    {it.value}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ===== Desktop ===== */}
+      <div className="hidden lg:block border-b border-slate-200 bg-white px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 ">
+          {items.map((it) => {
+            const active = activeView === it.id;
+
+            return (
+              <button
+                key={it.id}
+                type="button"
+                onClick={() => onSelectView(it.id)}
+                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm
                   ${
                     active
                       ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-700 border-slate-200 hover:border-slate-300"
+                      : "bg-white text-slate-700 border-slate-200"
                   }`}
-                title={labelFor(it.id)}
               >
                 <span
                   className={`h-2.5 w-2.5 rounded-full ${
                     active ? "bg-white/90" : accentFor(it.id)
                   }`}
-                  aria-hidden="true"
                 />
-                <span className="font-medium">{labelFor(it.id)}</span>
+                <span>{labelFor(it.id)}</span>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full ${
-                    active
-                      ? "bg-white/15 text-white"
-                      : "bg-slate-100 text-slate-700"
-                  }`}
+                  className={`text-xs px-2 py-0.5 rounded-full
+                    ${
+                      active
+                        ? "bg-white/15 text-white"
+                        : "bg-slate-100 text-slate-700"
+                    }`}
                 >
                   {it.value}
                 </span>
@@ -514,15 +177,15 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
             );
           })}
 
-          {activeView !== "ALL" ? (
+          {activeView !== "ALL" && (
             <button
               type="button"
               onClick={() => onSelectView("ALL")}
-              className="ml-1 text-xs text-slate-600 hover:text-slate-900 underline underline-offset-4"
+              className="ml-1 text-xs text-slate-600 underline"
             >
               Reset
             </button>
-          ) : null}
+          )}
         </div>
       </div>
     </>
@@ -531,7 +194,13 @@ export default function DashboardStrip({ tasks, activeView, onSelectView }) {
 
 DashboardStrip.propTypes = {
   tasks: PropTypes.array.isRequired,
-  activeView: PropTypes.oneOf(["ALL", "PENDING", "DUE_SOON", "OVERDUE"])
-    .isRequired,
+  activeView: PropTypes.oneOf([
+    "ALL",
+    "PENDING",
+    "TO_BE_DISCUSSED",
+    "COMMENTS_AWAITED",
+    "DUE_SOON",
+    "OVERDUE",
+  ]).isRequired,
   onSelectView: PropTypes.func.isRequired,
 };
