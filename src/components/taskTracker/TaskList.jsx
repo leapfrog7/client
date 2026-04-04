@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { diffDays, safeTrim } from "./utils";
 import { getStageStyle, QUICK_STAGES } from "./constants";
+import { exportTaskSummaryPdf } from "./exportTaskSummaryPdf";
+import { FaRegFilePdf } from "react-icons/fa";
 
 function daysUntil(dueAt) {
   if (!dueAt) return null;
@@ -160,11 +162,10 @@ export default function TaskList({
   return (
     <div className="h-full min-h-0 flex flex-col border-r border-slate-200 bg-white overflow-hidden">
       {/* ===== Command Bar (compact desktop-friendly) ===== */}
-      <div className="border-b border-slate-200 bg-white px-3 py-3 xl:px-4 xl:py-4">
-        <div className="flex items-center gap-2">
-          {/* Search dominates */}
+      <div className="border-b border-slate-200 bg-white px-3 py-2 xl:px-4">
+        {/* Search dominates */}
+        <div className="flex gap-2">
           <div className="relative flex-1">
-            {/* Search icon */}
             <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
               🔍
             </div>
@@ -173,45 +174,48 @@ export default function TaskList({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search tasks..."
-              className={`
-      w-full min-w-0
-      rounded-xl border border-slate-800 bg-slate-100 focus:bg-white
-      pl-3 pr-9
-      shadow-sm transition-all duration-200
-      text-slate-800 placeholder:text-slate-400
-
-   
-
-      ${compact ? "px-3 py-1.5 text-xs" : "px-3 py-2.5 text-sm"}
-    `}
+              className={`w-full min-w-0 rounded-xl border border-slate-800 bg-slate-100 focus:bg-white pl-3 pr-9 shadow-sm transition-all duration-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 ${
+                compact ? "py-1.5 text-xs" : "py-2.5 text-sm"
+              }`}
             />
 
-            {/* Clear button */}
             {q && (
               <button
                 type="button"
                 onClick={() => setQ("")}
-                className="absolute inset-y-0 right-2 flex items-center px-2 text-slate-400 hover:text-slate-700 transition"
+                className="absolute inset-y-0 right-2 flex items-center px-2 text-slate-400 transition hover:text-slate-700"
               >
                 ✕
               </button>
             )}
           </div>
-
+          {/* Small status line (kept very compact) */}
+          <div className=" max-w-24 mt-2 flex flex-col items-center justify-between text-[11px] text-slate-500">
+            <span>
+              {showArchived ? "Archived" : "Active"} · {filtered.length} shown
+            </span>
+            {q ? (
+              <span className="hidden xl:inline">Searching: “{q}”</span>
+            ) : (
+              <span />
+            )}
+          </div>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
           {/* Filters */}
           <button
             type="button"
             onClick={() => setFiltersOpen((v) => !v)}
-            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300
-              ${compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"}
-            `}
+            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300 ${
+              compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
+            }`}
             title="Filters"
           >
             <span className="inline-flex items-center gap-1">
               <span aria-hidden="true">⚙️</span>
               <span className={compact ? "hidden" : ""}>Filters</span>
               {activeFilterCount > 0 ? (
-                <span className="ml-1 text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                <span className="ml-1 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[11px] text-slate-700">
                   {activeFilterCount}
                 </span>
               ) : null}
@@ -222,9 +226,9 @@ export default function TaskList({
           <button
             type="button"
             onClick={onCreate}
-            className={`shrink-0 rounded-lg bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.99]
-              ${compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"}
-            `}
+            className={`shrink-0 rounded-lg bg-slate-900 text-white hover:bg-slate-800 active:scale-[0.99] ${
+              compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
+            }`}
             title="Create new task"
           >
             <span className="inline-flex items-center gap-1">
@@ -237,9 +241,9 @@ export default function TaskList({
           <button
             type="button"
             onClick={onToggleArchived}
-            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300
-              ${compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"}
-            `}
+            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300 ${
+              compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
+            }`}
             title={
               showArchived ? "Back to active tasks" : "View archived tasks"
             }
@@ -251,18 +255,23 @@ export default function TaskList({
               </span>
             </span>
           </button>
-        </div>
 
-        {/* Small status line (kept very compact) */}
-        <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-          <span>
-            {showArchived ? "Archived" : "Active"} · {filtered.length} shown
-          </span>
-          {q ? (
-            <span className="hidden xl:inline">Searching: “{q}”</span>
-          ) : (
-            <span />
-          )}
+          {/* Download Summary */}
+          <button
+            type="button"
+            onClick={() => exportTaskSummaryPdf(tasks)}
+            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300 ${
+              compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
+            }`}
+            title="Download summary PDF"
+          >
+            <span className="inline-flex items-center gap-1">
+              <span aria-hidden="true" className="text-red-700">
+                <FaRegFilePdf />
+              </span>
+              <span className={compact ? "hidden" : ""}>PDF Summary</span>
+            </span>
+          </button>
         </div>
 
         {/* ===== Filter drawer (desktop-only feel, but safe everywhere) ===== */}

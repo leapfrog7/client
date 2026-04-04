@@ -7,25 +7,191 @@ import {
   TextRun,
   UnderlineType,
   convertInchesToTwip,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
 } from "docx";
 import { saveAs } from "file-saver";
 
 const A4_PAGE_WIDTH_TWIP = 11906;
 const A4_PAGE_HEIGHT_TWIP = 16838;
 
-function splitNonEmptyParagraphs(text) {
-  return String(text || "")
-    .replace(/\r\n/g, "\n")
-    .split(/\n\s*\n/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-}
-
 function splitLinesPreserveMeaning(text) {
   return String(text || "")
     .replace(/\r\n/g, "\n")
     .split("\n")
     .map((line) => line.replace(/\s+$/, ""));
+}
+
+function parseInlineHtmlToRuns(html, styling) {
+  const container = document.createElement("div");
+  container.innerHTML = String(html || "");
+
+  const runs = [];
+
+  const walk = (
+    node,
+    marks = { bold: false, italic: false, underline: false },
+  ) => {
+    node.childNodes.forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const text = child.textContent || "";
+        if (text) {
+          runs.push(
+            new TextRun({
+              text,
+              bold: marks.bold,
+              italics: marks.italic,
+              underline: marks.underline
+                ? { type: UnderlineType.SINGLE }
+                : undefined,
+              font: styling.fontFamily,
+              size: styling.fontSize * 2,
+            }),
+          );
+        }
+        return;
+      }
+
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const tag = child.tagName.toLowerCase();
+
+        if (tag === "br") {
+          runs.push(
+            new TextRun({
+              break: 1,
+              font: styling.fontFamily,
+              size: styling.fontSize * 2,
+            }),
+          );
+          return;
+        }
+
+        const nextMarks = {
+          bold: marks.bold || tag === "b" || tag === "strong",
+          italic: marks.italic || tag === "i" || tag === "em",
+          underline: marks.underline || tag === "u",
+        };
+
+        walk(child, nextMarks);
+
+        if (tag === "div" || tag === "p") {
+          runs.push(
+            new TextRun({
+              break: 1,
+              font: styling.fontFamily,
+              size: styling.fontSize * 2,
+            }),
+          );
+        }
+      }
+    });
+  };
+
+  walk(container);
+
+  return runs.length
+    ? runs
+    : [
+        new TextRun({
+          text: "",
+          font: styling.fontFamily,
+          size: styling.fontSize * 2,
+        }),
+      ];
+}
+
+function parseRichHtmlToParagraphs(html, styling) {
+  const container = document.createElement("div");
+  container.innerHTML = String(html || "");
+
+  const blocks = [];
+  let current = [];
+
+  const pushCurrent = () => {
+    if (!current.length) return;
+    blocks.push(current);
+    current = [];
+  };
+
+  const walk = (
+    node,
+    marks = { bold: false, italic: false, underline: false },
+  ) => {
+    node.childNodes.forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        const text = child.textContent || "";
+        if (text) {
+          current.push(
+            new TextRun({
+              text,
+              bold: marks.bold,
+              italics: marks.italic,
+              underline: marks.underline
+                ? { type: UnderlineType.SINGLE }
+                : undefined,
+              font: styling.fontFamily,
+              size: styling.fontSize * 2,
+            }),
+          );
+        }
+        return;
+      }
+
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const tag = child.tagName.toLowerCase();
+
+        if (tag === "br") {
+          current.push(
+            new TextRun({
+              break: 1,
+              font: styling.fontFamily,
+              size: styling.fontSize * 2,
+            }),
+          );
+          return;
+        }
+
+        const nextMarks = {
+          bold: marks.bold || tag === "b" || tag === "strong",
+          italic: marks.italic || tag === "i" || tag === "em",
+          underline: marks.underline || tag === "u",
+        };
+
+        if (tag === "div" || tag === "p") {
+          pushCurrent();
+          walk(child, nextMarks);
+          pushCurrent();
+        } else {
+          walk(child, nextMarks);
+        }
+      }
+    });
+  };
+
+  walk(container);
+  pushCurrent();
+
+  return blocks.length
+    ? blocks
+    : [
+        [
+          new TextRun({
+            text: "",
+            font: styling.fontFamily,
+            size: styling.fontSize * 2,
+          }),
+        ],
+      ];
+}
+
+function isRichTextBlock(type) {
+  return (
+    type === "subject_block" ||
+    type === "body_paragraph" ||
+    type === "intro_phrase_block"
+  );
 }
 
 function getBlockText(block) {
@@ -40,6 +206,71 @@ function getBlockText(block) {
   }
 
   return block.content || block.placeholder || "";
+}
+
+function buildDocxTable(block, prevType, styling) {
+  const rows = Array.isArray(block.content?.rows) ? block.content.rows : [];
+  const hasHeaderRow = block.content?.hasHeaderRow ?? true;
+  const title = block.content?.title || "";
+
+  const beforeSpacing = getSpacingBefore(block, prevType, styling);
+
+  const table = new Table({
+    width: {
+      size: 100,
+      type: WidthType.PERCENTAGE,
+    },
+    rows: rows.map(
+      (row, rowIndex) =>
+        new TableRow({
+          children: row.map(
+            (cell) =>
+              new TableCell({
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: String(cell ?? ""),
+                        bold: hasHeaderRow && rowIndex === 0,
+                        font: styling.fontFamily,
+                        size: styling.fontSize * 2,
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+          ),
+        }),
+    ),
+  });
+
+  const output = [];
+
+  if (title) {
+    output.push(
+      new Paragraph({
+        spacing: { before: beforeSpacing, after: 120 },
+        children: [
+          new TextRun({
+            text: title,
+            bold: true,
+            font: styling.fontFamily,
+            size: styling.fontSize * 2,
+          }),
+        ],
+      }),
+    );
+  } else {
+    output.push(
+      new Paragraph({
+        spacing: { before: beforeSpacing, after: 0 },
+        children: [new TextRun({ text: "" })],
+      }),
+    );
+  }
+
+  output.push(table);
+  return output;
 }
 
 function getAlignment(type) {
@@ -140,54 +371,11 @@ function getSpacingBefore(block, prevType, styling) {
   return Math.round((styling.paragraphSpacing || 4) * 0.75 * 20);
 }
 
-// function makeTextRunsForBlock(block, styling) {
-//   if (block.type === "subject_block") {
-//     return [
-//       new TextRun({
-//         text: "Subject: ",
-//         bold: true,
-//         font: styling.fontFamily,
-//         size: styling.fontSize * 2,
-//       }),
-//       new TextRun({
-//         text: block.content || "",
-//         bold: true,
-//         font: styling.fontFamily,
-//         size: styling.fontSize * 2,
-//       }),
-//     ];
-//   }
-
-//   if (block.type === "communication_label") {
-//     return [
-//       new TextRun({
-//         text: String(block.content || "").toUpperCase(),
-//         bold: true,
-//         underline: styling.underlineCommunicationLabel
-//           ? { type: UnderlineType.SINGLE }
-//           : undefined,
-//         font: styling.fontFamily,
-//         size: styling.fontSize * 2,
-//       }),
-//     ];
-//   }
-
-//   const text = typeof block.content === "string" ? block.content : "";
-
-//   return [
-//     new TextRun({
-//       text,
-//       bold:
-//         block.type === "document_number" ||
-//         block.type === "government_identity" ||
-//         block.type === "department_identity",
-//       font: styling.fontFamily,
-//       size: styling.fontSize * 2,
-//     }),
-//   ];
-// }
-
 function makeParagraphsForBlock(block, prevType, styling) {
+  if (block.type === "body_table") {
+    return buildDocxTable(block, prevType, styling);
+  }
+
   const text = getBlockText(block);
   const alignment = getAlignment(block.type);
   const beforeSpacing = getSpacingBefore(block, prevType, styling);
@@ -203,8 +391,18 @@ function makeParagraphsForBlock(block, prevType, styling) {
     firstLine: convertInchesToTwip(styling.bodyFirstLineIndent || 0.5),
   };
 
-  // Subject
   if (block.type === "subject_block") {
+    const richRuns = isRichTextBlock(block.type)
+      ? parseInlineHtmlToRuns(block.content || "", styling)
+      : [
+          new TextRun({
+            text: typeof text === "string" ? text : "",
+            bold: true,
+            font: styling.fontFamily,
+            size: styling.fontSize * 2,
+          }),
+        ];
+
     return [
       new Paragraph({
         children: [
@@ -214,12 +412,7 @@ function makeParagraphsForBlock(block, prevType, styling) {
             font: styling.fontFamily,
             size: styling.fontSize * 2,
           }),
-          new TextRun({
-            text: text,
-            bold: true,
-            font: styling.fontFamily,
-            size: styling.fontSize * 2,
-          }),
+          ...richRuns,
         ],
         alignment,
         spacing: commonSpacing,
@@ -227,11 +420,10 @@ function makeParagraphsForBlock(block, prevType, styling) {
     ];
   }
 
-  // Body blocks: preserve separate paras inside one block
   if (block.type === "body_paragraph" || block.type === "intro_phrase_block") {
-    const paras = splitNonEmptyParagraphs(text);
+    const rawHtml = typeof block.content === "string" ? block.content : "";
 
-    if (!paras.length) {
+    if (!rawHtml.trim()) {
       return [
         new Paragraph({
           children: [
@@ -248,16 +440,12 @@ function makeParagraphsForBlock(block, prevType, styling) {
       ];
     }
 
-    return paras.map(
-      (para, index) =>
+    const paragraphRuns = parseRichHtmlToParagraphs(rawHtml, styling);
+
+    return paragraphRuns.map(
+      (runs, index) =>
         new Paragraph({
-          children: [
-            new TextRun({
-              text: para,
-              font: styling.fontFamily,
-              size: styling.fontSize * 2,
-            }),
-          ],
+          children: runs,
           alignment,
           spacing: {
             before:
@@ -270,7 +458,6 @@ function makeParagraphsForBlock(block, prevType, styling) {
     );
   }
 
-  // Addressee and Copy To: preserve heading and numbered items as separate paragraphs
   if (block.type === "to_block" || block.type === "copy_to_block") {
     const lines = splitLinesPreserveMeaning(text).filter(
       (line) => line.trim() !== "",
@@ -306,7 +493,6 @@ function makeParagraphsForBlock(block, prevType, styling) {
     });
   }
 
-  // Designation/contact block: preserve line-by-line structure
   if (block.type === "designation_contact_block") {
     const lines = splitLinesPreserveMeaning(text).filter(
       (line) => line.trim() !== "",
@@ -334,17 +520,12 @@ function makeParagraphsForBlock(block, prevType, styling) {
     );
   }
 
-  // Generic single paragraph block
   return [
     new Paragraph({
       children: [
         new TextRun({
-          text,
-          bold:
-            block.type === "document_number" ||
-            block.type === "government_identity" ||
-            block.type === "department_identity" ||
-            block.type === "communication_label",
+          text: typeof text === "string" ? text : "",
+          bold: block.type === "communication_label",
           underline:
             block.type === "communication_label" &&
             styling.underlineCommunicationLabel

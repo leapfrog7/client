@@ -31,9 +31,9 @@ function getLastUpdate(task) {
     (a, b) => new Date(b.at) - new Date(a.at),
   )[0];
 
-  if (latest.remark) return latest.remark.slice(0, 120);
+  if (latest.remark?.trim()) return latest.remark.trim().slice(0, 140);
 
-  if (latest.type === "stage_change") {
+  if (latest.type === "stage_change" && latest.toStage) {
     return `Moved to "${latest.toStage}"`;
   }
 
@@ -47,8 +47,31 @@ function getAge(createdAt) {
   return `${diff}d`;
 }
 
-// ---------- Stage order ----------
-const STAGE_ORDER = [
+function normalizeStage(stage) {
+  return String(stage || "").trim();
+}
+
+function sortTasksForPdf(list) {
+  return [...list].sort((a, b) => {
+    const da = daysUntil(a.dueAt);
+    const db = daysUntil(b.dueAt);
+
+    const aOverdue = da !== null && da < 0;
+    const bOverdue = db !== null && db < 0;
+    if (aOverdue && !bOverdue) return -1;
+    if (!aOverdue && bOverdue) return 1;
+
+    const aDueSoon = da !== null && da >= 0 && da <= 3;
+    const bDueSoon = db !== null && db >= 0 && db <= 3;
+    if (aDueSoon && !bDueSoon) return -1;
+    if (!aDueSoon && bDueSoon) return 1;
+
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+}
+
+// ---------- Known stage order ----------
+const KNOWN_STAGE_ORDER = [
   "Pending",
   "Under submission",
   "To be discussed",
@@ -57,13 +80,16 @@ const STAGE_ORDER = [
   "Approved",
   "Draft Issued",
   "In Abeyance",
+  "No Action needed",
+  "Completed",
 ];
 
-// ---------- Main function ----------
+// ---------- Main ----------
 export function exportTaskSummaryPdf(tasks, userName = "User") {
-  const doc = new jsPDF();
+  const doc = new jsPDF({ orientation: "landscape" });
 
-  const activeTasks = tasks.filter((t) => !t.isArchived);
+  // Active only
+  const activeTasks = (tasks || []).filter((t) => !t.isArchived);
 
   // ---------- Summary ----------
   const total = activeTasks.length;
@@ -79,94 +105,144 @@ export function exportTaskSummaryPdf(tasks, userName = "User") {
   }).length;
 
   const commentsAwaited = activeTasks.filter(
-    (t) => t.currentStage === "Comments awaited",
+    (t) => normalizeStage(t.currentStage) === "Comments awaited",
   ).length;
 
-  // ---------- Header ----------
-  doc.setFontSize(16);
-  doc.text("Task Summary", 14, 15);
+  const miscCount = activeTasks.filter((t) => {
+    const stage = normalizeStage(t.currentStage);
+    return !KNOWN_STAGE_ORDER.includes(stage);
+  }).length;
 
-  doc.setFontSize(10);
+  // ---------- Header ----------
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(14);
+
   doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 22);
   doc.text(`User: ${userName}`, 14, 27);
 
-  doc.text(
-    `Total: ${total} | Overdue: ${overdue} | Due ≤3d: ${dueSoon} | Comments awaited: ${commentsAwaited}`,
-    14,
-    32,
-  );
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total Active: ${total}`, 14, 33);
+  doc.text(`Overdue: ${overdue}`, 60, 33);
+  doc.text(`Due within 3d: ${dueSoon}`, 100, 33);
 
-  let y = 38;
+  doc.text(`Comments awaited: ${commentsAwaited}`, 14, 39);
+  doc.text(`Misc.: ${miscCount}`, 100, 39);
 
-  // ---------- Group by stage ----------
-  const grouped = {};
+  doc.setFont("helvetica", "normal");
 
-  activeTasks.forEach((t) => {
-    const stage = t.currentStage || "Other";
-    if (!grouped[stage]) grouped[stage] = [];
-    grouped[stage].push(t);
+  let y = 46;
+
+  // ---------- Group tasks ----------
+  const knownGroups = {};
+  const miscGroups = {};
+
+  activeTasks.forEach((task) => {
+    const stage = normalizeStage(task.currentStage) || "Misc.";
+
+    if (KNOWN_STAGE_ORDER.includes(stage)) {
+      if (!knownGroups[stage]) knownGroups[stage] = [];
+      knownGroups[stage].push(task);
+    } else {
+      if (!miscGroups[stage]) miscGroups[stage] = [];
+      miscGroups[stage].push(task);
+    }
   });
 
-  // ---------- Render each stage ----------
-  STAGE_ORDER.forEach((stage) => {
-    const list = grouped[stage];
-    if (!list || list.length === 0) return;
+  // ---------- Render helper ----------
+  function renderStageTable(stageTitle, list, includeActualStage = false) {
+    if (!list?.length) return;
 
-    // Sort: overdue → due soon → age desc
-    list.sort((a, b) => {
-      const da = daysUntil(a.dueAt);
-      const db = daysUntil(b.dueAt);
+    if (y > 185) {
+      doc.addPage();
+      y = 18;
+    }
 
-      if (da < 0 && db >= 0) return -1;
-      if (db < 0 && da >= 0) return 1;
-
-      if (da <= 3 && db > 3) return -1;
-      if (db <= 3 && da > 3) return 1;
-
-      return new Date(a.createdAt) - new Date(b.createdAt);
-    });
-
-    // Stage title
     doc.setFontSize(12);
-    doc.text(stage, 14, y);
-
+    doc.text(stageTitle, 14, y);
     y += 4;
 
-    // Table
-    autoTable(doc, {
-      startY: y,
-      head: [["S. No.", "Title", "Age", "Due on", "Last Update", "File No."]],
-      body: list.map((t, i) => [
+    const head = includeActualStage
+      ? [
+          [
+            "S. No.",
+            "Title",
+            "Age",
+            "Due on",
+            "Last Update",
+            "File No.",
+            "Stage",
+          ],
+        ]
+      : [["S. No.", "Title", "Age", "Due on", "Last Update", "File No."]];
+
+    const body = sortTasksForPdf(list).map((t, i) => {
+      const row = [
         i + 1,
         t.title || "Untitled",
         getAge(t.createdAt),
         formatDue(t.dueAt),
         getLastUpdate(t),
         t.identifiers?.fileNo || "—",
-      ]),
+      ];
+
+      if (includeActualStage) {
+        row.push(normalizeStage(t.currentStage) || "—");
+      }
+
+      return row;
+    });
+
+    autoTable(doc, {
+      startY: y,
+      head,
+      body,
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 11,
+        cellPadding: 2.2,
         valign: "top",
+        overflow: "linebreak",
       },
       headStyles: {
         fillColor: [240, 240, 240],
         textColor: 20,
       },
-      columnStyles: {
-        0: { cellWidth: 12 },
-        1: { cellWidth: 50 },
-        2: { cellWidth: 12 },
-        3: { cellWidth: 22 },
-        4: { cellWidth: 60 },
-        5: { cellWidth: 25 },
-      },
-      didDrawPage: () => {},
+      columnStyles: includeActualStage
+        ? {
+            0: { cellWidth: 12 },
+            1: { cellWidth: 80 },
+            2: { cellWidth: 14 },
+            3: { cellWidth: 22 },
+            4: { cellWidth: 80 },
+            5: { cellWidth: 28 },
+            6: { cellWidth: 35 },
+          }
+        : {
+            0: { cellWidth: 12 },
+            1: { cellWidth: 78 },
+            2: { cellWidth: 14 },
+            3: { cellWidth: 22 },
+            4: { cellWidth: 100 },
+            5: { cellWidth: 20 },
+          },
+      margin: { left: 14, right: 14 },
     });
 
     y = doc.lastAutoTable.finalY + 10;
+  }
+
+  // ---------- Render known stages in order ----------
+  KNOWN_STAGE_ORDER.forEach((stage) => {
+    renderStageTable(stage, knownGroups[stage] || []);
   });
 
-  // ---------- Save ----------
+  // ---------- Render Misc. ----------
+  const miscStageNames = Object.keys(miscGroups);
+
+  if (miscStageNames.length > 0) {
+    const miscTasks = miscStageNames.flatMap((stage) => miscGroups[stage]);
+
+    renderStageTable("Misc.", miscTasks, true);
+  }
+
   doc.save("task-summary.pdf");
 }

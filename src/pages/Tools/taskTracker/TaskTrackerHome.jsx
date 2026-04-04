@@ -17,10 +17,12 @@ import {
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
 import DashboardStrip from "../../../components/taskTracker/DashboardStrip";
 import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccordion";
+import { exportTaskSummaryPdf } from "../../../components/taskTracker/exportTaskSummaryPdf";
 // import TaskTrackerTutorial from "../../../components/taskTracker/TaskTrackerTutorial";
 // import PageFeedback from "../../../components/PageFeedback";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
+import { FaRegFilePdf } from "react-icons/fa";
 
 function daysUntil(dueAt) {
   if (!dueAt) return null;
@@ -580,48 +582,60 @@ export default function TaskTrackerHome() {
                 {/* Mobile action panel */}
                 <div className="px-3 pt-2">
                   <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm backdrop-blur-sm">
-                    <div className="p-3">
+                    <div className="p-3 space-y-2.5">
                       <button
                         type="button"
                         onClick={handleCreate}
-                        className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.99]"
+                        className="
+      w-full rounded-xl bg-slate-900 px-4 py-3
+      text-sm font-semibold text-white shadow-sm
+      transition hover:bg-slate-800 active:scale-[0.99]
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
+    "
                       >
                         + Create New Task
                       </button>
 
-                      <div className="mt-2 grid grid-cols-[1fr_auto] gap-2">
-                        <button
-                          type="button"
-                          onClick={toggleArchivedView}
-                          className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition active:scale-[0.99] ${
-                            showArchived
-                              ? "border-teal-200 bg-teal-50 text-teal-800"
-                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                          }`}
-                          title={
-                            showArchived
-                              ? "Back to active tasks"
-                              : "View archived tasks"
-                          }
-                        >
-                          {showArchived
-                            ? "📌 Back to Active"
-                            : "📦 See Archive"}
-                        </button>
-                        {/* 
-                        <button
-                          type="button"
-                          onClick={() => setTutorialOpen(true)}
-                          className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-blue-800 transition hover:bg-blue-100 active:scale-[0.99]"
-                          title="How to use"
-                        >
-                          📘 Help
-                        </button> */}
-                      </div>
+                      <button
+                        type="button"
+                        onClick={toggleArchivedView}
+                        className={`w-full rounded-xl border px-4 py-3 text-sm font-medium shadow-sm transition active:scale-[0.99]
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
+      ${
+        showArchived
+          ? "border-teal-200 bg-teal-50 text-teal-800 hover:bg-teal-100"
+          : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+      }`}
+                        title={
+                          showArchived
+                            ? "Back to active tasks"
+                            : "View archived tasks"
+                        }
+                      >
+                        <span className="inline-flex items-center justify-center gap-2">
+                          <span>{showArchived ? "📌" : "📦"}</span>
+                          <span>
+                            {showArchived ? "Back to Active" : "See Archive"}
+                          </span>
+                        </span>
+                      </button>
 
-                      {/* <div className="mt-2 px-1 text-[11px] text-slate-500">
-                        Track office work by stage, due date, and milestones.
-                      </div> */}
+                      <button
+                        type="button"
+                        onClick={() => exportTaskSummaryPdf(tasks)}
+                        className="
+      w-full rounded-xl border border-slate-200 bg-white px-4 py-3
+      text-sm font-medium text-slate-700 shadow-sm
+      transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.99]
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
+    "
+                        title="Download task summary PDF"
+                      >
+                        <span className="inline-flex items-center justify-center gap-2">
+                          <FaRegFilePdf className="text-base text-rose-600" />
+                          <span>Download Summary PDF</span>
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </div>

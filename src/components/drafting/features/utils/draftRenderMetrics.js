@@ -1,15 +1,46 @@
-export function getDraftBlockText(block) {
-  if (block.type === "subject_block") {
-    return `Subject: ${block.content || block.placeholder || ""}`;
-  }
+function stripHtml(html) {
+  return String(html || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/div>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
+function isRichTextBlock(type) {
+  return (
+    type === "subject_block" ||
+    type === "body_paragraph" ||
+    type === "intro_phrase_block"
+  );
+}
+
+export function getDraftBlockText(block) {
   if (block.type === "place_date_line") {
     const place = block.content?.place || "";
     const date = block.content?.date || "";
     return `${place}\nDated ${date}`;
   }
 
+  if (isRichTextBlock(block.type)) {
+    const raw =
+      typeof block.content === "string"
+        ? block.content
+        : block.placeholder || "";
+    return stripHtml(raw);
+  }
+
   return block.content || block.placeholder || "";
+}
+
+export function getDraftBlockHtml(block) {
+  if (!isRichTextBlock(block.type)) return null;
+
+  const raw =
+    typeof block.content === "string" ? block.content : block.placeholder || "";
+
+  return raw || "";
 }
 
 export function getDraftBlockClass(type, underlineCommunicationLabel = true) {
@@ -64,7 +95,11 @@ export function getDraftBlockSpacing(block, prevType, styling) {
     return 10;
   }
 
-  if (prevType === "body_paragraph" || prevType === "intro_phrase_block") {
+  if (
+    prevType === "body_paragraph" ||
+    prevType === "intro_phrase_block" ||
+    prevType === "body_table"
+  ) {
     if (
       block.type === "signoff_block" ||
       block.type === "complimentary_close" ||
@@ -88,7 +123,9 @@ export function getDraftBlockSpacing(block, prevType, styling) {
 
   if (
     prevType === "subject_block" &&
-    (block.type === "body_paragraph" || block.type === "intro_phrase_block")
+    (block.type === "body_paragraph" ||
+      block.type === "intro_phrase_block" ||
+      block.type === "body_table")
   ) {
     return styling.bodyParagraphSpacing || 8;
   }
@@ -118,6 +155,6 @@ export function getDraftBlockStyle(block, styling) {
       block.type === "department_identity"
         ? 500
         : undefined,
-    textIndent: isBody ? `${styling.bodyFirstLineIndent || 0.5}in` : 0,
+    textIndent: isBody ? `${styling.bodyFirstLineIndent}in` : 0,
   };
 }

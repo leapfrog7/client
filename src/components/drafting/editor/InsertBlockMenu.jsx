@@ -19,6 +19,7 @@ InsertBlockMenu.propTypes = {
 const FRIENDLY_LABELS = {
   subject_block: "Subject",
   body_paragraph: "Body Paragraph",
+  body_table: "Table",
   intro_phrase_block: "Body Text",
   salutation_block: "Salutation",
   to_block: "To",
@@ -51,6 +52,7 @@ const TYPE_PRIORITIES = {
   office_memorandum: [
     "subject_block",
     "body_paragraph",
+    "body_table",
     "to_block",
     "enclosure_block",
     "copy_to_block",
@@ -59,6 +61,7 @@ const TYPE_PRIORITIES = {
   ],
   office_order: [
     "body_paragraph",
+    "body_table",
     "copy_to_block",
     "enclosure_block",
     "subject_block",
@@ -70,6 +73,7 @@ const TYPE_PRIORITIES = {
     "subject_block",
     "salutation_block",
     "body_paragraph",
+    "body_table",
     "signoff_block",
     "signature_block",
     "designation_contact_block",
@@ -79,6 +83,7 @@ const TYPE_PRIORITIES = {
   do_letter: [
     "salutation_block",
     "body_paragraph",
+    "body_table",
     "complimentary_close",
     "recipient_identity_block",
     "contact_line",
@@ -87,6 +92,7 @@ const TYPE_PRIORITIES = {
   note: [
     "subject_block",
     "body_paragraph",
+    "body_table",
     "to_block",
     "copy_to_block",
     "enclosure_block",
@@ -94,6 +100,7 @@ const TYPE_PRIORITIES = {
   ],
   notification: [
     "body_paragraph",
+    "body_table",
     "subject_block",
     "copy_to_block",
     "enclosure_block",
@@ -103,6 +110,7 @@ const TYPE_PRIORITIES = {
   ],
   blank: [
     "body_paragraph",
+    "body_table",
     "subject_block",
     "to_block",
     "copy_to_block",
@@ -117,6 +125,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
   office_memorandum: [
     "subject_block",
     "body_paragraph",
+    "body_table",
     "to_block",
     "copy_to_block",
     "enclosure_block",
@@ -126,6 +135,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
   ],
   office_order: [
     "body_paragraph",
+    "body_table",
     "copy_to_block",
     "enclosure_block",
     "endorsement_block",
@@ -138,6 +148,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
     "subject_block",
     "salutation_block",
     "body_paragraph",
+    "body_table",
     "signoff_block",
     "signature_block",
     "designation_contact_block",
@@ -148,6 +159,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
   do_letter: [
     "salutation_block",
     "body_paragraph",
+    "body_table",
     "complimentary_close",
     "recipient_identity_block",
     "contact_line",
@@ -158,6 +170,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
   note: [
     "subject_block",
     "body_paragraph",
+    "body_table",
     "to_block",
     "copy_to_block",
     "id_note_footer",
@@ -168,6 +181,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
   ],
   notification: [
     "body_paragraph",
+    "body_table",
     "subject_block",
     "copy_to_block",
     "enclosure_block",
@@ -183,6 +197,7 @@ const TYPE_ADVANCED_ALLOWLIST = {
 
 const DEFAULT_PRIORITY = [
   "body_paragraph",
+  "body_table",
   "subject_block",
   "to_block",
   "copy_to_block",

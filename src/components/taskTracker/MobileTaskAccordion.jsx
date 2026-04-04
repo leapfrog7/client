@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { diffDays } from "./utils";
 import { getStageStyle } from "./constants";
 import TaskDetail from "./TaskDetail";
-import { exportTaskSummaryPdf } from "./exportTaskSummaryPdf";
 
 function daysUntil(dueAt) {
   if (!dueAt) return null;
@@ -725,14 +724,6 @@ export default function MobileTaskAccordion({
           </div>
         );
       })}
-      <div className="mx-0 pt-6 text-center">
-        <button
-          onClick={() => exportTaskSummaryPdf(tasks)}
-          className="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm"
-        >
-          📄 Download Summary
-        </button>
-      </div>
     </div>
   );
 }

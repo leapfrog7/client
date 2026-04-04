@@ -13,6 +13,7 @@ export const BLOCK_TYPES = {
 
   INTRO_PHRASE_BLOCK: "intro_phrase_block",
   BODY_PARAGRAPH: "body_paragraph",
+  BODY_TABLE: "body_table",
   NUMBERED_PARAGRAPH: "numbered_paragraph",
   BULLETED_LIST_BLOCK: "bulleted_list_block",
   QUOTED_ORDER_BLOCK: "quoted_order_block",

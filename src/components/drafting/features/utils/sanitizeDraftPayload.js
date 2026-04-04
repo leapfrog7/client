@@ -10,6 +10,30 @@ function sanitizeContent(type, content) {
     };
   }
 
+  if (type === BLOCK_TYPES.BODY_TABLE) {
+    return {
+      title: content?.title || "",
+      hasHeaderRow: content?.hasHeaderRow ?? true,
+      rows:
+        Array.isArray(content?.rows) && content.rows.length
+          ? content.rows.map((row) =>
+              Array.isArray(row) ? row.map((cell) => String(cell ?? "")) : [],
+            )
+          : [
+              ["Column 1", "Column 2", "Column 3"],
+              ["", "", ""],
+              ["", "", ""],
+            ],
+      columnWidths:
+        Array.isArray(content?.columnWidths) && content.columnWidths.length
+          ? content.columnWidths.map((w) => Math.max(80, Number(w) || 160))
+          : Array.from(
+              { length: Array.isArray(content?.rows)?.[0]?.length || 3 },
+              () => 160,
+            ),
+    };
+  }
+
   return typeof content === "string" ? content : "";
 }
 

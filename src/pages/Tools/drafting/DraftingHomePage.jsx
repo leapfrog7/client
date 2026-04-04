@@ -24,12 +24,12 @@ export default function DraftingHomePage() {
   return (
     <DraftingLayout>
       <div className="space-y-8">
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        {/* <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <SectionHeader
             title="Drafting Studio"
             subtitle="Start quickly with a standard format, continue a saved draft, or set your preferred drafting environment."
           />
-        </section>
+        </section> */}
 
         <section className="space-y-4">
           <SectionHeader

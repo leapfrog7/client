@@ -302,7 +302,7 @@ const App = () => {
       <div className="flex flex-col min-h-screen mx-auto overflow-hidden">
         <nav className="bg-customBlue p-4">
           <div className="container mx-auto md:w-11/12 flex justify-between items-center">
-            <div className="flex items-center space-x-4">
+            <div className="z-40 flex items-center space-x-4">
               <Logo />
               <NavBar />
             </div>
