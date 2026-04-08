@@ -93,6 +93,30 @@ function renderPreviewBlock(block, prevType, styling) {
 
   const richHtml = getDraftBlockHtml(block);
 
+  if (block.type === "subject_block" && richHtml) {
+    return (
+      <div
+        key={block.id}
+        className={`${getDraftBlockClass(
+          block.type,
+          styling.underlineCommunicationLabel,
+        )} whitespace-pre-wrap break-words text-slate-900`}
+        style={{
+          marginTop: `${getDraftBlockSpacing(block, prevType, styling)}px`,
+          ...getDraftBlockStyle(block, styling),
+        }}
+      >
+        <div className="flex items-start gap-2">
+          <span className="shrink-0 font-bold text-slate-900">Subject:</span>
+          <div
+            className="flex-1"
+            dangerouslySetInnerHTML={{ __html: richHtml }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       key={block.id}

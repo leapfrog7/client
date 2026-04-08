@@ -164,13 +164,13 @@ export default function InlineBlockActions({
   return (
     <>
       <div
-        className={`hidden md:block absolute -top-5 right-4 z-20 transition-all duration-200 ease-out ${
+        className={`hidden md:block absolute -top-8 -right-20 z-20 transition-all duration-200 ease-out ${
           isVisible
             ? "translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-1 opacity-0"
         }`}
       >
-        <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/90 px-2 py-2 shadow-[0_14px_34px_rgba(15,23,42,0.14)] backdrop-blur-md">
+        <div className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/90 px-2 py-2 shadow-[0_14px_34px_rgba(15,23,42,0.14)] backdrop-blur-md">
           <ActionIconButton title="Insert below" onClick={onInsertBelow}>
             <FiPlus className="text-[16px]" />
           </ActionIconButton>

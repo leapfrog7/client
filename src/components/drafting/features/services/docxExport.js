@@ -24,7 +24,8 @@ function splitLinesPreserveMeaning(text) {
     .map((line) => line.replace(/\s+$/, ""));
 }
 
-function parseInlineHtmlToRuns(html, styling) {
+function parseInlineHtmlToRuns(html, styling, options = {}) {
+  const { forceBold = false } = options;
   const container = document.createElement("div");
   container.innerHTML = String(html || "");
 
@@ -41,7 +42,7 @@ function parseInlineHtmlToRuns(html, styling) {
           runs.push(
             new TextRun({
               text,
-              bold: marks.bold,
+              bold: forceBold || marks.bold,
               italics: marks.italic,
               underline: marks.underline
                 ? { type: UnderlineType.SINGLE }
@@ -106,13 +107,25 @@ function parseRichHtmlToParagraphs(html, styling) {
   const container = document.createElement("div");
   container.innerHTML = String(html || "");
 
-  const blocks = [];
-  let current = [];
+  const paragraphs = [];
+  let currentRuns = [];
 
-  const pushCurrent = () => {
-    if (!current.length) return;
-    blocks.push(current);
-    current = [];
+  const pushParagraph = (forceEmpty = false) => {
+    if (!currentRuns.length) {
+      if (forceEmpty) {
+        paragraphs.push([
+          new TextRun({
+            text: "",
+            font: styling.fontFamily,
+            size: styling.fontSize * 2,
+          }),
+        ]);
+      }
+      return;
+    }
+
+    paragraphs.push(currentRuns);
+    currentRuns = [];
   };
 
   const walk = (
@@ -123,7 +136,7 @@ function parseRichHtmlToParagraphs(html, styling) {
       if (child.nodeType === Node.TEXT_NODE) {
         const text = child.textContent || "";
         if (text) {
-          current.push(
+          currentRuns.push(
             new TextRun({
               text,
               bold: marks.bold,
@@ -143,13 +156,7 @@ function parseRichHtmlToParagraphs(html, styling) {
         const tag = child.tagName.toLowerCase();
 
         if (tag === "br") {
-          current.push(
-            new TextRun({
-              break: 1,
-              font: styling.fontFamily,
-              size: styling.fontSize * 2,
-            }),
-          );
+          pushParagraph(true);
           return;
         }
 
@@ -160,9 +167,23 @@ function parseRichHtmlToParagraphs(html, styling) {
         };
 
         if (tag === "div" || tag === "p") {
-          pushCurrent();
-          walk(child, nextMarks);
-          pushCurrent();
+          const isEmptyBlock =
+            child.innerHTML === "<br>" ||
+            child.innerHTML === "" ||
+            child.textContent === "";
+
+          if (isEmptyBlock) {
+            paragraphs.push([
+              new TextRun({
+                text: "",
+                font: styling.fontFamily,
+                size: styling.fontSize * 2,
+              }),
+            ]);
+          } else {
+            walk(child, nextMarks);
+            pushParagraph(false);
+          }
         } else {
           walk(child, nextMarks);
         }
@@ -171,10 +192,13 @@ function parseRichHtmlToParagraphs(html, styling) {
   };
 
   walk(container);
-  pushCurrent();
 
-  return blocks.length
-    ? blocks
+  if (currentRuns.length) {
+    pushParagraph(false);
+  }
+
+  return paragraphs.length
+    ? paragraphs
     : [
         [
           new TextRun({
@@ -387,13 +411,9 @@ function makeParagraphsForBlock(block, prevType, styling) {
     line: lineSpacing,
   };
 
-  const bodyIndent = {
-    firstLine: convertInchesToTwip(styling.bodyFirstLineIndent || 0.5),
-  };
-
   if (block.type === "subject_block") {
     const richRuns = isRichTextBlock(block.type)
-      ? parseInlineHtmlToRuns(block.content || "", styling)
+      ? parseInlineHtmlToRuns(block.content || "", styling, { forceBold: true })
       : [
           new TextRun({
             text: typeof text === "string" ? text : "",
@@ -435,7 +455,6 @@ function makeParagraphsForBlock(block, prevType, styling) {
           ],
           alignment,
           spacing: commonSpacing,
-          indent: bodyIndent,
         }),
       ];
     }
@@ -448,12 +467,10 @@ function makeParagraphsForBlock(block, prevType, styling) {
           children: runs,
           alignment,
           spacing: {
-            before:
-              index === 0 ? beforeSpacing : styling.bodyParagraphSpacing || 8,
+            before: index === 0 ? beforeSpacing : 0,
             after: 0,
             line: lineSpacing,
           },
-          indent: bodyIndent,
         }),
     );
   }
