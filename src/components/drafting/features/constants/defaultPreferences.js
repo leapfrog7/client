@@ -1,6 +1,6 @@
 export const DEFAULT_PREFERENCES = {
   fontFamily: "Arial",
-  fontSize: 14,
+  fontSize: 12,
 
   lineSpacing: 1,
   paragraphSpacing: 4,

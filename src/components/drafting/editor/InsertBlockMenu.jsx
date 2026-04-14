@@ -14,6 +14,9 @@ InsertBlockMenu.propTypes = {
   ).isRequired,
   onAddBlock: PropTypes.func.isRequired,
   draftType: PropTypes.string,
+  currentBlockType: PropTypes.string,
+  onOpenParagraphBankInside: PropTypes.func,
+  onOpenParagraphBankAsBlock: PropTypes.func,
 };
 
 const FRIENDLY_LABELS = {
@@ -221,6 +224,9 @@ export default function InsertBlockMenu({
   insertableBlocks,
   onAddBlock,
   draftType = "",
+  currentBlockType = "",
+  onOpenParagraphBankInside,
+  onOpenParagraphBankAsBlock,
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -245,7 +251,6 @@ export default function InsertBlockMenu({
     });
 
     common.sort((a, b) => priority.indexOf(a.type) - priority.indexOf(b.type));
-
     advanced.sort((a, b) => a.displayLabel.localeCompare(b.displayLabel));
 
     return {
@@ -262,6 +267,9 @@ export default function InsertBlockMenu({
   };
 
   const draftTypeLabel = TEMPLATE_TYPE_LABELS[draftType] || "this draft";
+  const showParagraphBankOptions =
+    currentBlockType === "body_paragraph" ||
+    currentBlockType === "intro_phrase_block";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/35 p-4 sm:items-center">
@@ -288,6 +296,46 @@ export default function InsertBlockMenu({
         </div>
 
         <div className="overflow-y-auto px-6 py-5">
+          {showParagraphBankOptions ? (
+            <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+              <div className="mb-3 text-sm font-semibold text-slate-800">
+                Paragraph Bank
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenParagraphBankInside?.();
+                  }}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm"
+                >
+                  <div className="text-sm font-medium text-slate-900">
+                    Add inside current paragraph
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    Append bank content within this body paragraph block.
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenParagraphBankAsBlock?.();
+                  }}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition hover:border-slate-300 hover:bg-slate-50 hover:shadow-sm"
+                >
+                  <div className="text-sm font-medium text-slate-900">
+                    Add as new paragraph block
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    Insert bank content as a separate body paragraph below.
+                  </div>
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
             <div className="mb-3 text-sm font-semibold text-slate-800">
               Common items

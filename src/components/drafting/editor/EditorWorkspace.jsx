@@ -7,12 +7,14 @@ import DocumentSettingsModal from "./DocumentSettingsModal";
 import OfficeProfileModal from "./OfficeProfileModal";
 import useOfficeProfile from "../features/hooks/useOfficeProfile";
 import usePreferences from "../features/hooks/usePreferences";
+import ParagraphBankDrawer from "../paragraphBank/ParagraphBankDrawer";
 import {
   canDeleteBlock,
   createBlock,
   getInsertableBlockTypes,
   normalizeBlockOrders,
 } from "../features/utils/blockHelpers";
+import { getSelectedSignatoryProfile } from "../features/models/officeProfileModel";
 
 import { exportDraftToDocx } from "../features/services/docxExport";
 import { buildDraftDocumentHtml } from "../features/utils/renderDraftHtml";
@@ -35,6 +37,8 @@ function joinIncludedLines(items) {
 }
 
 function applyOfficeProfileToBlocks(blocks, officeProfile) {
+  const selectedSignatory = getSelectedSignatoryProfile(officeProfile);
+
   return blocks.map((block) => {
     if (block.type === "government_identity") {
       return {
@@ -85,7 +89,7 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
       return {
         ...block,
         content: officeProfile.includeSignatoryName
-          ? officeProfile.defaultSignatoryName
+          ? selectedSignatory.name
           : "",
       };
     }
@@ -94,7 +98,7 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
       return {
         ...block,
         content: officeProfile.includeSignatoryDesignation
-          ? officeProfile.defaultSignatoryDesignation
+          ? selectedSignatory.designation
           : "",
       };
     }
@@ -103,7 +107,7 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
       return {
         ...block,
         content: officeProfile.includeSignatoryName
-          ? officeProfile.defaultSignatoryName
+          ? selectedSignatory.name
           : "",
       };
     }
@@ -114,15 +118,15 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
         content: joinIncludedLines([
           {
             include: officeProfile.includeSignatoryDesignation,
-            value: officeProfile.defaultSignatoryDesignation,
+            value: selectedSignatory.designation,
           },
           {
             include: officeProfile.includePhone,
-            value: officeProfile.defaultPhone,
+            value: selectedSignatory.phone,
           },
           {
             include: officeProfile.includeEmail,
-            value: officeProfile.defaultEmail,
+            value: selectedSignatory.email,
           },
         ]),
       };
@@ -134,11 +138,11 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
         content: joinIncludedLines([
           {
             include: officeProfile.includePhone,
-            value: officeProfile.defaultPhone,
+            value: selectedSignatory.phone,
           },
           {
             include: officeProfile.includeEmail,
-            value: officeProfile.defaultEmail,
+            value: selectedSignatory.email,
           },
         ]),
       };
@@ -147,7 +151,6 @@ function applyOfficeProfileToBlocks(blocks, officeProfile) {
     return block;
   });
 }
-
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -174,6 +177,7 @@ function isRichTextBlock(type) {
     type === "intro_phrase_block"
   );
 }
+
 function buildPlainText(draft) {
   return draft.blocks
     .map((block) => {
@@ -386,6 +390,25 @@ function openPrintWindow(draft) {
   };
 }
 
+function normalizeInsertedParagraphHtml(content = "") {
+  const safe = String(content || "").trim();
+  if (!safe) return "";
+
+  if (/<(p|div|br)\b/i.test(safe)) return safe;
+
+  return `<p>${safe}</p>`;
+}
+
+function mergeParagraphHtml(existing = "", incoming = "") {
+  const current = String(existing || "").trim();
+  const next = normalizeInsertedParagraphHtml(incoming);
+
+  if (!current) return next;
+  if (!next) return current;
+
+  return `${current}<p><br></p>${next}`;
+}
+
 export default function EditorWorkspace({ draft, onDraftChange }) {
   const [activeBlockId, setActiveBlockId] = useState(
     draft?.blocks?.[0]?.id || null,
@@ -396,6 +419,9 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [insertAfterBlockId, setInsertAfterBlockId] = useState(null);
+  const [paragraphBankOpen, setParagraphBankOpen] = useState(false);
+  const [paragraphInsertMode, setParagraphInsertMode] = useState("new_block");
+  const [paragraphTargetBlockId, setParagraphTargetBlockId] = useState(null);
 
   const { saveOfficeProfile } = useOfficeProfile();
   const { updatePreferences } = usePreferences();
@@ -421,6 +447,9 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
       </div>
     );
   }
+
+  const activeBlock =
+    blocks.find((block) => block.id === activeBlockId) || null;
 
   const showToast = (message, kind = "success") => {
     setToast({ message, kind });
@@ -556,6 +585,80 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
     setInsertAfterBlockId(null);
   };
 
+  const insertParagraphFromBank = (content, item) => {
+    onDraftChange((prev) => {
+      const currentBlocks = [...(prev.blocks || [])];
+      const targetId =
+        paragraphTargetBlockId || insertAfterBlockId || activeBlockId;
+
+      if (paragraphInsertMode === "inside_current" && targetId) {
+        const index = currentBlocks.findIndex((b) => b.id === targetId);
+        const targetBlock = index >= 0 ? currentBlocks[index] : null;
+
+        if (
+          targetBlock &&
+          (targetBlock.type === "body_paragraph" ||
+            targetBlock.type === "intro_phrase_block")
+        ) {
+          currentBlocks[index] = {
+            ...targetBlock,
+            content: mergeParagraphHtml(targetBlock.content, content),
+          };
+
+          return {
+            ...prev,
+            blocks: normalizeBlockOrders(currentBlocks),
+          };
+        }
+      }
+
+      const nextBlock = createBlock("body_paragraph", content);
+
+      if (!targetId) {
+        return {
+          ...prev,
+          blocks: normalizeBlockOrders([...currentBlocks, nextBlock]),
+        };
+      }
+
+      const index = currentBlocks.findIndex((b) => b.id === targetId);
+
+      if (index < 0) {
+        return {
+          ...prev,
+          blocks: normalizeBlockOrders([...currentBlocks, nextBlock]),
+        };
+      }
+
+      currentBlocks.splice(index + 1, 0, nextBlock);
+
+      return {
+        ...prev,
+        blocks: normalizeBlockOrders(currentBlocks),
+      };
+    });
+
+    if (paragraphInsertMode === "inside_current" && paragraphTargetBlockId) {
+      setActiveBlockId(paragraphTargetBlockId);
+    }
+
+    setParagraphBankOpen(false);
+    setInsertAfterBlockId(null);
+    setParagraphTargetBlockId(null);
+    setParagraphInsertMode("new_block");
+
+    showToast(
+      paragraphInsertMode === "inside_current"
+        ? item?.type === "template"
+          ? "Smart paragraph added inside current paragraph."
+          : "Paragraph added inside current paragraph."
+        : item?.type === "template"
+          ? "Smart paragraph inserted."
+          : "Paragraph inserted.",
+      "success",
+    );
+  };
+
   const moveBlock = (blockId, direction) => {
     onDraftChange((prev) => {
       const current = [...(prev.blocks || [])];
@@ -610,6 +713,20 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
           >
             <FiPlus className="text-sm" />
             <span>Insert block</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setParagraphInsertMode("new_block");
+              setParagraphTargetBlockId(
+                insertAfterBlockId || activeBlockId || null,
+              );
+              setParagraphBankOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
+          >
+            <span>Paragraph Bank</span>
           </button>
 
           <button
@@ -682,6 +799,12 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
           setInsertAfterBlockId(blockId);
           setInsertMenuOpen(true);
         }}
+        onOpenParagraphBankRequest={(blockId) => {
+          setActiveBlockId(blockId);
+          setParagraphInsertMode("inside_current");
+          setParagraphTargetBlockId(blockId);
+          setParagraphBankOpen(true);
+        }}
       />
 
       <InsertBlockMenu
@@ -690,6 +813,31 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
         insertableBlocks={insertableBlocks}
         onAddBlock={addBlock}
         draftType={draft.type}
+        currentBlockType={activeBlock?.type || null}
+        onOpenParagraphBankInside={() => {
+          setParagraphInsertMode("inside_current");
+          setParagraphTargetBlockId(activeBlockId);
+          setInsertMenuOpen(false);
+          setParagraphBankOpen(true);
+        }}
+        onOpenParagraphBankAsBlock={() => {
+          setParagraphInsertMode("new_block");
+          setParagraphTargetBlockId(
+            insertAfterBlockId || activeBlockId || null,
+          );
+          setInsertMenuOpen(false);
+          setParagraphBankOpen(true);
+        }}
+      />
+
+      <ParagraphBankDrawer
+        open={paragraphBankOpen}
+        onClose={() => {
+          setParagraphBankOpen(false);
+          setParagraphInsertMode("new_block");
+          setParagraphTargetBlockId(null);
+        }}
+        onInsertParagraph={insertParagraphFromBank}
       />
 
       <DocumentSettingsModal

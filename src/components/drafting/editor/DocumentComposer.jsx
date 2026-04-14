@@ -20,6 +20,7 @@ DocumentComposer.propTypes = {
   onMoveDown: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onInsertRequest: PropTypes.func.isRequired,
+  onOpenParagraphBankRequest: PropTypes.func.isRequired,
 };
 
 export const A4_WIDTH_PX = 794;
@@ -496,6 +497,7 @@ export default function DocumentComposer({
   onMoveDown,
   onDelete,
   onInsertRequest,
+  onOpenParagraphBankRequest,
 }) {
   const [hoveredId, setHoveredId] = useState(null);
   const [isMobile, setIsMobile] = useState(
@@ -511,7 +513,11 @@ export default function DocumentComposer({
 
   const pagePadding = isMobile ? 18 : MS_WORD_MARGIN_PX;
   const pageMinHeight = isMobile ? "auto" : `${A4_HEIGHT_PX}px`;
-  const pageFontSizePx = `${(styling.fontSize || 12) * 1.333333}px`;
+  const baseFontSizePx = (styling.fontSize || 12) * 1.333333;
+  const mobileFontScale = 0.9; // adjust to taste
+  const pageFontSizePx = `${
+    isMobile ? baseFontSizePx * mobileFontScale : baseFontSizePx
+  }px`;
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-100 p-2 shadow-sm sm:p-5">
@@ -557,6 +563,7 @@ export default function DocumentComposer({
                 onMoveDown={() => onMoveDown(block.id)}
                 onDelete={() => onDelete(block.id)}
                 onInsertBelow={() => onInsertRequest(block.id)}
+                onOpenParagraphBank={() => onOpenParagraphBankRequest(block.id)}
               />
 
               {!isMobile && (hovered || active) && (

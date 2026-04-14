@@ -4,6 +4,7 @@ import {
   FaLayerGroup,
   FaRegFolderOpen,
   FaSliders,
+  FaBookOpen,
 } from "react-icons/fa6";
 
 const navItems = [
@@ -22,6 +23,11 @@ const navItems = [
     to: "/pages/tools/drafting/drafts",
     label: "Drafts",
     icon: FaRegFolderOpen,
+  },
+  {
+    to: "/pages/tools/drafting/paragraph-bank",
+    label: "Paragraph Bank",
+    icon: FaBookOpen,
   },
   {
     to: "/pages/tools/drafting/preferences",

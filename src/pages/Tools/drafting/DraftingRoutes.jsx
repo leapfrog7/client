@@ -4,6 +4,7 @@ import TemplateGalleryPage from "./TemplateGalleryPage";
 import DraftLibraryPage from "./DraftLibraryPage";
 import PreferencesPage from "./PreferencesPage";
 import DraftEditorPage from "./DraftEditorPage";
+import ParagraphBankPage from "../../../pages/Tools/drafting/ParagraphBankPage";
 
 export default function DraftingRoutes() {
   return (
@@ -13,6 +14,7 @@ export default function DraftingRoutes() {
       <Route path="/drafts" element={<DraftLibraryPage />} />
       <Route path="/preferences" element={<PreferencesPage />} />
       <Route path="/editor/:draftId" element={<DraftEditorPage />} />
+      <Route path="paragraph-bank" element={<ParagraphBankPage />} />
       <Route
         path="*"
         element={<Navigate to="/pages/tools/drafting" replace />}

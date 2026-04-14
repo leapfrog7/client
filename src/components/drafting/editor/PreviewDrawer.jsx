@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import {
@@ -151,8 +151,25 @@ export default function PreviewDrawer({ open, onClose, draft }) {
   const previewPageRef = useRef(null);
   const [toast, setToast] = useState(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 768 : false,
+  );
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   if (!open) return null;
+
+  const mobileFontScale = 0.9;
+  const previewPaddingPx = isMobile ? 30 : MS_WORD_MARGIN_PX;
+  const previewMinHeight = isMobile ? "auto" : `${A4_HEIGHT_PX}px`;
+  const baseFontSizePx = (draft.styling.fontSize || 12) * 1.333333;
+  const previewFontSizePx = `${
+    isMobile ? baseFontSizePx * mobileFontScale : baseFontSizePx
+  }px`;
 
   const showToast = (message, kind = "success") => {
     setToast({ message, kind });
@@ -235,15 +252,15 @@ export default function PreviewDrawer({ open, onClose, draft }) {
               ref={previewPageRef}
               className="mx-auto rounded-sm bg-white shadow-[0_6px_24px_rgba(15,23,42,0.08)]"
               style={{
-                width: `${A4_WIDTH_PX}px`,
-                maxWidth: "100%",
-                minHeight: `${A4_HEIGHT_PX}px`,
-                paddingTop: `${MS_WORD_MARGIN_PX}px`,
-                paddingRight: `${MS_WORD_MARGIN_PX}px`,
-                paddingBottom: `${MS_WORD_MARGIN_PX}px`,
-                paddingLeft: `${MS_WORD_MARGIN_PX}px`,
+                width: "100%",
+                maxWidth: `${A4_WIDTH_PX}px`,
+                minHeight: previewMinHeight,
+                paddingTop: `${previewPaddingPx}px`,
+                paddingRight: `${previewPaddingPx}px`,
+                paddingBottom: `${previewPaddingPx}px`,
+                paddingLeft: `${previewPaddingPx}px`,
                 fontFamily: draft.styling.fontFamily,
-                fontSize: `${(draft.styling.fontSize || 12) * 1.333333}px`,
+                fontSize: previewFontSizePx,
                 background: "#fff",
               }}
             >
