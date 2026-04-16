@@ -409,6 +409,55 @@ function mergeParagraphHtml(existing = "", incoming = "") {
   return `${current}<p><br></p>${next}`;
 }
 
+function normalizeAddresseeContent(content = "", blockType = "to_block") {
+  const heading = blockType === "copy_to_block" ? "Copy To" : "To";
+  const plain = stripHtml(content || "").trim();
+
+  if (!plain) return `${heading}`;
+
+  const normalized = plain.replace(/\r\n/g, "\n").trim();
+  const startsWithHeading =
+    normalized.toLowerCase() === heading.toLowerCase() ||
+    normalized.toLowerCase().startsWith(`${heading.toLowerCase()}\n`);
+
+  return startsWithHeading ? normalized : `${heading}\n${normalized}`;
+}
+
+function appendAddresseeContent(
+  existing = "",
+  incoming = "",
+  blockType = "to_block",
+) {
+  const heading = blockType === "copy_to_block" ? "Copy To" : "To";
+
+  const current = String(existing || "")
+    .replace(/\r\n/g, "\n")
+    .trim();
+  const nextNormalized = normalizeAddresseeContent(incoming, blockType);
+
+  const nextBody = nextNormalized
+    .replace(new RegExp(`^${heading}\\n?`, "i"), "")
+    .trim();
+
+  if (!current) {
+    return nextNormalized;
+  }
+
+  const currentHasHeading =
+    current.toLowerCase() === heading.toLowerCase() ||
+    current.toLowerCase().startsWith(`${heading.toLowerCase()}\n`);
+
+  const currentWithHeading = currentHasHeading
+    ? current
+    : `${heading}\n${current}`;
+
+  if (!nextBody) {
+    return currentWithHeading;
+  }
+
+  return `${currentWithHeading}\n${nextBody}`.trim();
+}
+
 export default function EditorWorkspace({ draft, onDraftChange }) {
   const [activeBlockId, setActiveBlockId] = useState(
     draft?.blocks?.[0]?.id || null,
@@ -595,20 +644,40 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
         const index = currentBlocks.findIndex((b) => b.id === targetId);
         const targetBlock = index >= 0 ? currentBlocks[index] : null;
 
-        if (
-          targetBlock &&
-          (targetBlock.type === "body_paragraph" ||
-            targetBlock.type === "intro_phrase_block")
-        ) {
-          currentBlocks[index] = {
-            ...targetBlock,
-            content: mergeParagraphHtml(targetBlock.content, content),
-          };
+        if (targetBlock) {
+          if (
+            targetBlock.type === "body_paragraph" ||
+            targetBlock.type === "intro_phrase_block"
+          ) {
+            currentBlocks[index] = {
+              ...targetBlock,
+              content: mergeParagraphHtml(targetBlock.content, content),
+            };
 
-          return {
-            ...prev,
-            blocks: normalizeBlockOrders(currentBlocks),
-          };
+            return {
+              ...prev,
+              blocks: normalizeBlockOrders(currentBlocks),
+            };
+          }
+
+          if (
+            targetBlock.type === "to_block" ||
+            targetBlock.type === "copy_to_block"
+          ) {
+            currentBlocks[index] = {
+              ...targetBlock,
+              content: appendAddresseeContent(
+                targetBlock.content,
+                content,
+                targetBlock.type,
+              ),
+            };
+
+            return {
+              ...prev,
+              blocks: normalizeBlockOrders(currentBlocks),
+            };
+          }
         }
       }
 
@@ -650,11 +719,11 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
     showToast(
       paragraphInsertMode === "inside_current"
         ? item?.type === "template"
-          ? "Smart paragraph added inside current paragraph."
-          : "Paragraph added inside current paragraph."
+          ? "Saved content added to current block."
+          : "Saved content added to current block."
         : item?.type === "template"
-          ? "Smart paragraph inserted."
-          : "Paragraph inserted.",
+          ? "Saved content inserted."
+          : "Saved content inserted.",
       "success",
     );
   };

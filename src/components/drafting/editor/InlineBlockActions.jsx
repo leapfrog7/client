@@ -57,7 +57,12 @@ ActionIconButton.propTypes = {
 };
 
 function supportsParagraphBank(blockType) {
-  return blockType === "body_paragraph" || blockType === "intro_phrase_block";
+  return (
+    blockType === "body_paragraph" ||
+    blockType === "intro_phrase_block" ||
+    blockType === "to_block" ||
+    blockType === "copy_to_block"
+  );
 }
 
 export default function InlineBlockActions({

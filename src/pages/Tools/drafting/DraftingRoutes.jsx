@@ -15,6 +15,7 @@ export default function DraftingRoutes() {
       <Route path="/preferences" element={<PreferencesPage />} />
       <Route path="/editor/:draftId" element={<DraftEditorPage />} />
       <Route path="paragraph-bank" element={<ParagraphBankPage />} />
+
       <Route
         path="*"
         element={<Navigate to="/pages/tools/drafting" replace />}
