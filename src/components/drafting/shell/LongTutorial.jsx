@@ -86,7 +86,7 @@ export default function DraftingStudioTutorial() {
           </p>
           <p className="mt-3">
             Once this profile is set, these details can auto-populate in future
-            drafts. This saves time and ensures consistency.
+            drafts. This saves time and ensures consistency as these do not change often.
           </p>
         </>
       ),

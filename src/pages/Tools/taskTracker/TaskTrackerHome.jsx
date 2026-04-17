@@ -12,6 +12,8 @@ import {
   createShareLink,
   archiveTask, // ✅ add
   unarchiveTask, // ✅ add
+  getTokenTimeLeftMs,
+  isTokenExpired,
 } from "../../../components/taskTracker/storage";
 
 import TaskFormModal from "../../../components/taskTracker/TaskFormModal";
@@ -40,6 +42,8 @@ export default function TaskTrackerHome() {
   // const [tutorialOpen, setTutorialOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [sessionTimeLeft, setSessionTimeLeft] = useState(null);
+  const [sessionExpiringSoon, setSessionExpiringSoon] = useState(false);
 
   // Form (create/edit)
   const [formOpen, setFormOpen] = useState(false);
@@ -78,6 +82,49 @@ export default function TaskTrackerHome() {
       if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    function syncSessionState() {
+      const token = localStorage.getItem("jwtToken");
+
+      if (!token) {
+        setSessionTimeLeft(null);
+        setSessionExpiringSoon(false);
+        setAuthRequired(true);
+        return;
+      }
+
+      if (isTokenExpired()) {
+        localStorage.removeItem("jwtToken");
+        setSessionTimeLeft(0);
+        setSessionExpiringSoon(false);
+        setAuthRequired(true);
+        notify("Your session has expired. Please login again.", "error");
+        return;
+      }
+
+      const left = getTokenTimeLeftMs();
+      setSessionTimeLeft(left);
+      setSessionExpiringSoon(left > 0 && left <= 15 * 60 * 1000); // 15 min
+    }
+
+    syncSessionState();
+
+    const interval = window.setInterval(syncSessionState, 30000);
+
+    function handleVisibility() {
+      if (!document.hidden) syncSessionState();
+    }
+
+    window.addEventListener("focus", syncSessionState);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", syncSessionState);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [notify]);
 
   async function refresh() {
     const t = await getTasks({ archived: showArchived });
@@ -459,6 +506,11 @@ export default function TaskTrackerHome() {
 
       {/* CTA header (does not consume scroll space) */}
       <div className="shrink-0 bg-white p-4 shadow-sm text-center mx-auto w-full">
+        {sessionExpiringSoon && sessionTimeLeft !== null && (
+          <div className="mt-2 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-800">
+            Session expires soon
+          </div>
+        )}
         <div className="text-lg md:text-2xl font-extrabold tracking-wider text-gray-600">
           TASK MANAGER
         </div>

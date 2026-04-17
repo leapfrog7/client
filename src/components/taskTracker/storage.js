@@ -45,6 +45,12 @@ function getToken() {
 function authHeaders() {
   const token = getToken();
   if (!token) throw new Error("Missing auth token (jwtToken). Please login.");
+
+  if (isTokenExpired()) {
+    localStorage.removeItem("jwtToken");
+    throw new Error("Session expired. Please login again.");
+  }
+
   return { Authorization: `Bearer ${token}` };
 }
 
@@ -77,6 +83,19 @@ async function http(method, url, body) {
       (data && typeof data === "object" && (data.msg || data.message)) ||
       (typeof data === "string" ? data : null) ||
       `Request failed: ${res.status} ${res.statusText}`;
+
+    const lower = String(msg).toLowerCase();
+
+    if (
+      res.status === 401 ||
+      lower.includes("auth") ||
+      lower.includes("token") ||
+      lower.includes("login") ||
+      lower.includes("expired")
+    ) {
+      localStorage.removeItem("jwtToken");
+    }
+
     throw new Error(msg);
   }
 
@@ -110,6 +129,44 @@ function normalizeItem(payload) {
   if (payload.task && payload.task.id) return payload.task;
   if (payload.data && payload.data.id) return payload.data;
   return payload; // last resort
+}
+
+function decodeJwtPayload(token) {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      "=",
+    );
+    const json = atob(padded);
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+export function isTokenExpired() {
+  const expMs = getTokenExpiryMs();
+  if (!expMs) return true;
+  return Date.now() >= expMs;
+}
+export function getTokenTimeLeftMs() {
+  const expMs = getTokenExpiryMs();
+  if (!expMs) return 0;
+  return Math.max(0, expMs - Date.now());
+}
+
+export function getTokenExpiryMs() {
+  const token = getToken();
+  if (!token) return null;
+
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return null;
+
+  return payload.exp * 1000;
 }
 
 export async function getTasks({ archived = false } = {}) {
