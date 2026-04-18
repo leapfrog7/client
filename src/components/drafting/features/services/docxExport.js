@@ -1,5 +1,6 @@
 import {
   AlignmentType,
+  BorderStyle,
   Document,
   Packer,
   PageOrientation,
@@ -407,9 +408,21 @@ function makeParagraphsForBlock(block, prevType, styling) {
 
   const commonSpacing = {
     before: beforeSpacing,
-    after: 0,
+    after: block.type === "id_note_footer" ? 40 : 0,
     line: lineSpacing,
   };
+
+  const commonBorder =
+    block.type === "id_note_footer"
+      ? {
+          top: {
+            style: BorderStyle.SINGLE,
+            size: 6,
+            color: "000000",
+            space: 1,
+          },
+        }
+      : undefined;
 
   if (block.type === "subject_block") {
     const richRuns = isRichTextBlock(block.type)
@@ -554,6 +567,7 @@ function makeParagraphsForBlock(block, prevType, styling) {
       ],
       alignment,
       spacing: commonSpacing,
+      border: commonBorder,
     }),
   ];
 }

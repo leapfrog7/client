@@ -166,28 +166,29 @@ export default function TaskList({
         {/* Search dominates */}
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
-              🔍
-            </div>
-
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search tasks..."
-              className={`w-full min-w-0 rounded-xl border border-slate-800 bg-slate-100 focus:bg-white pl-3 pr-9 shadow-sm transition-all duration-200 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 ${
+              className={`w-full min-w-0 rounded-xl border border-slate-200 bg-slate-100 pl-3 pr-24 text-slate-800 placeholder:text-slate-400 shadow-sm transition-all duration-200  ${
                 compact ? "py-1.5 text-xs" : "py-2.5 text-sm"
               }`}
             />
 
-            {q && (
-              <button
-                type="button"
-                onClick={() => setQ("")}
-                className="absolute inset-y-0 right-2 flex items-center px-2 text-slate-400 transition hover:text-slate-700"
-              >
-                ✕
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (q) setQ("");
+              }}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-lg border px-3 py-1 text-[11px] font-medium shadow-sm transition ${
+                q
+                  ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+                  : "border-slate-700 bg-slate-700 text-slate-50 rounded-md"
+              }`}
+              title={q ? "Clear search" : "Search"}
+            >
+              {q ? "Clear" : "Search 🔍︎"}
+            </button>
           </div>
           {/* Small status line (kept very compact) */}
           <div className=" max-w-24 mt-2 flex flex-col items-center justify-between text-[11px] text-slate-500">

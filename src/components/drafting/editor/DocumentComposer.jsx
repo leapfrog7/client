@@ -73,10 +73,10 @@ function getRowsForBlock(type, content = "") {
     case "sender_designation_block":
     case "contact_line":
     case "complimentary_close":
-      return Math.max(1, Math.min(2, lineCount));
+      return Math.max(1, Math.min(1, lineCount));
 
     case "subject_block":
-      return Math.max(1, Math.min(3, lineCount));
+      return Math.max(1, Math.min(1, lineCount));
 
     case "designation_contact_block":
     case "to_block":
@@ -88,6 +88,8 @@ function getRowsForBlock(type, content = "") {
     case "gazette_forwarding_block":
     case "press_forwarding_block":
       return Math.max(3, Math.min(8, lineCount));
+    case "enclosure_block":
+      return Math.max(1, Math.min(3, lineCount));
 
     case "body_paragraph":
     case "intro_phrase_block":
@@ -129,6 +131,8 @@ function getBlockTextClass(type) {
     case "designation_contact_block":
       return "text-right";
 
+    case "id_note_footer":
+      return "border-t border-slate-900 pt-1";
     default:
       return "";
   }
@@ -575,7 +579,7 @@ export default function DocumentComposer({
               <div
                 className={`rounded-md px-1 py-0 transition ${
                   active ? "bg-blue-50/70" : "bg-transparent"
-                }`}
+                } ${block.type === "id_note_footer" ? "border-t border-slate-900 pt-1" : ""}`}
               >
                 {block.type === "place_date_line" ? (
                   renderPlaceDateBlock(

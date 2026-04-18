@@ -71,6 +71,8 @@ export function getDraftBlockClass(type, underlineCommunicationLabel = true) {
     case "signature_block":
     case "designation_contact_block":
       return "text-right";
+    case "id_note_footer":
+      return "border-t border-slate-900 pt-1";
 
     default:
       return "";

@@ -22,6 +22,7 @@ import MobileTaskAccordion from "../../../components/taskTracker/MobileTaskAccor
 import { exportTaskSummaryPdf } from "../../../components/taskTracker/exportTaskSummaryPdf";
 // import TaskTrackerTutorial from "../../../components/taskTracker/TaskTrackerTutorial";
 // import PageFeedback from "../../../components/PageFeedback";
+import TaskTrackerEntryGate from "../../../components/taskTracker/TaskTrackerEntryGate";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
 import { FaRegFilePdf } from "react-icons/fa";
@@ -528,35 +529,15 @@ export default function TaskTrackerHome() {
 
       {/* MAIN TRACKER AREA (this is the only "full height" region) */}
       {authRequired ? (
-        <div className="p-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="text-base font-semibold text-slate-900">
-              Log in to get started
-            </div>
-            <p className="mt-1 text-sm text-slate-600">
-              Task Tracker saves your work securely to your account.
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  navigate("/login", { state: { from: location.pathname } })
-                }
-                className="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800"
-              >
-                Go to Login Page
-              </button>
-
-              <button
-                type="button"
-                onClick={() => (window.location.href = "/register")}
-                className="px-4 py-2 rounded-lg border border-slate-200 text-sm hover:border-slate-300"
-              >
-                Register - it is free
-              </button>
-            </div>
-          </div>
+        <div className="flex-1 min-h-0 overflow-auto bg-slate-50">
+          <TaskTrackerEntryGate
+            onLogin={() =>
+              navigate("/login", { state: { from: location.pathname } })
+            }
+            onRegister={() => {
+              window.location.href = "/register";
+            }}
+          />
         </div>
       ) : (
         <>

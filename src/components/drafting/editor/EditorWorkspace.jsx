@@ -13,8 +13,9 @@ import {
   createBlock,
   getInsertableBlockTypes,
   normalizeBlockOrders,
+  hydrateBlocksWithOfficeProfile,
 } from "../features/utils/blockHelpers";
-import { getSelectedSignatoryProfile } from "../features/models/officeProfileModel";
+// import { getSelectedSignatoryProfile } from "../features/models/officeProfileModel";
 
 import { exportDraftToDocx } from "../features/services/docxExport";
 import { buildDraftDocumentHtml } from "../features/utils/renderDraftHtml";
@@ -29,128 +30,153 @@ EditorWorkspace.propTypes = {
   onDraftChange: PropTypes.func.isRequired,
 };
 
-function joinIncludedLines(items) {
-  return items
-    .filter((item) => item.include && item.value?.trim())
-    .map((item) => item.value.trim())
-    .join("\n");
-}
+// function joinIncludedLines(items) {
+//   return items
+//     .filter((item) => item.include && item.value?.trim())
+//     .map((item) => item.value.trim())
+//     .join("\n");
+// }
 
-function applyOfficeProfileToBlocks(blocks, officeProfile) {
-  const selectedSignatory = getSelectedSignatoryProfile(officeProfile);
+// function applyOfficeProfileToBlocks(blocks, officeProfile) {
+//   const selectedSignatory = getSelectedSignatoryProfile(officeProfile);
 
-  return blocks.map((block) => {
-    if (block.type === "government_identity") {
-      return {
-        ...block,
-        content: joinIncludedLines([
-          {
-            include: officeProfile.includeGovtLineEn,
-            value: officeProfile.govtLineEn,
-          },
-          {
-            include: officeProfile.includeGovtLineHi,
-            value: officeProfile.govtLineHi,
-          },
-        ]),
-      };
-    }
+//   return blocks.map((block) => {
+//     if (block.type === "government_identity") {
+//       return {
+//         ...block,
+//         content: joinIncludedLines([
+//           {
+//             include: officeProfile.includeGovtLineEn,
+//             value: officeProfile.govtLineEn,
+//           },
+//           {
+//             include: officeProfile.includeGovtLineHi,
+//             value: officeProfile.govtLineHi,
+//           },
+//         ]),
+//       };
+//     }
 
-    if (block.type === "department_identity") {
-      return {
-        ...block,
-        content: joinIncludedLines([
-          {
-            include: officeProfile.includeDepartmentEn,
-            value: officeProfile.departmentEn,
-          },
-          {
-            include: officeProfile.includeDepartmentHi,
-            value: officeProfile.departmentHi,
-          },
-        ]),
-      };
-    }
+//     if (block.type === "department_identity") {
+//       return {
+//         ...block,
+//         content: joinIncludedLines([
+//           {
+//             include: officeProfile.includeDepartmentEn,
+//             value: officeProfile.departmentEn,
+//           },
+//           {
+//             include: officeProfile.includeDepartmentHi,
+//             value: officeProfile.departmentHi,
+//           },
+//         ]),
+//       };
+//     }
 
-    if (block.type === "place_date_line") {
-      return {
-        ...block,
-        content: {
-          place: officeProfile.includeCity ? officeProfile.city || "" : "",
-          date:
-            typeof block.content === "object" && block.content?.date
-              ? block.content.date
-              : "",
-        },
-      };
-    }
+//     if (block.type === "place_date_line") {
+//       return {
+//         ...block,
+//         content: {
+//           place: officeProfile.includeCity ? officeProfile.city || "" : "",
+//           date:
+//             typeof block.content === "object" && block.content?.date
+//               ? block.content.date
+//               : "",
+//         },
+//       };
+//     }
 
-    if (block.type === "sender_name_block") {
-      return {
-        ...block,
-        content: officeProfile.includeSignatoryName
-          ? selectedSignatory.name
-          : "",
-      };
-    }
+//     if (block.type === "sender_name_block") {
+//       return {
+//         ...block,
+//         content: officeProfile.includeSignatoryName
+//           ? selectedSignatory.name
+//           : "",
+//       };
+//     }
 
-    if (block.type === "sender_designation_block") {
-      return {
-        ...block,
-        content: officeProfile.includeSignatoryDesignation
-          ? selectedSignatory.designation
-          : "",
-      };
-    }
+//     if (block.type === "sender_designation_block") {
+//       return {
+//         ...block,
+//         content: officeProfile.includeSignatoryDesignation
+//           ? selectedSignatory.designation
+//           : "",
+//       };
+//     }
 
-    if (block.type === "signature_block") {
-      return {
-        ...block,
-        content: officeProfile.includeSignatoryName
-          ? selectedSignatory.name
-          : "",
-      };
-    }
+//     if (block.type === "signature_block") {
+//       return {
+//         ...block,
+//         content: officeProfile.includeSignatoryName
+//           ? selectedSignatory.name
+//           : "",
+//       };
+//     }
 
-    if (block.type === "designation_contact_block") {
-      return {
-        ...block,
-        content: joinIncludedLines([
-          {
-            include: officeProfile.includeSignatoryDesignation,
-            value: selectedSignatory.designation,
-          },
-          {
-            include: officeProfile.includePhone,
-            value: selectedSignatory.phone,
-          },
-          {
-            include: officeProfile.includeEmail,
-            value: selectedSignatory.email,
-          },
-        ]),
-      };
-    }
+//     if (block.type === "designation_contact_block") {
+//       return {
+//         ...block,
+//         content: joinIncludedLines([
+//           {
+//             include: officeProfile.includeSignatoryDesignation,
+//             value: selectedSignatory.designation,
+//           },
+//           {
+//             include: officeProfile.includePhone,
+//             value: selectedSignatory.phone,
+//           },
+//           {
+//             include: officeProfile.includeEmail,
+//             value: selectedSignatory.email,
+//           },
+//         ]),
+//       };
+//     }
 
-    if (block.type === "contact_line") {
-      return {
-        ...block,
-        content: joinIncludedLines([
-          {
-            include: officeProfile.includePhone,
-            value: selectedSignatory.phone,
-          },
-          {
-            include: officeProfile.includeEmail,
-            value: selectedSignatory.email,
-          },
-        ]),
-      };
-    }
+//     if (block.type === "id_note_footer") {
+//       const departmentName =
+//         officeProfile.includeDepartmentEn &&
+//         String(officeProfile.departmentEn || "").trim()
+//           ? String(officeProfile.departmentEn).trim()
+//           : "Department of ...";
 
-    return block;
-  });
-}
+//       const existing = String(block.content || "").trim();
+//       const idMatch = existing.match(
+//         /I\.D\.\s*No\.\s*(.*?)(?:\s+dated\s+.*)?$/i,
+//       );
+//       const idNoPart = idMatch?.[1]?.trim() || "...";
+
+//       const now = new Date();
+//       const day = String(now.getDate()).padStart(2, "0");
+//       const month = String(now.getMonth() + 1).padStart(2, "0");
+//       const year = now.getFullYear();
+//       const currentDate = `${day}/${month}/${year}`;
+
+//       return {
+//         ...block,
+//         content: `${departmentName} I.D. No. ${idNoPart} dated ${currentDate}`,
+//       };
+//     }
+
+//     if (block.type === "contact_line") {
+//       return {
+//         ...block,
+//         content: joinIncludedLines([
+//           {
+//             include: officeProfile.includePhone,
+//             value: selectedSignatory.phone,
+//           },
+//           {
+//             include: officeProfile.includeEmail,
+//             value: selectedSignatory.email,
+//           },
+//         ]),
+//       };
+//     }
+
+//     return block;
+//   });
+// }
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -277,6 +303,8 @@ function buildWordHtml(draft) {
       let textIndent = "0";
       let textTransform = "none";
       let marginBottom = "8px";
+      let borderTop = "none";
+      let paddingTop = "0";
 
       if (
         type === "document_number" ||
@@ -326,6 +354,11 @@ function buildWordHtml(draft) {
         }
       }
 
+      if (type === "id_note_footer") {
+        borderTop = "1px solid #0f172a";
+        paddingTop = "4px";
+      }
+
       if (type === "subject_block") {
         contentHtml = `<strong>${contentHtml}</strong>`;
       }
@@ -347,6 +380,8 @@ function buildWordHtml(draft) {
     text-decoration:${textDecoration};
     text-transform:${textTransform};
     white-space:pre-wrap;
+    border-top:${borderTop};
+    padding-top:${paddingTop};
   ">
     ${contentHtml}
   </p>
@@ -596,7 +631,7 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
     onDraftChange((prev) => ({
       ...prev,
       officeProfile: savedProfile,
-      blocks: applyOfficeProfileToBlocks(prev.blocks, savedProfile),
+      blocks: hydrateBlocksWithOfficeProfile(prev.blocks, savedProfile),
     }));
 
     setProfileOpen(false);
@@ -604,7 +639,9 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
 
   const addBlock = (type) => {
     onDraftChange((prev) => {
-      const nextBlock = createBlock(type);
+      const nextBlock = createBlock(type, undefined, {
+        officeProfile: prev.officeProfile,
+      });
       const currentBlocks = [...(prev.blocks || [])];
 
       if (!insertAfterBlockId) {

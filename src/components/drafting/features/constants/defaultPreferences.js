@@ -7,7 +7,7 @@ export const DEFAULT_PREFERENCES = {
 
   bodyLineSpacing: 1.15,
   bodyParagraphSpacing: 8,
-  bodyFirstLineIndent: 0.5, // inches
+  bodyFirstLineIndent: 0.0, // inches
 
   signatureGap: 28, // px
   pageMargin: 1, // inches

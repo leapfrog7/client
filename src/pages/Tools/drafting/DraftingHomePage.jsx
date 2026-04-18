@@ -4,6 +4,7 @@ import SectionHeader from "../../../components/drafting/common/SectionHeader";
 import QuickActions from "../../../components/drafting/home/QuickActions";
 import RecentDrafts from "../../../components/drafting/home/RecentDrafts";
 import FavoriteTemplates from "../../../components/drafting/home/FavoriteTemplates";
+import DraftingIntroCTA from "../../../components/drafting/home/DraftingIntroCTA";
 import useDrafts from "../../../components/drafting/features/hooks/useDrafts";
 import usePreferences from "../../../components/drafting/features/hooks/usePreferences";
 import useOfficeProfile from "../../../components/drafting/features/hooks/useOfficeProfile";
@@ -24,12 +25,7 @@ export default function DraftingHomePage() {
   return (
     <DraftingLayout>
       <div className="space-y-8">
-        {/* <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <SectionHeader
-            title="Drafting Studio"
-            subtitle="Start quickly with a standard format, continue a saved draft, or set your preferred drafting environment."
-          />
-        </section> */}
+        <DraftingIntroCTA />
 
         <section className="space-y-4">
           <SectionHeader

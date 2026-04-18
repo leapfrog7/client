@@ -488,26 +488,8 @@ export default function MobileTaskAccordion({
         </p>
       </div>
       {/* Search bar */}
-      <div className="py-2 ">
+      <div className="py-2">
         <div className="relative">
-          {/* Search icon */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg
-              className="h-4 w-4 text-slate-400"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeWidth="2"
-                d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-              />
-            </svg>
-          </div>
-
           <input
             type="search"
             value={searchQuery}
@@ -516,45 +498,30 @@ export default function MobileTaskAccordion({
             aria-label="Search tasks"
             className="
         block w-full rounded-xl border border-slate-800 bg-stone-50
-        py-4 pl-10 pr-24 focus:bg-white
+        py-4 pl-4 pr-24 focus:bg-white
         text-xs text-slate-800 placeholder:text-slate-400
         shadow-sm transition
-        
       "
           />
 
-          {/* Right-side action area */}
-          <div className="absolute inset-y-0 right-1.5 flex items-center gap-1">
-            {searchQuery ? (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="
-            rounded-lg px-2 py-1
-            text-xs text-slate-500 transition
-            hover:bg-slate-100 hover:text-slate-700
-          "
-                aria-label="Clear search"
-                title="Clear"
-              >
-                ✕
-              </button>
-            ) : null}
-
+          <div className="absolute inset-y-0 right-1.5 flex items-center">
             <button
               type="button"
-              onClick={() => {}}
-              className="
-          rounded-xl border border-transparent
-          bg-slate-900 px-3 py-1.5
-          text-xs font-medium text-white shadow-sm transition
-          hover:bg-slate-800
-          focus:outline-none  focus:ring-slate-200
-        "
-              aria-label="Search tasks"
-              title="Search"
+              onClick={() => {
+                if (searchQuery) setSearchQuery("");
+              }}
+              className={`
+          rounded-xl px-3 py-1.5 text-xs font-medium shadow-sm transition
+          ${
+            searchQuery
+              ? "bg-slate-900 text-white hover:bg-slate-800"
+              : "border border-transparent bg-slate-900 text-white hover:bg-slate-800"
+          }
+        `}
+              aria-label={searchQuery ? "Clear search" : "Search tasks"}
+              title={searchQuery ? "Clear" : "Search"}
             >
-              Search
+              {searchQuery ? "Clear ❌" : "Search 🔍︎"}
             </button>
           </div>
         </div>
