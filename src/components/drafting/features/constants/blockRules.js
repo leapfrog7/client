@@ -262,7 +262,7 @@ export const BLOCK_RULES = {
     isRequired: false,
     isRemovable: true,
     isRepeatable: false,
-    isLockedPosition: true,
+    isLockedPosition: false,
     placeholder: "Department of ... I.D. No. ... dated ...",
   },
 

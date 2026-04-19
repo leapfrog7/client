@@ -23,7 +23,7 @@ import { buildDraftDocumentHtml } from "../features/utils/renderDraftHtml";
 // import { FiFileText } from "react-icons/fi";
 import { PiMicrosoftWordLogoFill } from "react-icons/pi";
 import { FaRegCopy, FaPrint, FaRegEye, FaBuilding } from "react-icons/fa";
-import { FiSettings, FiPlus } from "react-icons/fi";
+import { FiSettings, FiPlus, FiDatabase } from "react-icons/fi";
 
 EditorWorkspace.propTypes = {
   draft: PropTypes.object,
@@ -805,24 +805,71 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
 
   const insertableBlocks = getInsertableBlockTypes(blocks);
 
+  function DraftActionButton({
+    label,
+    tip,
+    onClick,
+    children,
+    primary = false,
+  }) {
+    return (
+      <div className="relative ">
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={label}
+          title={tip}
+          className={[
+            "inline-flex items-center gap-1 md:gap-2 rounded-md md:rounded-xl px-2 md:px-3 py-2 md:py-2 text-xs md:text-sm border",
+            primary
+              ? "border-slate-900 bg-slate-900 text-white shadow-sm hover:bg-slate-800"
+              : "border-slate-300 bg-white text-slate-800 shadow-sm hover:bg-slate-200",
+          ].join(" ")}
+        >
+          <span
+            className={[
+              "flex h-3 w-3 md:h-6 md:w-6 items-center justify-center rounded-lg",
+              primary
+                ? "bg-white/10 text-white"
+                : "bg-slate-100 text-slate-700",
+            ].join(" ")}
+          >
+            {children}
+          </span>
+
+          <span className="font-medium">{label}</span>
+        </button>
+      </div>
+    );
+  }
+
+  DraftActionButton.propTypes = {
+    label: PropTypes.string.isRequired,
+    tip: PropTypes.string.isRequired,
+    onClick: PropTypes.func.isRequired,
+    children: PropTypes.node.isRequired,
+    primary: PropTypes.bool,
+  };
+
   return (
     <div className="space-y-5">
-      <div className="sticky top-[60px] z-10 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur sm:px-4">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-          <button
-            type="button"
+      <div className="sticky top-[60px] z-10 rounded-lg md:rounded-2xl md:border md:border-slate-200 bg-white px-3 py-3 md:shadow-sm sm:px-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <DraftActionButton
+            label="Insert block"
+            tip="Add a new drafting block below the current flow."
             onClick={() => {
               setInsertAfterBlockId(null);
               setInsertMenuOpen(true);
             }}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-900 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 ease-out hover:-translate-y-[1px] hover:bg-slate-800 hover:shadow-[0px_8px_18px_rgba(15,23,42,0.16)] active:translate-y-0"
+            primary
           >
             <FiPlus className="text-sm" />
-            <span>Insert block</span>
-          </button>
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Paragraph Bank"
+            tip="Insert saved paragraphs, templates, or reusable text."
             onClick={() => {
               setParagraphInsertMode("new_block");
               setParagraphTargetBlockId(
@@ -830,66 +877,59 @@ export default function EditorWorkspace({ draft, onDraftChange }) {
               );
               setParagraphBankOpen(true);
             }}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
-            <span>Paragraph Bank</span>
-          </button>
+            <FiDatabase className="text-sm" />
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Preview"
+            tip="Open the final on-screen document preview."
             onClick={() => setPreviewOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <FaRegEye className="text-sm" />
-            <span>Preview</span>
-          </button>
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Document settings"
+            tip="Adjust font, spacing, margins, and document presentation."
             onClick={() => setSettingsOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <FiSettings className="text-sm" />
-            <span>Document settings</span>
-          </button>
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Office profile"
+            tip="Manage office details, signatories, and defaults."
             onClick={() => setProfileOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <FaBuilding className="text-sm" />
-            <span>Office profile</span>
-          </button>
+          </DraftActionButton>
 
-          <div className="mx-2 hidden h-8 w-px bg-slate-300/70 lg:block" />
+          <div className="mx-1 hidden h-8 w-px bg-slate-300/70 lg:block" />
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Copy Text"
+            tip="Copy the draft text for pasting into Word or elsewhere."
             onClick={handleCopyForWord}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <FaRegCopy className="text-sm" />
-            <span>Copy Text</span>
-          </button>
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Download DOCX"
+            tip="Download the draft as a Word document."
             onClick={handleDownloadDocx}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <PiMicrosoftWordLogoFill className="text-base" />
-            <span>Download DOCX</span>
-          </button>
+          </DraftActionButton>
 
-          <button
-            type="button"
+          <DraftActionButton
+            label="Print"
+            tip="Open the print view for printing or PDF save."
             onClick={handlePrint}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-medium text-slate-800 backdrop-blur-sm shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out hover:-translate-y-[1px] hover:border-slate-400 hover:bg-white/85 hover:text-slate-900 hover:shadow-[0px_8px_20px_rgba(15,23,42,0.08)] active:translate-y-0"
           >
             <FaPrint className="text-sm" />
-            <span>Print</span>
-          </button>
+          </DraftActionButton>
         </div>
       </div>
 

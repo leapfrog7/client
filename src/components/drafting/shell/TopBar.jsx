@@ -18,18 +18,18 @@ export default function TopBar() {
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-8xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-sm">
-                <FaPenNib className="text-sm" />
+              <div className="flex h-6 w-6 md:h-10 md:w-10 shrink-0 items-center justify-center rounded-md md:rounded-2xl bg-slate-900 text-white shadow-sm">
+                <FaPenNib className=" text-xs md:text-sm" />
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Link
                     to="/pages/tools/drafting"
-                    className="truncate text-base font-semibold tracking-tight text-slate-900"
+                    className="truncate text-base md:text-xl font-bold md:font-extrabold  text-slate-900"
                   >
                     Drafting Studio
                   </Link>
@@ -58,7 +58,7 @@ export default function TopBar() {
               type="button"
               data-drafting-tutorial-trigger="true"
               onClick={() => setShowTutorial(true)}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+              className="inline-flex items-center gap-2 rounded-md md:rounded-xl border border-slate-300 bg-white px-2 py-2 md:px-3.5 md:py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
             >
               <FaCircleQuestion className="text-sm" />
               <span className="hidden sm:inline">Learn to use</span>
@@ -66,7 +66,7 @@ export default function TopBar() {
 
             <Link
               to="/pages/tools/drafting/drafts"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-2 py-2 md:px-3.5 md:py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
             >
               <FaRegFolderOpen className="text-sm" />
               <span className="hidden sm:inline">Open Drafts</span>
@@ -80,10 +80,10 @@ export default function TopBar() {
           <div className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 sm:px-6">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">
+                <h2 className="text-base md:text-lg font-semibold text-slate-900">
                   Learn to use Drafting Studio
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-xs md:text-sm text-slate-500">
                   A quick guide to help you get comfortable with the workflow.
                 </p>
               </div>

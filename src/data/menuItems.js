@@ -5,7 +5,7 @@ import { GiReceiveMoney } from "react-icons/gi";
 import { GrGroup } from "react-icons/gr";
 import { SlCalender } from "react-icons/sl";
 import { MdOutlineHandshake } from "react-icons/md";
-import { FaPersonCane } from "react-icons/fa6";
+import { FaPersonCane, FaPenNib } from "react-icons/fa6";
 import { GiPayMoney } from "react-icons/gi";
 import { TbReportSearch } from "react-icons/tb";
 import { IoNewspaperOutline, IoFolderOpenOutline } from "react-icons/io5";
@@ -14,7 +14,7 @@ import { HiOutlineBanknotes } from "react-icons/hi2";
 import { LiaHandsHelpingSolid } from "react-icons/lia";
 import { AiOutlineAppstoreAdd } from "react-icons/ai";
 import { CiHospital1 } from "react-icons/ci";
-import { GiTakeMyMoney } from "react-icons/gi";
+// import { GiTakeMyMoney } from "react-icons/gi";
 import { VscTable } from "react-icons/vsc";
 import { LuNotebookText } from "react-icons/lu";
 import { MdModeOfTravel } from "react-icons/md";
@@ -149,11 +149,11 @@ export const navItems = [
     path: null,
     icon: AiOutlineAppstoreAdd, // You can change the icon to something else if you'd like
     submenu: [
-      {
-        label: "NPS or UPS",
-        path: "/pages/public/nps-or-ups",
-        icon: GiTakeMyMoney, // Matching your Economy icon style
-      },
+      // {
+      //   label: "NPS or UPS",
+      //   path: "/pages/public/nps-or-ups",
+      //   icon: GiTakeMyMoney, // Matching your Economy icon style
+      // },
       {
         label: "CGHS Units",
         path: "/pages/public/cghs-units",
@@ -178,6 +178,11 @@ export const navItems = [
         label: "Task Manager",
         path: "/pages/tools/task-tracker", // 👈 NEW ENTRY
         icon: GoTasklist, // You can change this to any relevant icon
+      },
+      {
+        label: "Drafting Studio",
+        path: "/pages/tools/drafting",
+        icon: FaPenNib,
       },
     ],
   },

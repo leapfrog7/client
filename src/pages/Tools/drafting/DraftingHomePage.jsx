@@ -27,9 +27,9 @@ export default function DraftingHomePage() {
       <div className="space-y-8">
         <DraftingIntroCTA />
 
-        <section className="space-y-4">
+        <section className="space-y-4 p-2 md:p-0">
           <SectionHeader
-            title="Quick actions"
+            title="Quick actions 🎬"
             subtitle="Choose the fastest way to begin your drafting work."
           />
           <QuickActions
@@ -38,17 +38,17 @@ export default function DraftingHomePage() {
           />
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 p-2 md:p-0">
           <SectionHeader
-            title="Recent drafts"
+            title="Recent drafts ⌛"
             subtitle="Reopen the documents you worked on most recently."
           />
           <RecentDrafts drafts={recentDrafts} />
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 p-2 md:p-0">
           <SectionHeader
-            title="Popular templates"
+            title="Popular templates 🔥"
             subtitle="Start from common government communication formats."
           />
           <FavoriteTemplates />

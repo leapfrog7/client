@@ -4,6 +4,7 @@ import DraftingLayout from "../../../components/drafting/shell/DraftingLayout";
 import SectionHeader from "../../../components/drafting/common/SectionHeader";
 import EditorWorkspace from "../../../components/drafting/editor/EditorWorkspace";
 import useDraftEditor from "../../../components/drafting/features/hooks/useDraftEditor";
+import DraftTitleField from "../../../components/drafting/drafts/DraftTitleField";
 import { formatDraftDate } from "../../../components/drafting/features/utils/formatDraftDate";
 
 export default function DraftEditorPage() {
@@ -79,36 +80,55 @@ export default function DraftEditorPage() {
 
   return (
     <DraftingLayout statusLabel={statusLabel} statusUpdatedAt={lastSavedAt}>
-      <div className="space-y-5">
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="space-y-3">
+        <div className="rounded-2xl  bg-white px-2 ">
+          <div className="flex flex-col gap-3 md:gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="min-w-0 flex-1">
-              <label className="block">
-                <span className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-500">
-                  Draft title
-                </span>
-                <input
-                  type="text"
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(e.target.value)}
-                  onBlur={handleTitleBlur}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-lg font-semibold text-slate-900 outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
-                />
-              </label>
+              <DraftTitleField
+                titleInput={titleInput}
+                setTitleInput={setTitleInput}
+                handleTitleBlur={handleTitleBlur}
+              />
             </div>
 
-            <div className="flex flex-col gap-3 lg:items-end">
-              <div className="text-sm text-slate-500">
-                Last saved:{" "}
-                {lastSavedAt ? formatDraftDate(lastSavedAt) : "Not yet saved"}
+            <div className="flex md:flex-col gap-2 md:gap-3 lg:min-w-[220px] lg:items-end">
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 text-[11px] ,d:text-xs text-slate-500">
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span>
+                  Last saved:{" "}
+                  <span className="font-medium text-slate-700">
+                    {lastSavedAt
+                      ? formatDraftDate(lastSavedAt)
+                      : "Not yet saved"}
+                  </span>
+                </span>
               </div>
 
               <button
                 type="button"
                 onClick={saveCurrentDraft}
-                className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-1 md:gap-2 rounded-md md:rounded-xl border border-slate-300 bg-white px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 hover:border-slate-400 active:scale-[0.98]"
               >
-                Save now
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  className="h-4 w-4 text-slate-500"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5 4.75h11.5L20 8.25V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5.75a1 1 0 0 1 1-1Z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 4.75v4h7v-4M8 19v-5h8v5"
+                  />
+                </svg>
+                Save draft
               </button>
             </div>
           </div>

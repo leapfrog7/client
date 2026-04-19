@@ -38,7 +38,7 @@ const navItems = [
 
 function linkClasses(isActive) {
   return [
-    "group inline-flex items-center gap-1 rounded-xl pl-4 pr-8 py-2",
+    "group inline-flex items-center gap-1 rounded-xl md:pl-4 md:pr-8 pl-1 pr-4 py-2",
     "text-sm font-medium transition-all duration-200",
     isActive
       ? "bg-sky-200 text-sky-800 font-semibold shadow-sm"
@@ -50,7 +50,7 @@ export default function SideNav() {
   return (
     <nav
       aria-label="Drafting navigation"
-      className="flex items-center gap-2 md:gap-8 overflow-x-auto py-3 scrollbar-none"
+      className="flex items-center gap-2 md:gap-8 overflow-x-auto py-2 md:py-3 scrollbar-none"
     >
       {navItems.map((item) => {
         const Icon = item.icon;
@@ -65,7 +65,7 @@ export default function SideNav() {
             {({ isActive }) => (
               <>
                 <span
-                  className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-md md:rounded-lg transition ${
                     isActive
                       ? "bg-white/12 text-sky-800"
                       : "bg-slate-100 text-slate-500 group-hover:bg-white"

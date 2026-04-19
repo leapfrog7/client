@@ -86,7 +86,8 @@ export default function DraftingStudioTutorial() {
           </p>
           <p className="mt-3">
             Once this profile is set, these details can auto-populate in future
-            drafts. This saves time and ensures consistency as these do not change often.
+            drafts. This saves time and ensures consistency as these do not
+            change often.
           </p>
         </>
       ),
@@ -291,7 +292,7 @@ export default function DraftingStudioTutorial() {
         <>
           <p>A simple way to use the Drafting Studio is:</p>
 
-          <ol className="mt-4 list-decimal space-y-2 pl-6 text-slate-700">
+          <ol className="mt-2 md:mt-4 list-decimal space-y-2 pl-6 text-slate-700">
             <li>Set up your Office Profile</li>
             <li>Save your common Signatories</li>
             <li>Set your Document Settings and defaults</li>
@@ -311,7 +312,7 @@ export default function DraftingStudioTutorial() {
         <>
           <p>The Drafting Studio is meant to help users:</p>
 
-          <ul className="mt-4 list-disc space-y-2 pl-6 text-slate-700">
+          <ul className="mt-2 md:mt-4 list-disc space-y-1 pl-4 md:pl-6 text-slate-700">
             <li>draft faster</li>
             <li>avoid routine formatting work</li>
             <li>maintain consistency in official communications</li>
@@ -326,31 +327,31 @@ export default function DraftingStudioTutorial() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+    <div className="space-y-4">
+      <div className="rounded-md md:rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 md:p-4 ">
         <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
           Tutorial
         </span>
-        <h1 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="mt-2 md:mt-4 text-lg md:text-2xl font-bold tracking-tight text-slate-900">
           Drafting Studio
         </h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
+        <p className="mt-2 md:mt-4 max-w-4xl text-sm leading-7 text-slate-600 md:text-base">
           The Drafting Studio is built to remove the repetitive burden of
           formatting official communications, so that users can focus on content
           instead of layout, alignment, and structure.
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-3 md:space-y-5">
         {sections.map((section, index) => (
           <article
             key={index}
-            className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+            className="rounded-md md:rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+            <h2 className="text-base md:text-lg font-semibold text-slate-900 sm:text-xl">
               {section.title}
             </h2>
-            <div className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
+            <div className="mt-1 md:mt-3 text-sm leading-6 md:leading-7 text-slate-600">
               {section.content}
             </div>
           </article>

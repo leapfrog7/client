@@ -15,7 +15,7 @@ export default function DraftingLayout({
   statusUpdatedAt,
 }) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 w-full">
       <TopBar />
 
       <div className="border-b border-slate-200/80 bg-white/70 backdrop-blur">
@@ -24,7 +24,7 @@ export default function DraftingLayout({
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto xlg:w-11/12 px-2 py-4 sm:px-6 lg:px-8">
         <section className="min-w-0">{children}</section>
       </main>
 
