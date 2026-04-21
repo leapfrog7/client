@@ -19,12 +19,12 @@ export default function DraftingLayout({
       <TopBar />
 
       <div className="border-b border-slate-200/80 bg-white/70 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 bg-zinc-100">
           <SideNav />
         </div>
       </div>
 
-      <main className="mx-auto xlg:w-11/12 px-2 py-4 sm:px-6 lg:px-8">
+      <main className="mx-auto  px-2 py-4 sm:px-6 lg:px-8">
         <section className="min-w-0">{children}</section>
       </main>
 

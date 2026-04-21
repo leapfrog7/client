@@ -701,7 +701,15 @@ const App = () => {
 
             <Route
               path="/pages/tools/drafting/*"
-              element={<DraftingRoutes />}
+              element={
+                <Suspense
+                  fallback={
+                    <div className="p-6">Loading Drafting Studio...</div>
+                  }
+                >
+                  <DraftingRoutes />
+                </Suspense>
+              }
             />
           </Routes>
         </div>
