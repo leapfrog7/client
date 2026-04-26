@@ -4,6 +4,8 @@ import { diffDays, safeTrim } from "./utils";
 import { getStageStyle, QUICK_STAGES } from "./constants";
 import { exportTaskSummaryPdf } from "./exportTaskSummaryPdf";
 import { FaRegFilePdf } from "react-icons/fa";
+import { IoArchiveOutline } from "react-icons/io5";
+import { VscFolderActive } from "react-icons/vsc";
 
 function daysUntil(dueAt) {
   if (!dueAt) return null;
@@ -31,6 +33,7 @@ export default function TaskList({
   onUnarchive,
   showArchived,
   onToggleArchived,
+  archiveSwitching = false,
 }) {
   const [q, setQ] = useState("");
   const [compact, setCompact] = useState(false);
@@ -77,6 +80,8 @@ export default function TaskList({
           t.identifiers?.fileNo,
           t.identifiers?.section,
           t.currentStage,
+          t.category,
+          t.assignedTo,
         ]
           .filter(Boolean)
           .join(" ")
@@ -242,17 +247,41 @@ export default function TaskList({
           <button
             type="button"
             onClick={onToggleArchived}
-            className={`shrink-0 rounded-lg border border-slate-200 bg-white hover:border-slate-300 ${
+            disabled={archiveSwitching}
+            className={`shrink-0 rounded-lg border border-slate-200 bg-white transition ${
               compact ? "px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm"
+            } ${
+              archiveSwitching
+                ? "cursor-not-allowed opacity-60"
+                : "hover:border-slate-300"
             }`}
             title={
               showArchived ? "Back to active tasks" : "View archived tasks"
             }
           >
             <span className="inline-flex items-center gap-1">
-              <span aria-hidden="true">{showArchived ? "↩" : "📦"}</span>
+              {archiveSwitching ? (
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+              ) : (
+                <span aria-hidden="true">
+                  {showArchived ? (
+                    <span className="text-emerald-500">
+                      <VscFolderActive />
+                    </span>
+                  ) : (
+                    <span className="text-amber-700">
+                      <IoArchiveOutline />
+                    </span>
+                  )}
+                </span>
+              )}
+
               <span className={compact ? "hidden" : ""}>
-                {showArchived ? "Back" : "Archive"}
+                {archiveSwitching
+                  ? "Loading"
+                  : showArchived
+                    ? "Active"
+                    : "Archive"}
               </span>
             </span>
           </button>
@@ -369,7 +398,16 @@ export default function TaskList({
 
       {/* ===== List ===== */}
       <div className="flex-1 min-h-0 overflow-auto bg-slate-50">
-        {filtered.length === 0 ? (
+        {archiveSwitching ? (
+          <div className="flex h-full items-center justify-center p-6">
+            <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-center shadow-sm">
+              <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700" />
+              <div className="mt-3 text-sm font-medium text-slate-800">
+                Loading {showArchived ? "archived" : "active"} tasks...
+              </div>
+            </div>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="p-6 text-sm text-slate-600">
             No tasks found. Try clearing filters or create a new task.
           </div>
@@ -384,13 +422,14 @@ export default function TaskList({
               return (
                 <li
                   key={t.id}
-                  className={`relative cursor-pointer bg-white hover:bg-slate-50 transition ${
-                    isSelected
-                      ? "bg-gradient-to-b from-[#e1e1f4] via-[#f3f3f1] to-[#f7f7f7]"
-                      : "bg-white hover:bg-slate-50"
-                  }`}
                   onClick={() => onSelect(t.id)}
+                  className={`group relative cursor-pointer border-b border-slate-100 transition-all duration-150
+    ${isSelected ? "bg-blue-100/80" : "bg-white hover:bg-slate-50"}
+  `}
                 >
+                  {isSelected && (
+                    <div className="absolute left-0 top-0 h-full w-1 rounded-r-full bg-amber-500" />
+                  )}
                   <div
                     className={`absolute left-0 top-0 h-full w-1 ${s.dot} opacity-80`}
                     aria-hidden="true"
@@ -418,13 +457,25 @@ export default function TaskList({
                         ) : null}
 
                         <div className="mt-2 flex flex-wrap items-center gap-2">
+                          {t.category ? (
+                            <span className="inline-flex items-center rounded-full border border-sky-100 bg-zinc-100 px-2 py-0.5 text-[11px] font-medium leading-5 text-sky-800">
+                              {t.category}
+                            </span>
+                          ) : null}
+
+                          {t.assignedTo ? (
+                            <span className="inline-flex items-center rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[11px] font-medium leading-5 text-violet-800">
+                              With: {t.assignedTo}
+                            </span>
+                          ) : null}
+
                           <span
-                            className={`text-[11px] px-2 py-0.5 rounded-full border ${s.chip}`}
+                            className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-5 ${s.chip}`}
                           >
                             {t.currentStage || "—"}
                           </span>
 
-                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] leading-5 text-slate-700">
                             {agingDays}d
                           </span>
                         </div>
@@ -433,40 +484,73 @@ export default function TaskList({
                       {/* Actions show only for selected row (cleaner) */}
                       <div className="shrink-0">
                         {isSelected ? (
-                          <div className="flex items-center gap-2">
-                            {showArchived ? (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onUnarchive(t.id);
-                                }}
-                                className="text-[11px] px-2 py-1 rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                              >
-                                Restore
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onArchive(t.id);
-                                }}
-                                className="text-[16px] px-2 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
-                              >
-                                📦
-                              </button>
-                            )}
+                          <div className="flex items-center gap-1.5">
+                            {/* Archive / Restore Button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                showArchived
+                                  ? onUnarchive(t.id)
+                                  : onArchive(t.id);
+                              }}
+                              className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:border-slate-300 hover:text-black hover:bg-slate-50 active:scale-95"
+                              title={showArchived ? "Restore" : "Archive"}
+                            >
+                              {showArchived ? (
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                  />
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-4 h-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                                  />
+                                </svg>
+                              )}
+                            </button>
 
+                            {/* Delete Button */}
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onDelete(t.id);
                               }}
-                              className="text-[16px] px-2 py-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                              className="p-2 rounded-lg border border-slate-200 bg-white text-slate-500 transition-all duration-200 hover:border-red-200 hover:text-red-600 hover:bg-red-50 active:scale-95"
+                              title="Delete"
                             >
-                              🗑️
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
                             </button>
                           </div>
                         ) : (
@@ -495,4 +579,5 @@ TaskList.propTypes = {
   onUnarchive: PropTypes.func.isRequired,
   showArchived: PropTypes.bool.isRequired,
   onToggleArchived: PropTypes.func.isRequired,
+  archiveSwitching: PropTypes.bool,
 };

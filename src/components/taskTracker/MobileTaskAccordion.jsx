@@ -54,6 +54,7 @@ export default function MobileTaskAccordion({
   onArchive,
   archiveLabel,
   isArchivedView,
+  archiveSwitching = false,
 }) {
   const [savingFor, setSavingFor] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,13 +92,17 @@ export default function MobileTaskAccordion({
       const fileNo = normalizeText(t.identifiers?.fileNo);
       const section = normalizeText(t.identifiers?.section);
       const stage = normalizeText(t.currentStage);
+      const category = normalizeText(t.category);
+      const assignedTo = normalizeText(t.assignedTo);
 
       return (
         title.includes(q) ||
         receiptNo.includes(q) ||
         fileNo.includes(q) ||
         section.includes(q) ||
-        stage.includes(q)
+        stage.includes(q) ||
+        category.includes(q) ||
+        assignedTo.includes(q)
       );
     });
   }, [tasks, searchQuery]);
@@ -210,6 +215,20 @@ export default function MobileTaskAccordion({
     window.addEventListener("resize", syncHeight);
     return () => window.removeEventListener("resize", syncHeight);
   }, [expandedTaskId]);
+
+  if (archiveSwitching) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+        <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700" />
+        <div className="mt-3 text-sm font-semibold text-slate-800">
+          Loading {isArchivedView ? "archived" : "active"} tasks...
+        </div>
+        <div className="mt-1 text-xs text-slate-500">
+          Please wait while the list is refreshed.
+        </div>
+      </div>
+    );
+  }
 
   if (!tasks?.length) {
     return <div className="p-4 text-sm text-slate-800">No tasks found.</div>;
@@ -362,112 +381,124 @@ export default function MobileTaskAccordion({
 
             <div className="p-3">
               <div className="grid grid-cols-2 gap-2">
-                {!isArchivedView ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onEditDetails?.(moreTask.id);
-                    }}
-                    className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
-                  >
-                    <div className="font-normal text-xs">✏️ Edit</div>
-                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-slate-500">
-                      title / due / identifiers
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onArchive?.(moreTask.id);
-                    }}
-                    className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
-                  >
-                    <div className="font-normal text-xs">↩️ Restore</div>
-                    <div className="text-[11px] text-slate-500">
-                      back to active
-                    </div>
-                  </button>
-                )}
+                {isArchivedView ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onArchive?.(moreTask.id);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-teal-200 bg-sky-50 text-sm text-sky-800 hover:bg-sky-100 text-center"
+                    >
+                      <div className="font-normal text-xs">↩️ Restore</div>
+                      <div className="text-[11px] text-sky-700">
+                        back to active
+                      </div>
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMoreMenu(null);
-                    onOpenShare?.(moreTask.id);
-                  }}
-                  className="px-2 py-1 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
-                >
-                  <div className="font-normal text-xs">🔗 Share</div>
-                  <div className="text-[11px] sm:font-xs font-light sm:font-normal text-slate-500">
-                    read-only
-                  </div>
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onOpenShare?.(moreTask.id);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-center"
+                    >
+                      <div className="font-normal text-xs">🔗 Share</div>
+                      <div className="text-[11px] text-slate-500">
+                        read-only
+                      </div>
+                    </button>
 
-                {!isArchivedView ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onArchive?.(moreTask.id);
-                    }}
-                    className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-centre"
-                  >
-                    <div className="font-normal text-xs">
-                      📦 {archiveLabel || "Archive"}
-                    </div>
-                    <div className="text-[11px] text-slate-500">
-                      hide from active
-                    </div>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onDelete(moreTask.id);
+                      }}
+                      className="col-span-2 px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-center"
+                    >
+                      <div className="font-normal text-xs">
+                        🗑️ Delete permanently
+                      </div>
+                      <div className="text-[11px] text-rose-700">
+                        cannot be undone
+                      </div>
+                    </button>
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onDelete(moreTask.id);
-                    }}
-                    className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-centre"
-                  >
-                    <div className="font-normal text-xs ">🗑️ Delete</div>
-                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-rose-700">
-                      permanent
-                    </div>
-                  </button>
-                )}
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onEditDetails?.(moreTask.id);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-center"
+                    >
+                      <div className="font-normal text-xs">✏️ Edit</div>
+                      <div className="text-[11px] text-slate-500">
+                        title / due / identifiers
+                      </div>
+                    </button>
 
-                {!isArchivedView ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onDelete(moreTask.id);
-                    }}
-                    className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-centre"
-                  >
-                    <div className="font-normal text-xs">🗑️ Delete</div>
-                    <div className="text-[11px] sm:font-xs font-light sm:font-normal text-rose-700">
-                      permanent
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMoreMenu(null);
-                      onEditDetails?.(moreTask.id);
-                    }}
-                    className="px-3 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-left"
-                  >
-                    <div className="font-semibold">✏️ Edit</div>
-                    <div className="text-[11px] text-slate-500">
-                      title / due / identifiers
-                    </div>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onOpenShare?.(moreTask.id);
+                      }}
+                      className="px-2 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-center"
+                    >
+                      <div className="font-normal text-xs">🔗 Share</div>
+                      <div className="text-[11px] text-slate-500">
+                        read-only
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onArchive?.(moreTask.id);
+                      }}
+                      className="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 hover:bg-slate-50 text-center"
+                    >
+                      <div className="font-normal text-xs">
+                        📦 {archiveLabel || "Archive"}
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        hide from active
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMoreMenu(null);
+                        onDelete(moreTask.id);
+                      }}
+                      className="px-3 py-2 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-800 hover:bg-rose-100 text-center"
+                    >
+                      <div className="font-normal text-xs">🗑️ Delete</div>
+                      <div className="text-[11px] text-rose-700">permanent</div>
+                    </button>
+                  </>
                 )}
               </div>
+
+              {isArchivedView ? (
+                <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-5 text-amber-900">
+                  This task is archived and read-only. Restore it to active
+                  tasks before editing details, changing stage, or adding
+                  updates.
+                </div>
+              ) : (
+                <div className="mt-3 text-[11px] text-slate-500">
+                  Tip: tap outside to close.
+                </div>
+              )}
 
               <div className="mt-3 text-[11px] text-slate-500">
                 Tip: tap outside to close.
@@ -585,6 +616,21 @@ export default function MobileTaskAccordion({
                     {displayTitle(t.title, 100) || "Untitled"}
                   </span>
                 </div>
+                {(t.category || t.assignedTo) && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    {t.category ? (
+                      <span className="rounded-full border border-sky-100 bg-sky-50 px-2 py-0.5 text-[10px] font-medium text-sky-800">
+                        {t.category}
+                      </span>
+                    ) : null}
+
+                    {t.assignedTo ? (
+                      <span className="rounded-full border border-violet-100 bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-800">
+                        With: {t.assignedTo}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
 
                 {/* Meta row */}
                 <div className="mt-2 flex items-center justify-between gap-2">
@@ -685,6 +731,7 @@ export default function MobileTaskAccordion({
                   onEditDetails={() => onEditDetails(t.id)}
                   onNotify={onNotify}
                   embedded
+                  forceArchivedView={isArchivedView}
                 />
               </div>
             </div>
@@ -707,4 +754,5 @@ MobileTaskAccordion.propTypes = {
   onArchive: PropTypes.func,
   archiveLabel: PropTypes.string,
   isArchivedView: PropTypes.bool,
+  archiveSwitching: PropTypes.bool,
 };

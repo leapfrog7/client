@@ -46,6 +46,8 @@ export default function TaskTrackerHome() {
   const [sessionTimeLeft, setSessionTimeLeft] = useState(null);
   const [sessionExpiringSoon, setSessionExpiringSoon] = useState(false);
 
+  const [archiveSwitching, setArchiveSwitching] = useState(false);
+
   // Form (create/edit)
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState("create"); // create | edit
@@ -127,6 +129,16 @@ export default function TaskTrackerHome() {
     };
   }, [notify]);
 
+  const responsibleSuggestions = useMemo(() => {
+    const names = tasks
+      .map((t) => t.assignedTo)
+      .filter(Boolean)
+      .map((v) => v.trim())
+      .filter(Boolean);
+
+    return [...new Set(names)].sort((a, b) => a.localeCompare(b));
+  }, [tasks]);
+
   async function refresh() {
     const t = await getTasks({ archived: showArchived });
     setTasks(Array.isArray(t) ? t : []);
@@ -134,14 +146,22 @@ export default function TaskTrackerHome() {
 
   async function toggleArchivedView() {
     const next = !showArchived;
-    setShowArchived(next);
-    setExpandedTaskId(null);
-    setSelectedTaskId(null);
-    // setPage(1);
 
-    const t = await getTasks({ archived: next });
-    setTasks(Array.isArray(t) ? t : []);
-    if (t?.length) setSelectedTaskId(t[0].id);
+    try {
+      setArchiveSwitching(true);
+
+      setShowArchived(next);
+      setExpandedTaskId(null);
+      setSelectedTaskId(null);
+
+      const t = await getTasks({ archived: next });
+      setTasks(Array.isArray(t) ? t : []);
+      if (t?.length) setSelectedTaskId(t[0].id);
+    } catch (e) {
+      notify(e.message || "Could not switch task view", "error");
+    } finally {
+      setArchiveSwitching(false);
+    }
   }
 
   async function handleArchive(taskId) {
@@ -508,7 +528,7 @@ export default function TaskTrackerHome() {
       {/* CTA header (does not consume scroll space) */}
       <div className="shrink-0 bg-white p-4 shadow-sm text-center mx-auto w-full">
         {sessionExpiringSoon && sessionTimeLeft !== null && (
-          <div className="mt-2 inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-800">
+          <div className="mt-2 animate-ping  inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-800">
             Session expires soon
           </div>
         )}
@@ -560,6 +580,7 @@ export default function TaskTrackerHome() {
                   onUnarchive={handleUnarchive}
                   showArchived={showArchived}
                   onToggleArchived={toggleArchivedView}
+                  archiveSwitching={archiveSwitching}
                 />
               </div>
 
@@ -579,6 +600,7 @@ export default function TaskTrackerHome() {
                     onOpenShare={openShareView}
                     onEditDetails={handleEditDetails}
                     onNotify={notify}
+                    forceArchivedView={showArchived}
                   />
                 </div>
                 {/* <div>
@@ -632,24 +654,32 @@ export default function TaskTrackerHome() {
                       <button
                         type="button"
                         onClick={toggleArchivedView}
+                        disabled={archiveSwitching}
                         className={`w-full rounded-xl border px-4 py-3 text-sm font-medium shadow-sm transition active:scale-[0.99]
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-300
-      ${
-        showArchived
+    ${
+      archiveSwitching
+        ? "cursor-not-allowed opacity-60"
+        : showArchived
           ? "border-teal-200 bg-teal-50 text-teal-800 hover:bg-teal-100"
           : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-      }`}
-                        title={
-                          showArchived
-                            ? "Back to active tasks"
-                            : "View archived tasks"
-                        }
+    }`}
                       >
                         <span className="inline-flex items-center justify-center gap-2">
-                          <span>{showArchived ? "📌" : "📦"}</span>
-                          <span>
-                            {showArchived ? "Back to Active" : "See Archive"}
-                          </span>
+                          {archiveSwitching ? (
+                            <>
+                              <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+                              <span>Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>{showArchived ? "📌" : "📦"}</span>
+                              <span>
+                                {showArchived
+                                  ? "Back to Active"
+                                  : "See Archive"}
+                              </span>
+                            </>
+                          )}
                         </span>
                       </button>
 
@@ -700,6 +730,7 @@ export default function TaskTrackerHome() {
                       onArchive={showArchived ? handleUnarchive : handleArchive}
                       archiveLabel={showArchived ? "Restore" : "Archive"}
                       isArchivedView={showArchived}
+                      archiveSwitching={archiveSwitching}
                     />
                   )}
                 </div>
@@ -736,6 +767,7 @@ export default function TaskTrackerHome() {
         initialValues={formInitial}
         onClose={() => setFormOpen(false)}
         onSubmit={handleFormSubmit}
+        responsibleSuggestions={responsibleSuggestions}
       />
     </div>
   );

@@ -7,16 +7,34 @@ function TabButton({ active, onClick, children }) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-2 text-[11px] sm:text-sm  transition
-        ${active ? "text-slate-700 font-bold lg:font-extrabold" : "text-slate-700 hover:text-slate-700"}
-      `}
+      className="group relative   text-xs sm:text-sm font-medium transition-all duration-300 outline-none"
       type="button"
       aria-pressed={active}
     >
-      {children}
+      {/* Label: Slides up slightly and turns black when active */}
+      <span
+        className={`relative z-10 block transition-all duration-300 ${
+          active
+            ? "text-teal-700 bg-teal-50  px-4 py-2 transform -translate-y-[1px]"
+            : "text-slate-500 px-4 py-2 group-hover:text-slate-800 group-hover:rounded-none"
+        }`}
+      >
+        {children}
+      </span>
+
+      {/* The Underline: Grows from center outwards */}
       <div
-        className={`mt-1 h-0.5 rounded-full transition ${
-          active ? "bg-slate-700 rounded-full" : "bg-transparent"
+        className={`absolute bottom-0 left-0 h-[3px] w-full bg-teal-300 transition-transform duration-300 ease-out origin-center ${
+          active ? "scale-x-200" : "scale-x-0"
+        }`}
+      />
+
+      {/* Hover background: A very faint pulse effect */}
+      <div
+        className={`absolute inset-0  transition-all duration-300 -z-0 ${
+          active
+            ? "bg-transparent"
+            : "bg-teal-100/0 group-hover:bg-slate-100/50"
         }`}
       />
     </button>
@@ -33,6 +51,7 @@ export default function UpdateComposer({
   currentStage,
   onAddUpdate,
   onNotify,
+  disabled = false,
 }) {
   // Default to "quick" (your original), but visually we make it feel lighter.
   const [mode, setMode] = useState("quick"); // quick | custom | remark
@@ -50,7 +69,15 @@ export default function UpdateComposer({
     setMode("quick");
   }, [currentStage]);
 
+  useEffect(() => {
+    if (disabled) {
+      setStatus("idle");
+    }
+  }, [disabled]);
+
   const canSubmit = useMemo(() => {
+    if (disabled) return false;
+
     const r = safeTrim(remark);
 
     if (mode === "remark") return r.length > 0;
@@ -61,7 +88,7 @@ export default function UpdateComposer({
     }
 
     return safeTrim(quickStage).length > 0;
-  }, [mode, quickStage, customStage, remark]);
+  }, [disabled, mode, quickStage, customStage, remark]);
 
   function buildPayload() {
     const r = safeTrim(remark);
@@ -80,6 +107,12 @@ export default function UpdateComposer({
   }
 
   async function handleSubmit() {
+    if (disabled) {
+      setStatus("idle");
+      onNotify?.("This task is archived. Restore it to add updates.", "error");
+      return;
+    }
+
     if (!canSubmit || status === "saving") return;
 
     setStatus("saving");
@@ -169,13 +202,17 @@ export default function UpdateComposer({
                       <button
                         key={s}
                         type="button"
-                        onClick={() => setQuickStage(s)}
+                        disabled={disabled}
+                        onClick={() => {
+                          if (!disabled) setQuickStage(s);
+                        }}
                         className={`text-[11px] sm:text-xs lg:text-sm sm:font-normal px-3 py-1.5 rounded-full border transition
             ${
               active
                 ? "bg-black text-white border-black"
                 : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-            }`}
+            }
+             ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
                         aria-pressed={active}
                       >
                         {s}
@@ -201,9 +238,10 @@ export default function UpdateComposer({
               </div>
               <input
                 value={customStage}
+                disabled={disabled}
                 onChange={(e) => setCustomStage(e.target.value)}
                 placeholder="e.g., Draft para-wise comments"
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300  lg:font-normal"
+                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-slate-300  lg:font-normal disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
               />
               <div className="mt-1 text-[11px] text-slate-700  lg:font-normal">
                 Tip: keep it short and action-based.
@@ -220,6 +258,7 @@ export default function UpdateComposer({
             </div>
             <textarea
               value={remark}
+              disabled={disabled}
               onChange={(e) => setRemark(e.target.value)}
               placeholder={
                 mode === "remark"
@@ -227,7 +266,7 @@ export default function UpdateComposer({
                   : "Example: Submitted to DS for approval."
               }
               rows={3}
-              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[11px] lg:text-sm focus:outline-none focus:ring-2 focus:ring-slate-300  lg:font-normal"
+              className="w-full px-3 py-2 rounded-lg border border-slate-200 text-[11px] lg:text-sm focus:outline-none focus:ring-2 focus:ring-slate-300  lg:font-normal disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -240,28 +279,68 @@ export default function UpdateComposer({
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!canSubmit || status === "saving"}
-              className={`px-3 lg:px-4 py-2 rounded-xl text-xs lg:text-sm font-normal lg:font-semibold transition active:scale-[0.99]
-                ${
-                  status === "saving"
-                    ? "bg-slate-300 text-slate-700 cursor-not-allowed"
-                    : status === "saved"
-                      ? "bg-emerald-600 text-white"
-                      : canSubmit
-                        ? "bg-black text-white hover:bg-black"
-                        : "bg-slate-200 text-slate-700 cursor-not-allowed"
-                }`}
+              disabled={disabled || !canSubmit || status === "saving"}
+              className={`relative min-w-[120px] overflow-hidden rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 active:scale-[0.98]
+  ${
+    disabled
+      ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+      : status === "saving"
+        ? "bg-black/80 text-white/80 cursor-not-allowed"
+        : status === "saved"
+          ? "bg-black text-white"
+          : canSubmit
+            ? "bg-black text-white hover:bg-neutral-800 shadow-md"
+            : "bg-slate-200 text-slate-500 cursor-not-allowed"
+  }`}
             >
-              {status === "saving" ? (
-                <span className="inline-flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 rounded-full border-2 border-white/60 border-t-white animate-spin  lg:font-normal" />
-                  Saving…
-                </span>
-              ) : status === "saved" ? (
-                "Saved ✓"
-              ) : (
-                "Add update"
-              )}
+              <div className="flex items-center justify-center gap-2">
+                {status === "saving" ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    <span>Saving...</span>
+                  </>
+                ) : status === "saved" ? (
+                  <span className="flex items-center gap-1 animate-in zoom-in duration-300">
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Saved
+                  </span>
+                ) : disabled ? (
+                  "Archived"
+                ) : (
+                  "Add update"
+                )}
+              </div>
             </button>
           </div>
         </div>
@@ -274,4 +353,5 @@ UpdateComposer.propTypes = {
   currentStage: PropTypes.string,
   onAddUpdate: PropTypes.func.isRequired,
   onNotify: PropTypes.func,
+  disabled: PropTypes.bool,
 };

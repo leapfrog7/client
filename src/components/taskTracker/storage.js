@@ -190,12 +190,21 @@ export async function getTaskById(taskId) {
   return normalizeItem(payload);
 }
 
-export async function createTask({ title, identifiers, dueAt, currentStage }) {
+export async function createTask({
+  title,
+  identifiers,
+  dueAt,
+  currentStage,
+  category,
+  assignedTo,
+}) {
   const payload = await http("POST", TASK_API, {
     title,
     identifiers,
     dueAt: dueAt || null,
     currentStage: currentStage || "Pending",
+    category: category || "General",
+    assignedTo: assignedTo || "",
   });
   return normalizeItem(payload);
 }
@@ -207,6 +216,8 @@ export async function updateTaskBasics(taskId, patch) {
       ? { identifiers: patch.identifiers }
       : {}),
     ...(patch.dueAt !== undefined ? { dueAt: patch.dueAt } : {}),
+    ...(patch.category !== undefined ? { category: patch.category } : {}),
+    ...(patch.assignedTo !== undefined ? { assignedTo: patch.assignedTo } : {}),
   };
   const payload = await http("PATCH", `${TASK_API}/${taskId}`, body);
   return normalizeItem(payload);
@@ -257,6 +268,8 @@ export async function updateTask(taskId, updaterFn) {
   if (next?.title !== undefined) patch.title = next.title;
   if (next?.identifiers !== undefined) patch.identifiers = next.identifiers;
   if (next?.dueAt !== undefined) patch.dueAt = next.dueAt;
+  if (next?.category !== undefined) patch.category = next.category;
+  if (next?.assignedTo !== undefined) patch.assignedTo = next.assignedTo;
 
   if (Object.keys(patch).length) {
     await updateTaskBasics(taskId, patch);

@@ -4,7 +4,7 @@ import { diffDays, formatDateTime } from "./utils";
 import { getStageStyle } from "./constants";
 import PropTypes from "prop-types";
 
-export default function Timeline({ task, defaultLimit = 5 }) {
+export default function Timeline({ task, defaultLimit = 5, onShowAllRequest }) {
   const [showAll, setShowAll] = useState(false);
 
   // Always define events, even when task is null, so hooks are stable
@@ -41,14 +41,21 @@ export default function Timeline({ task, defaultLimit = 5 }) {
 
         <div className="flex items-center gap-3">
           <span className="text-xs  lg:font-normal md:text-sm text-slate-700">
-            {total} updates
+            {total} milestones
           </span>
 
           {total > defaultLimit && (
             <button
               type="button"
-              onClick={() => setShowAll((v) => !v)}
-              className="text-xs md:text-sm  lg:font-normal text-slate-700 hover:text-slate-700 underline underline-offset-4"
+              onClick={() => {
+                if (!showAll && onShowAllRequest) {
+                  onShowAllRequest();
+                  return;
+                }
+
+                setShowAll((v) => !v);
+              }}
+              className="text-xs md:text-sm lg:font-normal text-slate-700 hover:text-slate-700 underline underline-offset-4"
             >
               {showAll ? "Show recent" : `Show all (${hiddenCount}+ more)`}
             </button>
@@ -148,6 +155,7 @@ export default function Timeline({ task, defaultLimit = 5 }) {
 
 Timeline.propTypes = {
   defaultLimit: PropTypes.number,
+  onShowAllRequest: PropTypes.func,
   task: PropTypes.shape({
     id: PropTypes.string.isRequired,
     title: PropTypes.string,
