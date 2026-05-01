@@ -19,7 +19,7 @@ const MonthPicker = ({ months, selectedMonthKey, onChange, loading }) => {
         <div className="flex items-center justify-between gap-3">
           {/* Label (same row) */}
           <div className="flex items-center gap-2 min-w-0">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700 border border-blue-100">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-700 border border-blue-100">
               <FaRegCalendarAlt className="text-sm" />
             </span>
             <div className="min-w-0">

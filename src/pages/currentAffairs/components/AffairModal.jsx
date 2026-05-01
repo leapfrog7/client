@@ -24,7 +24,6 @@ const typePillClass = (type) => {
   return "bg-gray-50 text-gray-800 border-gray-200";
 };
 
-// Basic PortableText renderers (safe minimal)
 const portableComponents = {
   block: {
     normal: ({ children }) => (
@@ -78,41 +77,42 @@ const portableComponents = {
   },
 };
 
-const SWIPE_THRESHOLD = 70; // px
+const SWIPE_THRESHOLD = 70;
 const SWIPE_VELOCITY = 650;
 
-const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
+const AffairModal = ({
+  open,
+  item,
+
+  hasPrev,
+  hasNext,
+  onPrev,
+  onNext,
+  currentGlobalIndex,
+  totalItems,
+  onClose,
+}) => {
   const isMobile = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 767px)").matches;
   }, []);
 
-  // direction: -1 (prev) | +1 (next) for slide animation
   const [direction, setDirection] = useState(0);
 
-  const safeItems = Array.isArray(items) ? items : [];
-
-  const currentIndex = useMemo(() => {
-    if (!item?._id) return -1;
-    return safeItems.findIndex((x) => x?._id === item._id);
-  }, [safeItems, item?._id]);
-
-  const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex >= 0 && currentIndex < safeItems.length - 1;
+  // const safeItems = Array.isArray(items) ? items : [];
 
   const goPrev = useCallback(() => {
     if (!hasPrev) return;
     setDirection(-1);
-    onChangeItem?.(safeItems[currentIndex - 1]);
-  }, [hasPrev, onChangeItem, safeItems, currentIndex]);
+    onPrev?.();
+  }, [hasPrev, onPrev]);
 
   const goNext = useCallback(() => {
     if (!hasNext) return;
     setDirection(1);
-    onChangeItem?.(safeItems[currentIndex + 1]);
-  }, [hasNext, onChangeItem, safeItems, currentIndex]);
+    onNext?.();
+  }, [hasNext, onNext]);
 
-  // Lock background scroll
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -122,7 +122,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
     };
   }, [open]);
 
-  // ESC close + Arrow navigation
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
@@ -136,10 +135,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
 
   if (!item) return null;
 
-  // const subtitle =
-  //   `${typeLabel(item.type)} • ${item.date ? formatDate(item.date) : ""}`.trim();
-
-  // Motion variants
   const backdrop = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.18 } },
@@ -167,7 +162,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
     exit: { y: 10, scale: 0.98, opacity: 0, transition: { duration: 0.15 } },
   };
 
-  // Inner "page flip" animation for item changes
   const pageVariants = {
     enter: (dir) => ({
       x: dir === 0 ? 0 : dir > 0 ? 40 : -40,
@@ -189,7 +183,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
           animate="show"
           exit="exit"
         >
-          {/* Backdrop */}
           <motion.button
             type="button"
             aria-label="Close modal"
@@ -198,7 +191,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
             variants={backdrop}
           />
 
-          {/* Panel */}
           <motion.div
             className={[
               "relative w-full overflow-hidden bg-white shadow-2xl",
@@ -216,15 +208,12 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Grab handle (mobile) */}
             <div className="md:hidden w-full flex justify-center pt-2">
               <div className="h-1.5 w-12 rounded-full bg-gray-300" />
             </div>
 
-            {/* Header */}
             <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur">
               <div className="p-3 md:p-5">
-                {/* Mobile top row: close + counter + compact nav */}
                 <div className="md:hidden flex items-center justify-between gap-2">
                   <button
                     type="button"
@@ -236,9 +225,9 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                     <FaTimes />
                   </button>
 
-                  {currentIndex >= 0 && safeItems.length ? (
+                  {currentGlobalIndex >= 0 && totalItems > 0 ? (
                     <div className="px-3 py-1 rounded-full border border-gray-200 bg-white text-xs font-semibold text-gray-700">
-                      {currentIndex + 1}/{safeItems.length}
+                      {currentGlobalIndex + 1}/{totalItems}
                     </div>
                   ) : (
                     <div />
@@ -269,7 +258,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                   </div>
                 </div>
 
-                {/* Desktop top row: chips left, actions right (your original style) */}
                 <div className="hidden md:flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -293,9 +281,9 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                         </span>
                       ) : null}
 
-                      {currentIndex >= 0 && safeItems.length ? (
+                      {currentGlobalIndex >= 0 && totalItems > 0 ? (
                         <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-700">
-                          {currentIndex + 1}/{safeItems.length}
+                          {currentGlobalIndex + 1}/{totalItems}
                         </span>
                       ) : null}
                     </div>
@@ -331,12 +319,10 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                   </div>
                 </div>
 
-                {/* Title */}
                 <h2 className="mt-2 text-lg md:text-2xl font-extrabold text-gray-900 leading-snug break-words">
                   {item.title}
                 </h2>
 
-                {/* Mobile chips (below title) */}
                 <div className="md:hidden mt-2 flex flex-wrap items-center gap-2">
                   <span
                     className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
@@ -359,14 +345,12 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                   ) : null}
                 </div>
 
-                {/* Tiny hint (optional) */}
                 <div className="md:hidden mt-2 text-center text-[11px] text-gray-500">
                   Swipe left/right to navigate
                 </div>
               </div>
             </div>
 
-            {/* Body (with item-flip transition) */}
             <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(100dvh-220px-env(safe-area-inset-top))] md:max-h-[78vh]">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -377,7 +361,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                   animate="center"
                   exit="exit"
                   transition={{ duration: 0.18 }}
-                  // ✅ swipe left/right to move (content area only)
                   drag={isMobile ? "x" : false}
                   dragConstraints={isMobile ? { left: 0, right: 0 } : undefined}
                   dragElastic={isMobile ? 0.12 : undefined}
@@ -386,7 +369,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                     const swipe = info.offset.x;
                     const v = info.velocity.x;
 
-                    // swipe left => next
                     if (
                       (swipe < -SWIPE_THRESHOLD || v < -SWIPE_VELOCITY) &&
                       hasNext
@@ -394,7 +376,7 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                       goNext();
                       return;
                     }
-                    // swipe right => prev
+
                     if (
                       (swipe > SWIPE_THRESHOLD || v > SWIPE_VELOCITY) &&
                       hasPrev
@@ -403,7 +385,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                     }
                   }}
                 >
-                  {/* Preferred content: Portable Text rich editor */}
                   {Array.isArray(item.content) && item.content.length > 0 ? (
                     <div className="prose prose-sm md:prose-base max-w-none">
                       <PortableText
@@ -424,7 +405,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                     </>
                   )}
 
-                  {/* Sources */}
                   {!!(item.sources || []).length && (
                     <>
                       <h3 className="mt-6 text-xs md:text-base font-bold text-gray-500 mb-2">
@@ -460,7 +440,6 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
                     </>
                   )}
 
-                  {/* Mobile hint */}
                   <div className="md:hidden mt-6 text-center text-xs text-gray-500">
                     Tip: swipe left/right for next/prev • swipe down to close
                   </div>
@@ -477,9 +456,27 @@ const AffairModal = ({ open, item, items, onChangeItem, onClose }) => {
 AffairModal.propTypes = {
   open: PropTypes.bool.isRequired,
   item: PropTypes.object,
-  items: PropTypes.array, // ✅ new
-  onChangeItem: PropTypes.func, // ✅ new
+  items: PropTypes.array,
+  onChangeItem: PropTypes.func,
+  hasPrev: PropTypes.bool,
+  hasNext: PropTypes.bool,
+  onPrev: PropTypes.func,
+  onNext: PropTypes.func,
+  currentGlobalIndex: PropTypes.number,
+  totalItems: PropTypes.number,
   onClose: PropTypes.func.isRequired,
+};
+
+AffairModal.defaultProps = {
+  item: null,
+  items: [],
+  onChangeItem: undefined,
+  hasPrev: false,
+  hasNext: false,
+  onPrev: undefined,
+  onNext: undefined,
+  currentGlobalIndex: -1,
+  totalItems: 0,
 };
 
 export default AffairModal;

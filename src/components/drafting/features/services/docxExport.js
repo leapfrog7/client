@@ -104,6 +104,121 @@ function parseInlineHtmlToRuns(html, styling, options = {}) {
       ];
 }
 
+// function parseRichHtmlToParagraphs(html, styling) {
+//   const container = document.createElement("div");
+//   container.innerHTML = String(html || "");
+
+//   const paragraphs = [];
+//   let currentRuns = [];
+
+//   const pushParagraph = (forceEmpty = false) => {
+//     if (!currentRuns.length) {
+//       if (forceEmpty) {
+//         paragraphs.push([
+//           new TextRun({
+//             text: "",
+//             font: styling.fontFamily,
+//             size: styling.fontSize * 2,
+//           }),
+//         ]);
+//       }
+//       return;
+//     }
+
+//     paragraphs.push(currentRuns);
+//     currentRuns = [];
+//   };
+
+//   const walk = (
+//     node,
+//     marks = { bold: false, italic: false, underline: false },
+//   ) => {
+//     node.childNodes.forEach((child) => {
+//       if (child.nodeType === Node.TEXT_NODE) {
+//         const text = child.textContent || "";
+//         if (text) {
+//           currentRuns.push(
+//             new TextRun({
+//               text,
+//               bold: marks.bold,
+//               italics: marks.italic,
+//               underline: marks.underline
+//                 ? { type: UnderlineType.SINGLE }
+//                 : undefined,
+//               font: styling.fontFamily,
+//               size: styling.fontSize * 2,
+//             }),
+//           );
+//         }
+//         return;
+//       }
+
+//       if (child.nodeType === Node.ELEMENT_NODE) {
+//         const tag = child.tagName.toLowerCase();
+
+//         if (tag === "br") {
+//           pushParagraph(true);
+//           return;
+//         }
+
+//         const nextMarks = {
+//           bold: marks.bold || tag === "b" || tag === "strong",
+//           italic: marks.italic || tag === "i" || tag === "em",
+//           underline: marks.underline || tag === "u",
+//         };
+
+//         if (tag === "div" || tag === "p") {
+//           const isEmptyBlock =
+//             child.innerHTML === "<br>" ||
+//             child.innerHTML === "" ||
+//             child.textContent === "";
+
+//           if (isEmptyBlock) {
+//             paragraphs.push([
+//               new TextRun({
+//                 text: "",
+//                 font: styling.fontFamily,
+//                 size: styling.fontSize * 2,
+//               }),
+//             ]);
+//           } else {
+//             walk(child, nextMarks);
+//             pushParagraph(false);
+//           }
+//         } else {
+//           walk(child, nextMarks);
+//         }
+//       }
+//     });
+//   };
+
+//   walk(container);
+
+//   if (currentRuns.length) {
+//     pushParagraph(false);
+//   }
+
+//   return paragraphs.length
+//     ? paragraphs
+//     : [
+//         [
+//           new TextRun({
+//             text: "",
+//             font: styling.fontFamily,
+//             size: styling.fontSize * 2,
+//           }),
+//         ],
+//       ];
+// }
+
+function createInvisibleSpacerRun(styling) {
+  return new TextRun({
+    text: "\u00A0",
+    font: styling.fontFamily,
+    size: styling.fontSize * 2,
+  });
+}
+
 function parseRichHtmlToParagraphs(html, styling) {
   const container = document.createElement("div");
   container.innerHTML = String(html || "");
@@ -114,13 +229,7 @@ function parseRichHtmlToParagraphs(html, styling) {
   const pushParagraph = (forceEmpty = false) => {
     if (!currentRuns.length) {
       if (forceEmpty) {
-        paragraphs.push([
-          new TextRun({
-            text: "",
-            font: styling.fontFamily,
-            size: styling.fontSize * 2,
-          }),
-        ]);
+        paragraphs.push([createInvisibleSpacerRun(styling)]);
       }
       return;
     }
@@ -174,13 +283,7 @@ function parseRichHtmlToParagraphs(html, styling) {
             child.textContent === "";
 
           if (isEmptyBlock) {
-            paragraphs.push([
-              new TextRun({
-                text: "",
-                font: styling.fontFamily,
-                size: styling.fontSize * 2,
-              }),
-            ]);
+            paragraphs.push([createInvisibleSpacerRun(styling)]);
           } else {
             walk(child, nextMarks);
             pushParagraph(false);
@@ -198,17 +301,7 @@ function parseRichHtmlToParagraphs(html, styling) {
     pushParagraph(false);
   }
 
-  return paragraphs.length
-    ? paragraphs
-    : [
-        [
-          new TextRun({
-            text: "",
-            font: styling.fontFamily,
-            size: styling.fontSize * 2,
-          }),
-        ],
-      ];
+  return paragraphs.length ? paragraphs : [[createInvisibleSpacerRun(styling)]];
 }
 
 function isRichTextBlock(type) {

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 const TYPES = [
   { label: "All", value: "" },
   { label: "PIB", value: "PIB" },
-  { label: "Govt Scheme", value: "GOVT_SCHEME" },
+  // { label: "Govt Scheme", value: "GOVT_SCHEME" },
   { label: "Misc", value: "MISC" },
   { label: "Your Bookmarks", value: "__BOOKMARKS__" },
 ];
@@ -24,7 +24,7 @@ const FiltersBar = ({ selectedType, onTypeChange, bookmarkCount = 0 }) => {
               className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition
                 ${
                   active
-                    ? "bg-blue-600 text-white border-blue-600"
+                    ? "bg-amber-600 text-white border-amber-600"
                     : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                 }`}
             >

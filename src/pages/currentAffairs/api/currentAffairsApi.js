@@ -48,6 +48,17 @@ export const fetchBookmarks = async () => {
   return data.bookmarks || [];
 };
 
+export const fetchBookmarkedItems = async () => {
+  const { data } = await axios.get(
+    `${BASE_URL}/current_affairs/bookmarks/items`,
+    {
+      headers: authHeader(),
+    },
+  );
+
+  return data?.items || [];
+};
+
 export const toggleBookmark = async ({ sanityId, monthKey, type }) => {
   const { data } = await axios.post(
     `${BASE_URL}/current_affairs/bookmarks/toggle`,

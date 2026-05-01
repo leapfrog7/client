@@ -31,7 +31,7 @@ const SectionEditor = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${BASE_URL}/api/v1/public/resources/${slug}`
+        `${BASE_URL}/api/v1/public/resources/${slug}`,
       );
       setRule(res.data);
     } catch (err) {
@@ -61,104 +61,124 @@ const SectionEditor = () => {
   };
 
   const filteredSections =
-    rule?.sections?.filter((section) => {
-      if (searchTerm.length < 3) return true;
+    rule?.sections
+      ?.map((section, originalIndex) => ({
+        ...section,
+        originalIndex,
+      }))
+      .filter((section) => {
+        if (searchTerm.length < 3) return true;
 
-      const lower = searchTerm.toLowerCase();
+        const lower = searchTerm.toLowerCase();
 
-      const inMetadata =
-        section.ruleNumber?.toLowerCase().includes(lower) ||
-        section.ruleTitle?.toLowerCase().includes(lower) ||
-        section.chapterTitle?.toLowerCase().includes(lower);
+        const inMetadata =
+          section.ruleNumber?.toLowerCase().includes(lower) ||
+          section.ruleTitle?.toLowerCase().includes(lower) ||
+          section.chapterTitle?.toLowerCase().includes(lower);
 
-      const inBlocks = section.contentBlocks?.some(
-        (block) =>
-          (block.type === "text" || block.type === "note") &&
-          block.value?.toLowerCase().includes(lower)
-      );
+        const inBlocks = section.contentBlocks?.some((block) => {
+          if (block.type !== "text" && block.type !== "note") return false;
 
-      return inMetadata || inBlocks;
-    }) ?? []; // default to empty array if rule is null
+          return String(block.value || "")
+            .toLowerCase()
+            .includes(lower);
+        });
+
+        return inMetadata || inBlocks;
+      }) ?? [];
 
   //Pagination Code
   const [currentPage, setCurrentPage] = useState(1);
   const sectionsPerPage = 5;
 
-  // const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
+  const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
+
+  useEffect(() => {
+    if (totalPages === 0) {
+      setCurrentPage(1);
+      return;
+    }
+
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedSections = filteredSections.slice(
+    (currentPage - 1) * sectionsPerPage,
+    currentPage * sectionsPerPage,
+  );
 
   const getPaginationButtons = () => {
     const buttons = [];
     const maxVisible = 5;
 
+    if (totalPages <= 0) return [];
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) buttons.push(i);
     } else {
       buttons.push(1);
+
       if (currentPage > 3) buttons.push("...");
+
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
+
       for (let i = start; i <= end; i++) buttons.push(i);
+
       if (currentPage < totalPages - 2) buttons.push("...");
+
       buttons.push(totalPages);
     }
 
     return buttons;
   };
 
-  const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
-
-  const paginatedSections = filteredSections.slice(
-    (currentPage - 1) * sectionsPerPage,
-    currentPage * sectionsPerPage
-  );
-
   const handleSubmitSection = async () => {
     try {
-      const updatedSections = [...(rule.sections || [])];
-
-      if (editSectionIndex !== null) {
-        // Update existing section at given index
-        updatedSections[editSectionIndex] = newSection;
-      } else {
-        // Add new section
-        updatedSections.push(newSection);
-      }
-
-      const updatedRule = {
-        ...rule,
-        sections: updatedSections,
-      };
       console.log("SUBMITTING section payload:", newSection.contentBlocks);
 
-      await axios.put(
-        `${BASE_URL}/api/v1/resourceManagement/${slug}`,
-        updatedRule,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      if (editSectionIndex !== null) {
+        await axios.put(
+          `${BASE_URL}/api/v1/resourceManagement/${slug}/sections/${editSectionIndex}`,
+          newSection,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-      toast.success(
-        editSectionIndex !== null ? "Section updated" : "Section added"
-      );
+        toast.success("Section updated");
+      } else {
+        await axios.post(
+          `${BASE_URL}/api/v1/resourceManagement/${slug}/sections`,
+          newSection,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-      // Reset form and state
+        toast.success("Section added");
+      }
+
       setNewSection({
-        chapterTitle: newSection.chapterTitle, // ✅ retain chapter
+        chapterTitle: newSection.chapterTitle,
         ruleNumber: "",
         ruleTitle: "",
         contentBlocks: [],
       });
-      setEditSectionIndex(null); // reset edit mode
-      fetchRule(); // reload data
+
+      setEditSectionIndex(null);
+      fetchRule();
     } catch (err) {
+      console.error("Failed to save section:", err);
       toast.error("Failed to save section");
     }
   };
 
   const handleRemoveBlock = (indexToRemove) => {
     const updatedBlocks = newSection.contentBlocks.filter(
-      (_, i) => i !== indexToRemove
+      (_, i) => i !== indexToRemove,
     );
     setNewSection({ ...newSection, contentBlocks: updatedBlocks });
   };
@@ -177,26 +197,17 @@ const SectionEditor = () => {
 
   const handleDeleteSection = async (indexToRemove) => {
     try {
-      const updatedSections = rule.sections.filter(
-        (_, i) => i !== indexToRemove
-      );
-
-      const updatedRule = {
-        ...rule,
-        sections: updatedSections,
-      };
-
-      await axios.put(
-        `${BASE_URL}/api/v1/resourceManagement/${slug}`,
-        updatedRule,
+      await axios.delete(
+        `${BASE_URL}/api/v1/resourceManagement/${slug}/sections/${indexToRemove}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       toast.success("Section deleted");
-      fetchRule(); // refresh the list
+      fetchRule();
     } catch (err) {
+      console.error("Failed to delete section:", err);
       toast.error("Failed to delete section");
     }
   };
@@ -464,8 +475,8 @@ const SectionEditor = () => {
 
         {rule.sections && rule.sections.length > 0 ? (
           <ul className="space-y-2">
-            {paginatedSections.map((sec, idx) => {
-              const actualIndex = (currentPage - 1) * sectionsPerPage + idx;
+            {paginatedSections.map((sec) => {
+              const actualIndex = sec.originalIndex;
 
               return (
                 <li
@@ -512,7 +523,7 @@ const SectionEditor = () => {
                         if (block.type === "text" || block.type === "note") {
                           console.log(
                             `Block ${bIdx + 1} HTML value:`,
-                            block.value
+                            block.value,
                           );
                         }
 
@@ -587,41 +598,45 @@ const SectionEditor = () => {
           <p className="text-sm text-gray-500">No sections added yet.</p>
         )}
       </div>
-      <div className="flex justify-center mt-6 space-x-1 text-sm">
-        <button
-          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        {getPaginationButtons().map((num, idx) =>
-          num === "..." ? (
-            <span key={idx} className="px-2 py-1 text-gray-500">
-              ...
-            </span>
-          ) : (
-            <button
-              key={idx}
-              onClick={() => setCurrentPage(num)}
-              className={`px-3 py-1 border rounded ${
-                currentPage === num
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              {num}
-            </button>
-          )
-        )}
-        <button
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+      {filteredSections.length > 0 && (
+        <div className="flex justify-center mt-6 space-x-1 text-sm">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          {getPaginationButtons().map((num, idx) =>
+            num === "..." ? (
+              <span key={idx} className="px-2 py-1 text-gray-500">
+                ...
+              </span>
+            ) : (
+              <button
+                key={idx}
+                onClick={() => setCurrentPage(num)}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === num
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                {num}
+              </button>
+            ),
+          )}
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            disabled={totalPages === 0 || currentPage === totalPages}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

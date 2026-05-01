@@ -1,113 +1,6 @@
-// import { useState, useEffect, useMemo } from "react";
-// import PropTypes from "prop-types";
-// import DashboardCard from "./DashboardCards";
-// import DashboardHeader from "./DashBoardHeader";
-// import { jwtDecode } from "jwt-decode"; // ✅ Import jwtDecode
-// // import axios from "axios";
-// // import { FiBarChart2 } from "react-icons/fi";
-
-// const Dashboard = ({ userStats }) => {
-//   // ✅ Use default values to prevent errors
-//   const paperITopics = useMemo(() => userStats?.paperI || [], [userStats]);
-//   const paperIITopics = useMemo(() => userStats?.paperII || [], [userStats]);
-//   const [userId, setUserId] = useState(null); // ✅ Store userId
-//   const [loading, setLoading] = useState(true); // ✅ Prevent rendering while loading
-
-//   useEffect(() => {
-//     const token = localStorage.getItem("jwtToken"); // ✅ Retrieve JWT token
-//     if (token) {
-//       try {
-//         const decodedToken = jwtDecode(token); // ✅ Decode token
-//         setUserId(decodedToken.userId); // ✅ Extract and store userId
-//       } catch (error) {
-//         console.error("❌ Invalid token:", error);
-//       }
-//     }
-//     setLoading(false); // ✅ Mark loading as false once processed
-//   }, []);
-
-//   if (loading) {
-//     return <p>Loading Dashboard...</p>; // ✅ Show loading state while waiting for `userId`
-//   }
-
-//   if (!userId) {
-//     return <p>Error: User not authenticated</p>; // ✅ Handle missing `userId`
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-white flex flex-col p-4 mt-2 text-gray-700 md:rounded-md">
-//       {/* Dashboard Header */}
-//       <DashboardHeader />
-//       {/* Paper I Section */}
-//       <div className="mb-8 text-center">
-//         <h2 className="text-xl md:text-2xl font-extrabold mb-5 border border-l-white border-r-white border-t-black border-b-black bg-gradient-to-r  px-5 py-3 text-red-700  tracking-wide">
-//           Paper I
-//         </h2>
-
-//         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-//           {paperITopics.map((topic, index) => (
-//             <DashboardCard
-//               key={index} // ✅ Use topicId as unique key
-//               userId={userId}
-//               title={topic.title}
-//               progress={parseFloat(topic.progress) || 0} // ✅ Ensure it's a number
-//               path={topic.path}
-//               topicId={topic.topicId} // ✅ Directly pass topicId
-//               attemptedQuestions={topic.attemptedQuestions || 0}
-//               bgColor="bg-gradient-to-r from-pink-200 to-rose-100"
-//               textColor="text-pink-800"
-//             />
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Paper II Section */}
-//       <div className="text-center">
-//         <h2 className="text-xl md:text-2xl font-extrabold mb-5 border border-l-white border-r-white border-t-black border-b-black bg-gradient-to-r  px-5 py-3 text-blue-700 tracking-wide ">
-//           Paper II
-//         </h2>
-//         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-//           {paperIITopics.map((topic, index) => (
-//             <DashboardCard
-//               key={index}
-//               userId={userId}
-//               title={topic.title}
-//               progress={parseFloat(topic.progress) || 0} // ✅ Ensure it's a number
-//               path={topic.path}
-//               topicId={topic.topicId} // ✅ Directly pass topicId
-//               attemptedQuestions={topic.attemptedQuestions || 0}
-//               bgColor="bg-gradient-to-r from-purple-100 to-blue-100"
-//               textColor="text-purple-800"
-//             />
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // ✅ Removed `username` from PropTypes since it's unused
-// Dashboard.propTypes = {
-//   userStats: PropTypes.shape({
-//     paperI: PropTypes.arrayOf(
-//       PropTypes.shape({
-//         title: PropTypes.string.isRequired,
-//         progress: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-//         path: PropTypes.string.isRequired,
-//         attemptedQuestions: PropTypes.number, // ✅ No longer marked as required
-//       })
-//     ),
-//     paperII: PropTypes.arrayOf(
-//       PropTypes.shape({
-//         title: PropTypes.string.isRequired,
-//         progress: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-//         path: PropTypes.string.isRequired,
-//         attemptedQuestions: PropTypes.number, // ✅ No longer marked as required
-//       })
-//     ),
-//   }),
-// };
 import { useMemo, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FaNewspaper } from "react-icons/fa";
 import PropTypes from "prop-types";
 import axios from "axios";
 import DashboardCard from "./DashboardCards";
@@ -341,6 +234,44 @@ const Dashboard = ({ userStats, userId, onStatsUpdate }) => {
           </div>
         </div>
       )}
+
+      <div className="mt-6">
+        <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-amber-50 via-white to-zinc-100 p-4 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-xl text-zinc-600 ">
+                <FaNewspaper className="text-lg" />
+              </div>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base font-semibold text-zinc-800 sm:text-lg">
+                    Current Affairs
+                  </h2>
+                  <span className="inline-flex rounded-full bg-cyan-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-cyan-700">
+                    Monthly
+                  </span>
+                </div>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  Curated primarily from Press Information Bureau releases and
+                  cover important developments, Government initiatives, and
+                  other misc relevant updates to support exam-focused
+                  preparation.
+                </p>
+              </div>
+            </div>
+
+            <div className="sm:shrink-0">
+              <Link
+                to="/pages/current_affairs"
+                className="inline-flex items-center justify-center rounded-xl bg-amber-200 px-4 py-2.5 text-sm font-semibold text-zinc-600 shadow-sm transition hover:bg-amber-100 hover:border hover:border-amber-600"
+              >
+                Open Current Affairs
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 // import PageHeader from "./components/PageHeader";
 // import MonthPicker from "./components/MonthPicker";
 // import FiltersBar from "./components/FiltersBar";
+// import SearchBar from "./components/SearchBar";
 // import AffairsList from "./components/AffairsList";
 // import AffairModal from "./components/AffairModal";
 // import SkeletonList from "./components/SkeletonList";
@@ -24,9 +25,13 @@
 //   const [months, setMonths] = useState([]);
 //   const [selectedMonthKey, setSelectedMonthKey] = useState("");
 
-//   const [type, setType] = useState(""); // "" | "PIB" | "GOVT_SCHEME" | "MISC"
+//   const [type, setType] = useState(""); // "" | "PIB" | "GOVT_SCHEME" | "MISC" | "__BOOKMARKS__"
 //   const [itemsLoading, setItemsLoading] = useState(false);
 //   const [items, setItems] = useState([]);
+
+//   // ✅ Search
+//   const [q, setQ] = useState("");
+//   const [debouncedQ, setDebouncedQ] = useState("");
 
 //   const [pagination, setPagination] = useState({
 //     page: 1,
@@ -49,6 +54,15 @@
 //     };
 //   }, []);
 
+//   // ✅ Debounce search input (prevents spam)
+//   useEffect(() => {
+//     const t = setTimeout(() => {
+//       const s = q.trim();
+//       setDebouncedQ(s.length >= 3 ? s : "");
+//     }, 350);
+
+//     return () => clearTimeout(t);
+//   }, [q]);
 //   // Load months once
 //   useEffect(() => {
 //     if (!canShowContent) return;
@@ -115,9 +129,13 @@
 //     if (!isBookmarksMode) return items;
 //     return items.filter((it) => bookmarkIds.has(it._id));
 //   }, [items, bookmarkIds, isBookmarksMode]);
-//   // Core loader (safe for unmount)
 
-//   const loadItems = async ({ monthKey, page = 1, nextType = type }) => {
+//   const loadItems = async ({
+//     monthKey,
+//     page = 1,
+//     nextType = type,
+//     nextQ = debouncedQ,
+//   }) => {
 //     if (!monthKey) return;
 
 //     // ✅ If "Your Bookmarks" selected, fetch ALL items (no server type filter)
@@ -130,6 +148,7 @@
 //         page,
 //         limit: 20,
 //         type: serverType,
+//         q: nextQ, // ✅ search param
 //       });
 
 //       if (!mountedRef.current) return;
@@ -148,21 +167,26 @@
 //     }
 //   };
 
-//   // Load items when month/type/page changes (SINGLE source of truth)
+//   // Load items when month/type/search changes (SINGLE source of truth)
 //   useEffect(() => {
 //     if (!canShowContent) return;
 //     if (!selectedMonthKey) return;
 
-//     // If month/type changes, always reset to page 1
+//     // If month/type/search changes, always reset to page 1
 //     setPagination((p) => ({ ...p, page: 1 }));
 
 //     // Scroll top nicely
 //     const isFarDown = window.scrollY > 200;
 //     window.scrollTo({ top: 0, behavior: isFarDown ? "smooth" : "auto" });
 
-//     loadItems({ monthKey: selectedMonthKey, page: 1, nextType: type });
+//     loadItems({
+//       monthKey: selectedMonthKey,
+//       page: 1,
+//       nextType: type,
+//       nextQ: debouncedQ,
+//     });
 //     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [selectedMonthKey, type, canShowContent]);
+//   }, [selectedMonthKey, type, canShowContent, debouncedQ]);
 
 //   const handlePageChange = (nextPage) => {
 //     if (!selectedMonthKey) return;
@@ -173,7 +197,12 @@
 //     // Update pagination page immediately for UI
 //     setPagination((p) => ({ ...p, page: nextPage }));
 
-//     loadItems({ monthKey: selectedMonthKey, page: nextPage, nextType: type });
+//     loadItems({
+//       monthKey: selectedMonthKey,
+//       page: nextPage,
+//       nextType: type,
+//       nextQ: debouncedQ,
+//     });
 //   };
 
 //   const handleToggleBookmark = async (item) => {
@@ -240,20 +269,44 @@
 //       <MonthPicker
 //         months={months}
 //         selectedMonthKey={selectedMonthKey}
-//         onChange={setSelectedMonthKey}
+//         onChange={(mk) => {
+//           // ✅ Clear open item when switching months (avoid mismatched item)
+//           setOpenItem(null);
+//           setSelectedMonthKey(mk);
+//         }}
 //         loading={monthsLoading}
 //       />
 
 //       <FiltersBar
 //         selectedType={type}
-//         onTypeChange={setType}
+//         onTypeChange={(t) => {
+//           setOpenItem(null);
+//           setType(t);
+//         }}
 //         bookmarkCount={bookmarkIds.size}
 //       />
 
-//       <div className="mx-2 mt-3 text-xs text-gray-500">
+//       {/* ✅ Search bar */}
+//       <SearchBar
+//         value={q}
+//         onChange={(val) => {
+//           setOpenItem(null);
+//           setQ(val);
+//         }}
+//         onClear={() => setQ("")}
+//         disabled={monthsLoading || !selectedMonthKey}
+//       />
+
+//       <div className="mx-2 mt-1 text-xs text-gray-500">
 //         {monthTitle ? (
 //           <span>
 //             Showing <span className="font-semibold">{monthTitle}</span>
+//             {debouncedQ ? (
+//               <>
+//                 {" "}
+//                 • search: <span className="font-semibold">“{debouncedQ}”</span>
+//               </>
+//             ) : null}
 //             {pagination?.total ? ` • ${pagination.total} items` : ""}
 //           </span>
 //         ) : null}
@@ -282,15 +335,19 @@
 //       ) : (
 //         <EmptyState
 //           title="No items found"
-//           desc="Try another month or switch the type filter."
+//           desc={
+//             debouncedQ
+//               ? "Try a different keyword, or clear search."
+//               : "Try another month or switch the type filter."
+//           }
 //         />
 //       )}
 
 //       <AffairModal
 //         open={!!openItem}
 //         item={openItem}
-//         items={visibleItems} // ✅ pass the currently visible list
-//         onChangeItem={(nextItem) => setOpenItem(nextItem)} // ✅ allow modal to switch
+//         items={visibleItems}
+//         onChangeItem={(nextItem) => setOpenItem(nextItem)}
 //         onClose={() => setOpenItem(null)}
 //       />
 //     </div>
@@ -299,7 +356,7 @@
 
 // export default CurrentAffairs;
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import PageHeader from "./components/PageHeader";
 import MonthPicker from "./components/MonthPicker";
 import FiltersBar from "./components/FiltersBar";
@@ -314,8 +371,11 @@ import {
   fetchMonths,
   fetchMonthItems,
   fetchBookmarks,
+  fetchBookmarkedItems,
   toggleBookmark,
 } from "./api/currentAffairsApi";
+
+const PAGE_LIMIT = 20;
 
 const CurrentAffairs = () => {
   const token = localStorage.getItem("jwtToken");
@@ -330,23 +390,22 @@ const CurrentAffairs = () => {
   const [itemsLoading, setItemsLoading] = useState(false);
   const [items, setItems] = useState([]);
 
-  // ✅ Search
+  const [pagesCache, setPagesCache] = useState({}); // { [page]: { items, pagination } }
+
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
 
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 20,
+    limit: PAGE_LIMIT,
     total: 0,
     hasMore: false,
   });
 
   const [openItem, setOpenItem] = useState(null);
 
-  // Bookmarks: store Sanity _id strings
   const [bookmarkIds, setBookmarkIds] = useState(() => new Set());
 
-  // Mounted guard
   const mountedRef = useRef(true);
   useEffect(() => {
     mountedRef.current = true;
@@ -355,7 +414,11 @@ const CurrentAffairs = () => {
     };
   }, []);
 
-  // ✅ Debounce search input (prevents spam)
+  // const isBookmarksMode = type === "__BOOKMARKS__";
+
+  const filterItemsForMode = useCallback((rawItems) => {
+    return Array.isArray(rawItems) ? rawItems : [];
+  }, []);
   useEffect(() => {
     const t = setTimeout(() => {
       const s = q.trim();
@@ -364,7 +427,7 @@ const CurrentAffairs = () => {
 
     return () => clearTimeout(t);
   }, [q]);
-  // Load months once
+
   useEffect(() => {
     if (!canShowContent) return;
 
@@ -377,7 +440,6 @@ const CurrentAffairs = () => {
         const list = Array.isArray(m) ? m : [];
         setMonths(list);
 
-        // auto-select latest month if none selected
         if (list.length) {
           setSelectedMonthKey((prev) => prev || list[0].monthKey);
         }
@@ -392,7 +454,6 @@ const CurrentAffairs = () => {
     run();
   }, [canShowContent]);
 
-  // Load bookmarks once
   useEffect(() => {
     if (!canShowContent) return;
 
@@ -402,9 +463,6 @@ const CurrentAffairs = () => {
 
         if (!mountedRef.current) return;
 
-        // Accept BOTH formats:
-        // 1) ["sanityId1", "sanityId2"]
-        // 2) [{ sanityId: "..." }, ...]
         const ids = (Array.isArray(list) ? list : [])
           .map((b) => (typeof b === "string" ? b : b?.sanityId))
           .filter(Boolean);
@@ -424,59 +482,145 @@ const CurrentAffairs = () => {
     return m?.title || "";
   }, [months, selectedMonthKey]);
 
-  const isBookmarksMode = type === "__BOOKMARKS__";
   const visibleItems = useMemo(() => {
     if (!Array.isArray(items)) return [];
-    if (!isBookmarksMode) return items;
-    return items.filter((it) => bookmarkIds.has(it._id));
-  }, [items, bookmarkIds, isBookmarksMode]);
+    return items;
+  }, [items]);
 
-  const loadItems = async ({
-    monthKey,
-    page = 1,
-    nextType = type,
-    nextQ = debouncedQ,
-  }) => {
-    if (!monthKey) return;
+  const applyPageData = useCallback((pageData, nextPage) => {
+    setItems(pageData?.items || []);
+    setPagination(
+      pageData?.pagination || {
+        page: nextPage || 1,
+        limit: PAGE_LIMIT,
+        total: 0,
+        hasMore: false,
+      },
+    );
+  }, []);
 
-    // ✅ If "Your Bookmarks" selected, fetch ALL items (no server type filter)
-    const serverType = nextType === "__BOOKMARKS__" ? "" : nextType;
+  const loadItems = useCallback(
+    async ({
+      monthKey,
+      page = 1,
+      nextType = type,
+      nextQ = debouncedQ,
+      syncState = true,
+    }) => {
+      if (!monthKey && nextType !== "__BOOKMARKS__") return null;
 
-    setItemsLoading(true);
-    try {
-      const data = await fetchMonthItems({
-        monthKey,
-        page,
-        limit: 20,
-        type: serverType,
-        q: nextQ, // ✅ search param
-      });
+      if (syncState) setItemsLoading(true);
 
-      if (!mountedRef.current) return;
+      try {
+        // Bookmarks mode: fetch actual bookmarked items
+        if (nextType === "__BOOKMARKS__") {
+          const bookmarkedItems = await fetchBookmarkedItems();
 
-      setItems(data?.items || []);
-      setPagination(
-        data?.pagination || { page: 1, limit: 20, total: 0, hasMore: false },
-      );
-    } catch (e) {
-      console.error(e);
-      if (!mountedRef.current) return;
-      setItems([]);
-      setPagination({ page: 1, limit: 20, total: 0, hasMore: false });
-    } finally {
-      if (mountedRef.current) setItemsLoading(false);
-    }
-  };
+          if (!mountedRef.current) return null;
 
-  // Load items when month/type/search changes (SINGLE source of truth)
+          const searchedItems = nextQ
+            ? bookmarkedItems.filter((it) => {
+                const title = String(it?.title || "").toLowerCase();
+                const content = JSON.stringify(it?.content || "").toLowerCase();
+                const ql = nextQ.toLowerCase();
+                return title.includes(ql) || content.includes(ql);
+              })
+            : bookmarkedItems;
+
+          const start = (page - 1) * PAGE_LIMIT;
+          const end = start + PAGE_LIMIT;
+
+          const normalized = {
+            items: searchedItems.slice(start, end),
+            pagination: {
+              page,
+              limit: PAGE_LIMIT,
+              total: searchedItems.length,
+              hasMore: end < searchedItems.length,
+            },
+          };
+
+          setPagesCache((prev) => ({
+            ...prev,
+            [page]: normalized,
+          }));
+
+          if (syncState) {
+            applyPageData(normalized, page);
+          }
+
+          return normalized;
+        }
+
+        // Normal month mode
+        const data = await fetchMonthItems({
+          monthKey,
+          page,
+          limit: PAGE_LIMIT,
+          type: nextType,
+          q: nextQ,
+        });
+
+        if (!mountedRef.current) return null;
+
+        const normalized = {
+          items: data?.items || [],
+          pagination: data?.pagination || {
+            page,
+            limit: PAGE_LIMIT,
+            total: 0,
+            hasMore: false,
+          },
+        };
+
+        setPagesCache((prev) => ({
+          ...prev,
+          [page]: normalized,
+        }));
+
+        if (syncState) {
+          applyPageData(normalized, page);
+        }
+
+        return normalized;
+      } catch (e) {
+        console.error(e);
+        if (!mountedRef.current) return null;
+
+        if (syncState) {
+          setItems([]);
+          setPagination({
+            page: 1,
+            limit: PAGE_LIMIT,
+            total: 0,
+            hasMore: false,
+          });
+        }
+
+        return {
+          items: [],
+          pagination: {
+            page,
+            limit: PAGE_LIMIT,
+            total: 0,
+            hasMore: false,
+          },
+        };
+      } finally {
+        if (syncState && mountedRef.current) setItemsLoading(false);
+      }
+    },
+    [type, debouncedQ, applyPageData],
+  );
+
   useEffect(() => {
     if (!canShowContent) return;
     if (!selectedMonthKey) return;
 
-    // If month/type/search changes, always reset to page 1
+    setOpenItem(null);
+    setPagesCache({});
     setPagination((p) => ({ ...p, page: 1 }));
 
-    // Scroll top nicely
     const isFarDown = window.scrollY > 200;
     window.scrollTo({ top: 0, behavior: isFarDown ? "smooth" : "auto" });
 
@@ -485,26 +629,160 @@ const CurrentAffairs = () => {
       page: 1,
       nextType: type,
       nextQ: debouncedQ,
+      syncState: true,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMonthKey, type, canShowContent, debouncedQ]);
+  }, [selectedMonthKey, type, canShowContent, debouncedQ, loadItems]);
 
-  const handlePageChange = (nextPage) => {
+  const getOrLoadPage = useCallback(
+    async (page, { syncState = false } = {}) => {
+      const cached = pagesCache[page];
+      if (cached) {
+        if (syncState) applyPageData(cached, page);
+        return cached;
+      }
+
+      return loadItems({
+        monthKey: selectedMonthKey,
+        page,
+        nextType: type,
+        nextQ: debouncedQ,
+        syncState,
+      });
+    },
+    [pagesCache, applyPageData, loadItems, selectedMonthKey, type, debouncedQ],
+  );
+
+  const handlePageChange = async (nextPage) => {
     if (!selectedMonthKey) return;
 
     const isFarDown = window.scrollY > 200;
     window.scrollTo({ top: 0, behavior: isFarDown ? "smooth" : "auto" });
 
-    // Update pagination page immediately for UI
     setPagination((p) => ({ ...p, page: nextPage }));
-
-    loadItems({
-      monthKey: selectedMonthKey,
-      page: nextPage,
-      nextType: type,
-      nextQ: debouncedQ,
-    });
+    await getOrLoadPage(nextPage, { syncState: true });
   };
+
+  const currentModalIndex = useMemo(() => {
+    if (!openItem?._id) return -1;
+    return visibleItems.findIndex((it) => it?._id === openItem._id);
+  }, [openItem, visibleItems]);
+
+  const currentGlobalIndex = useMemo(() => {
+    if (!openItem || currentModalIndex < 0) return -1;
+    return (
+      (pagination.page - 1) * (pagination.limit || PAGE_LIMIT) +
+      currentModalIndex
+    );
+  }, [openItem, currentModalIndex, pagination.page, pagination.limit]);
+
+  const totalPages = useMemo(() => {
+    return Math.max(
+      1,
+      Math.ceil(
+        (pagination?.total || 0) / Math.max(pagination?.limit || PAGE_LIMIT, 1),
+      ),
+    );
+  }, [pagination]);
+
+  const handleModalNext = useCallback(async () => {
+    if (!openItem) return;
+
+    if (currentModalIndex >= 0 && currentModalIndex < visibleItems.length - 1) {
+      setOpenItem(visibleItems[currentModalIndex + 1]);
+      return;
+    }
+
+    let nextPage = pagination.page + 1;
+
+    while (nextPage <= totalPages) {
+      const pageData = await getOrLoadPage(nextPage, { syncState: false });
+      const nextVisibleItems = filterItemsForMode(pageData?.items || []);
+
+      if (nextVisibleItems.length > 0) {
+        applyPageData(pageData, nextPage);
+        setPagination((p) => ({
+          ...p,
+          page: nextPage,
+          limit: pageData?.pagination?.limit || p.limit,
+          total: pageData?.pagination?.total || p.total,
+          hasMore: pageData?.pagination?.hasMore || false,
+        }));
+        setOpenItem(nextVisibleItems[0]);
+        return;
+      }
+
+      nextPage += 1;
+    }
+  }, [
+    openItem,
+    currentModalIndex,
+    visibleItems,
+    pagination.page,
+    totalPages,
+    getOrLoadPage,
+    filterItemsForMode,
+    applyPageData,
+  ]);
+
+  const handleModalPrev = useCallback(async () => {
+    if (!openItem) return;
+
+    if (currentModalIndex > 0) {
+      setOpenItem(visibleItems[currentModalIndex - 1]);
+      return;
+    }
+
+    let prevPage = pagination.page - 1;
+
+    while (prevPage >= 1) {
+      const pageData = await getOrLoadPage(prevPage, { syncState: false });
+      const prevVisibleItems = filterItemsForMode(pageData?.items || []);
+
+      if (prevVisibleItems.length > 0) {
+        applyPageData(pageData, prevPage);
+        setPagination((p) => ({
+          ...p,
+          page: prevPage,
+          limit: pageData?.pagination?.limit || p.limit,
+          total: pageData?.pagination?.total || p.total,
+          hasMore: pageData?.pagination?.hasMore || false,
+        }));
+        setOpenItem(prevVisibleItems[prevVisibleItems.length - 1]);
+        return;
+      }
+
+      prevPage -= 1;
+    }
+  }, [
+    openItem,
+    currentModalIndex,
+    visibleItems,
+    pagination.page,
+    getOrLoadPage,
+    filterItemsForMode,
+    applyPageData,
+  ]);
+
+  const modalHasPrev = useMemo(() => {
+    if (!openItem) return false;
+    if (currentModalIndex > 0) return true;
+    return pagination.page > 1;
+  }, [openItem, currentModalIndex, pagination.page]);
+
+  const modalHasNext = useMemo(() => {
+    if (!openItem) return false;
+    if (currentModalIndex >= 0 && currentModalIndex < visibleItems.length - 1) {
+      return true;
+    }
+    return pagination.page < totalPages || !!pagination.hasMore;
+  }, [
+    openItem,
+    currentModalIndex,
+    visibleItems.length,
+    pagination.page,
+    pagination.hasMore,
+    totalPages,
+  ]);
 
   const handleToggleBookmark = async (item) => {
     const sanityId = item?._id;
@@ -516,7 +794,6 @@ const CurrentAffairs = () => {
       type: item?.type || "MISC",
     };
 
-    // optimistic UI
     setBookmarkIds((prev) => {
       const next = new Set(prev);
       if (next.has(sanityId)) next.delete(sanityId);
@@ -529,7 +806,6 @@ const CurrentAffairs = () => {
 
       if (!mountedRef.current) return;
 
-      // ✅ Re-sync from server (authoritative)
       const list = await fetchBookmarks();
 
       const ids = (Array.isArray(list) ? list : [])
@@ -541,7 +817,6 @@ const CurrentAffairs = () => {
       console.error(e);
       if (!mountedRef.current) return;
 
-      // revert on error
       setBookmarkIds((prev) => {
         const next = new Set(prev);
         if (next.has(sanityId)) next.delete(sanityId);
@@ -571,7 +846,6 @@ const CurrentAffairs = () => {
         months={months}
         selectedMonthKey={selectedMonthKey}
         onChange={(mk) => {
-          // ✅ Clear open item when switching months (avoid mismatched item)
           setOpenItem(null);
           setSelectedMonthKey(mk);
         }}
@@ -587,7 +861,6 @@ const CurrentAffairs = () => {
         bookmarkCount={bookmarkIds.size}
       />
 
-      {/* ✅ Search bar */}
       <SearchBar
         value={q}
         onChange={(val) => {
@@ -649,6 +922,12 @@ const CurrentAffairs = () => {
         item={openItem}
         items={visibleItems}
         onChangeItem={(nextItem) => setOpenItem(nextItem)}
+        hasPrev={modalHasPrev}
+        hasNext={modalHasNext}
+        onPrev={handleModalPrev}
+        onNext={handleModalNext}
+        currentGlobalIndex={currentGlobalIndex}
+        totalItems={pagination.total}
         onClose={() => setOpenItem(null)}
       />
     </div>
