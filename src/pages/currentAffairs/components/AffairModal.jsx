@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDate } from "../utils/formatDate";
 import { PortableText } from "@portabletext/react";
@@ -77,9 +77,6 @@ const portableComponents = {
   },
 };
 
-const SWIPE_THRESHOLD = 70;
-const SWIPE_VELOCITY = 650;
-
 const AffairModal = ({
   open,
   item,
@@ -98,6 +95,8 @@ const AffairModal = ({
   }, []);
 
   const [direction, setDirection] = useState(0);
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const touchEndRef = useRef({ x: 0, y: 0 });
 
   // const safeItems = Array.isArray(items) ? items : [];
 
@@ -112,6 +111,56 @@ const AffairModal = ({
     setDirection(1);
     onNext?.();
   }, [hasNext, onNext]);
+
+  const handleTouchStart = useCallback((e) => {
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+
+    touchEndRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    touchEndRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isMobile) return;
+
+    const deltaX = touchEndRef.current.x - touchStartRef.current.x;
+    const deltaY = touchEndRef.current.y - touchStartRef.current.y;
+
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    // Ignore mostly vertical gestures
+    if (absY > absX) return;
+
+    // Ignore tiny horizontal movement
+    if (absX < 60) return;
+
+    if (deltaX < 0 && hasNext) {
+      goNext();
+      return;
+    }
+
+    if (deltaX > 0 && hasPrev) {
+      goPrev();
+    }
+  }, [isMobile, hasNext, hasPrev, goNext, goPrev]);
 
   useEffect(() => {
     if (!open) return;
@@ -361,29 +410,9 @@ const AffairModal = ({
                   animate="center"
                   exit="exit"
                   transition={{ duration: 0.18 }}
-                  drag={isMobile ? "x" : false}
-                  dragConstraints={isMobile ? { left: 0, right: 0 } : undefined}
-                  dragElastic={isMobile ? 0.12 : undefined}
-                  onDragEnd={(e, info) => {
-                    if (!isMobile) return;
-                    const swipe = info.offset.x;
-                    const v = info.velocity.x;
-
-                    if (
-                      (swipe < -SWIPE_THRESHOLD || v < -SWIPE_VELOCITY) &&
-                      hasNext
-                    ) {
-                      goNext();
-                      return;
-                    }
-
-                    if (
-                      (swipe > SWIPE_THRESHOLD || v > SWIPE_VELOCITY) &&
-                      hasPrev
-                    ) {
-                      goPrev();
-                    }
-                  }}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 >
                   {Array.isArray(item.content) && item.content.length > 0 ? (
                     <div className="prose prose-sm md:prose-base max-w-none">
