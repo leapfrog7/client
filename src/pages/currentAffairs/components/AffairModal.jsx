@@ -87,6 +87,7 @@ const AffairModal = ({
   onNext,
   currentGlobalIndex,
   totalItems,
+  navLoading,
   onClose,
 }) => {
   const isMobile = useMemo(() => {
@@ -242,10 +243,10 @@ const AffairModal = ({
 
           <motion.div
             className={[
-              "relative w-full overflow-hidden bg-white shadow-2xl",
+              "relative flex w-full flex-col overflow-hidden bg-white shadow-2xl",
               "md:max-w-3xl md:rounded-2xl",
               "rounded-t-3xl md:rounded-2xl",
-              "max-h-[calc(100dvh-72px-env(safe-area-inset-top))] md:max-h-none",
+              "max-h-[calc(100dvh-16px-env(safe-area-inset-top))] md:max-h-[90vh]",
             ].join(" ")}
             variants={isMobile ? panelMobile : panelDesktop}
             drag={isMobile ? "y" : false}
@@ -261,13 +262,13 @@ const AffairModal = ({
               <div className="h-1.5 w-12 rounded-full bg-gray-300" />
             </div>
 
-            <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur">
-              <div className="p-3 md:p-5">
+            <div className="sticky top-0 z-10 border-b border-gray-100 bg-white/95 backdrop-blur">
+              <div className="p-2 md:p-5">
                 <div className="md:hidden flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="inline-flex items-center justify-center h-10 w-10 rounded-xl border border-gray-200 bg-white text-gray-700 active:scale-[0.98] transition"
+                    className="inline-flex items-center justify-center h-8 w-8 rounded-xl border border-gray-200 bg-white text-gray-700 active:scale-[0.98] transition"
                     aria-label="Close"
                     title="Close"
                   >
@@ -368,13 +369,13 @@ const AffairModal = ({
                   </div>
                 </div>
 
-                <h2 className="mt-2 text-lg md:text-2xl font-extrabold text-gray-900 leading-snug break-words">
+                <h2 className="mt-1.5 text-base md:text-2xl font-bold text-gray-900 leading-6 md:leading-snug break-words">
                   {item.title}
                 </h2>
 
-                <div className="md:hidden mt-2 flex flex-wrap items-center gap-2">
+                <div className="md:hidden mt-1.5 flex flex-wrap items-center gap-1.5">
                   <span
-                    className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
+                    className={`hidden md:inline-flex  items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typePillClass(
                       item.type,
                     )}`}
                   >
@@ -393,14 +394,22 @@ const AffairModal = ({
                     </span>
                   ) : null}
                 </div>
-
-                <div className="md:hidden mt-2 text-center text-[11px] text-gray-500">
-                  Swipe left/right to navigate
-                </div>
               </div>
             </div>
 
-            <div className="p-4 md:p-6 overflow-y-auto max-h-[calc(100dvh-220px-env(safe-area-inset-top))] md:max-h-[78vh]">
+            <div className="relative min-h-0 flex-1 overflow-y-auto p-3 pb-6 md:p-6">
+              {navLoading && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
+                  <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-cyan-600" />
+                      <span className="text-sm font-medium text-slate-700">
+                        Loading next item...
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={item._id}
@@ -493,6 +502,7 @@ AffairModal.propTypes = {
   onNext: PropTypes.func,
   currentGlobalIndex: PropTypes.number,
   totalItems: PropTypes.number,
+  navLoading: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
 };
 
@@ -506,6 +516,7 @@ AffairModal.defaultProps = {
   onNext: undefined,
   currentGlobalIndex: -1,
   totalItems: 0,
+  navLoading: false,
 };
 
 export default AffairModal;

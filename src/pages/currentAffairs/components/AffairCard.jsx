@@ -1,3 +1,148 @@
+// import PropTypes from "prop-types";
+// import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+// import { formatDate } from "../utils/formatDate";
+
+// const badgeClass = (type) => {
+//   switch (type) {
+//     case "PIB":
+//       return "bg-blue-50 text-blue-700 border-blue-100";
+//     case "Govt Scheme":
+//     case "GOVT_SCHEME":
+//       return "bg-emerald-50 text-emerald-700 border-emerald-100";
+//     default:
+//       return "bg-slate-50 text-slate-700 border-slate-200";
+//   }
+// };
+
+// const normalizeType = (t) => {
+//   if (t === "GOVT_SCHEME") return "Govt Scheme";
+//   if (t === "MISC") return "Misc";
+//   return t || "Misc";
+// };
+
+// const priorityPillClass = (p) => {
+//   const v = (p || "").toUpperCase();
+//   if (v === "HIGH") return "bg-amber-50 text-amber-800 border-amber-200";
+//   return "";
+// };
+
+// const AffairCard = ({ item, onOpen, onBookmark, isBookmarked }) => {
+//   const typeLabel = normalizeType(item?.type);
+//   const showHighPriority = (item?.priority || "").toUpperCase() === "HIGH";
+
+//   return (
+//     <button
+//       type="button"
+//       onClick={() => onOpen(item)}
+//       className="
+//         group w-full text-left
+//         rounded-xl border border-gray-200
+//         bg-gradient-to-b from-white to-gray-50/60
+//         p-3
+//         shadow-sm
+//         md:hover:shadow-md md:hover:-translate-y-[1px]
+//         active:translate-y-0
+//         transition
+//         focus:outline-none
+//       "
+//       aria-label={`Open: ${item?.title || "Current Affairs item"}`}
+//     >
+//       {/* Top meta row: Type / Priority (left) + Date (right) */}
+//       <div className="flex items-start justify-between gap-3">
+//         <div className="flex flex-wrap items-center gap-2">
+//           <span
+//             className={`
+//               inline-flex items-center rounded-lg border
+//               px-2 py-0.5 text-[11px] md:text-xs font-semibold
+//               ${badgeClass(typeLabel)}
+//             `}
+//           >
+//             {typeLabel}
+//           </span>
+
+//           {showHighPriority ? (
+//             <span
+//               className={`
+//                 inline-flex items-center rounded-lg border
+//                 px-2 py-0.5 text-[11px] md:text-xs font-semibold
+//                 ${priorityPillClass(item?.priority)}
+//               `}
+//               title="High priority"
+//             >
+//               HIGH
+//             </span>
+//           ) : null}
+//         </div>
+
+//         <span className="shrink-0 text-[11px] md:text-xs text-gray-500">
+//           {item?.date ? formatDate(item.date) : ""}
+//         </span>
+//       </div>
+
+//       {/* Title */}
+//       <h5
+//         className="
+//           mt-2
+//           text-sm md:text-lg
+//           font-bold
+//           text-gray-900
+//           leading-5 md:leading-7
+//           line-clamp-2
+//         "
+//       >
+//         {item?.title}
+//       </h5>
+
+//       {/* Bottom row: only Bookmark action */}
+//       <div className="mt-3 flex items-center justify-end">
+//         <button
+//           type="button"
+//           onClick={(e) => {
+//             e.stopPropagation();
+//             onBookmark?.(item);
+//           }}
+//           aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+//           aria-pressed={isBookmarked}
+//           title={isBookmarked ? "Bookmarked" : "Bookmark"}
+//           className={`
+//             inline-flex items-center justify-center
+//             h-9 w-9 md:h-10 md:w-10
+//             rounded-xl border
+//             transition
+//             active:scale-95
+//             focus:outline-none
+//             ${
+//               isBookmarked
+//                 ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+//                 : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+//             }
+//           `}
+//         >
+//           {isBookmarked ? (
+//             <FaBookmark className="text-sm md:text-base" />
+//           ) : (
+//             <FaRegBookmark className="text-sm md:text-base" />
+//           )}
+//         </button>
+//       </div>
+
+//       {/* Subtle hint (desktop only) */}
+//       <div className="hidden md:block mt-2 text-xs text-gray-400">
+//         Click to read
+//       </div>
+//     </button>
+//   );
+// };
+
+// AffairCard.propTypes = {
+//   item: PropTypes.object.isRequired,
+//   onOpen: PropTypes.func.isRequired,
+//   onBookmark: PropTypes.func,
+//   isBookmarked: PropTypes.bool,
+// };
+
+// export default AffairCard;
+
 import PropTypes from "prop-types";
 import { FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { formatDate } from "../utils/formatDate";
@@ -38,17 +183,63 @@ const AffairCard = ({ item, onOpen, onBookmark, isBookmarked }) => {
         group w-full text-left
         rounded-xl border border-gray-200
         bg-gradient-to-b from-white to-gray-50/60
-        p-3
+        px-3 py-3
         shadow-sm
         md:hover:shadow-md md:hover:-translate-y-[1px]
         active:translate-y-0
         transition
-        focus:outline-none 
+        focus:outline-none
       "
       aria-label={`Open: ${item?.title || "Current Affairs item"}`}
     >
-      {/* Top meta row: Type / Priority (left) + Date (right) */}
+      {/* Top meta row */}
       <div className="flex items-start justify-between gap-3">
+        {/* <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={`
+              inline-flex items-center rounded-lg border
+              px-2 py-0.5 text-[11px] md:text-xs font-semibold
+              ${badgeClass(typeLabel)}
+            `}
+          >
+            {typeLabel}
+          </span>
+
+          {showHighPriority ? (
+            <span
+              className={`
+                inline-flex items-center rounded-lg border
+                px-2 py-0.5 text-[11px] md:text-xs font-semibold
+                ${priorityPillClass(item?.priority)}
+              `}
+              title="High priority"
+            >
+              HIGH
+            </span>
+          ) : null}
+        </div> */}
+
+        <span className="shrink-0 text-[11px] md:text-xs text-gray-500">
+          {item?.date ? formatDate(item.date) : ""}
+        </span>
+      </div>
+
+      {/* Title */}
+      <h5
+        className="
+          mt-2
+          text-sm md:text-lg
+          font-bold
+          text-gray-700
+          leading-5 md:leading-7
+          line-clamp-2
+        "
+      >
+        {item?.title}
+      </h5>
+
+      {/* Footer */}
+      <div className="mt-2.5 flex items-center justify-between gap-3 border-t border-slate-100 pt-2.5">
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={`
@@ -73,28 +264,11 @@ const AffairCard = ({ item, onOpen, onBookmark, isBookmarked }) => {
             </span>
           ) : null}
         </div>
+        {/* <div className="inline-flex items-center gap-1 text-[11px] md:text-xs font-medium text-gray-500">
+          <span>Read more</span>
+          <FaArrowRight className="text-[10px] transition group-hover:translate-x-0.5" />
+        </div> */}
 
-        <span className="shrink-0 text-[11px] md:text-xs text-gray-500">
-          {item?.date ? formatDate(item.date) : ""}
-        </span>
-      </div>
-
-      {/* Title */}
-      <h5
-        className="
-          mt-2
-          text-sm md:text-lg
-          font-bold
-          text-gray-900
-          leading-5 md:leading-7
-          line-clamp-2
-        "
-      >
-        {item?.title}
-      </h5>
-
-      {/* Bottom row: only Bookmark action */}
-      <div className="mt-3 flex items-center justify-end">
         <button
           type="button"
           onClick={(e) => {
@@ -105,30 +279,23 @@ const AffairCard = ({ item, onOpen, onBookmark, isBookmarked }) => {
           aria-pressed={isBookmarked}
           title={isBookmarked ? "Bookmarked" : "Bookmark"}
           className={`
-            inline-flex items-center justify-center
-            h-9 w-9 md:h-10 md:w-10
-            rounded-xl border
-            transition
-            active:scale-95
-            focus:outline-none 
-            ${
-              isBookmarked
-                ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
-                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
-            }
-          `}
+      inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5
+      text-[11px] md:text-xs font-medium transition bg-zinc-50
+      active:scale-95 focus:outline-none
+      ${
+        isBookmarked
+          ? "border-amber-700 bg-white text-amber-700 hover:bg-amber-100"
+          : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+      }
+    `}
         >
           {isBookmarked ? (
-            <FaBookmark className="text-sm md:text-base" />
+            <FaBookmark className="text-xs md:text-sm" />
           ) : (
-            <FaRegBookmark className="text-sm md:text-base" />
+            <FaRegBookmark className="text-xs md:text-sm" />
           )}
+          <span>Bookmark</span>
         </button>
-      </div>
-
-      {/* Subtle hint (desktop only) */}
-      <div className="hidden md:block mt-2 text-xs text-gray-400">
-        Click to read
       </div>
     </button>
   );
