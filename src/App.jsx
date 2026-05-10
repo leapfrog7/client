@@ -89,6 +89,9 @@ const PrevYear = lazy(() => import("./pages/Admin/PrevYear"));
 const DraftingRoutes = lazy(
   () => import("./pages/Tools/drafting/DraftingRoutes"),
 );
+const ExcelUtilityRoutes = lazy(
+  () => import("./pages/Tools/excelUtility/ExcelUtilityRoutes"),
+);
 
 import { FiMenu } from "react-icons/fi";
 
@@ -724,6 +727,21 @@ const App = () => {
                   }
                 >
                   <DraftingRoutes />
+                </Suspense>
+              }
+            />
+
+            <Route
+              path="/pages/tools/excel-utility/*"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="p-6 text-sm font-semibold text-blue-700">
+                      Initializing Excel Utility...
+                    </div>
+                  }
+                >
+                  <ExcelUtilityRoutes />
                 </Suspense>
               }
             />

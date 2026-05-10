@@ -528,7 +528,7 @@ export default function TaskTrackerHome() {
       {/* CTA header (does not consume scroll space) */}
       <div className="shrink-0 bg-white p-4 shadow-sm text-center mx-auto w-full">
         {sessionExpiringSoon && sessionTimeLeft !== null && (
-          <div className="mt-2 animate-ping  inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-800">
+          <div className="my-2 animate-pulse  inline-flex items-center rounded-full border border-red-800 bg-rose-100 px-3 py-1 text-lg text-red-700">
             Session expires soon
           </div>
         )}
