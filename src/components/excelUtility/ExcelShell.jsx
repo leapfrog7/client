@@ -15,6 +15,8 @@ import { buildMissingDataAnalysis } from "./engine/missingDataEngine";
 import { buildDuplicateAnalysis } from "./engine/duplicateAnalysisEngine";
 import { buildNumericAnalysis } from "./engine/numericAnalysisEngine";
 import { buildDateAnalysis } from "./engine/dateAnalysisEngine";
+import { buildTimeAnalysis } from "./engine/timeAnalysisEngine";
+import useAnalysisReport from "./hooks/useAnalysisReport";
 
 const TABS = [
   { id: "basic", label: "Basic Utilities" },
@@ -34,6 +36,7 @@ export default function ExcelShell() {
   const [selectedNumericColumnIndex, setSelectedNumericColumnIndex] =
     useState("");
   const [selectedDateColumnIndex, setSelectedDateColumnIndex] = useState("");
+  const [selectedTimeColumnIndex, setSelectedTimeColumnIndex] = useState("");
 
   const {
     workbook,
@@ -50,6 +53,16 @@ export default function ExcelShell() {
   const { result, hasResult, cleanData, clearResult, mergeSheets } =
     useExcelActions();
 
+  const {
+    reportItems,
+    reportItemCount,
+    hasReportItems,
+    reportSummaryText,
+    addReportItem,
+    removeReportItem,
+    clearReport,
+  } = useAnalysisReport();
+
   const handleCleanData = () => {
     if (!activeSheet) return;
     cleanData(activeSheet);
@@ -58,13 +71,17 @@ export default function ExcelShell() {
   const handleResetWorkbook = () => {
     resetWorkbook();
     clearResult();
+
     setSelectedCountColumnIndex("");
     setSelectedMissingColumnIndex("");
     setSelectedDuplicateColumnIndex("");
     setSelectedNumericColumnIndex("");
     setSelectedDateColumnIndex("");
+    setSelectedTimeColumnIndex("");
+
     setDuplicateResult(null);
     setIsDuplicateProcessing(false);
+    clearReport();
   };
 
   const handleMergeSheets = () => {
@@ -165,6 +182,19 @@ export default function ExcelShell() {
     setSelectedDateColumnIndex(columnIndex);
   };
 
+  const timeResult = useMemo(() => {
+    if (!activeSheet || selectedTimeColumnIndex === "") return null;
+
+    return buildTimeAnalysis({
+      sheet: activeSheet,
+      columnIndex: Number(selectedTimeColumnIndex),
+    });
+  }, [activeSheet, selectedTimeColumnIndex]);
+
+  const handleSelectTimeColumn = (columnIndex) => {
+    setSelectedTimeColumnIndex(columnIndex);
+  };
+
   return (
     <main className="min-h-screen bg-slate-50">
       {isLoading ? <WorkbookLoadingOverlay /> : null}
@@ -226,8 +256,10 @@ export default function ExcelShell() {
               setSelectedDuplicateColumnIndex("");
               setSelectedNumericColumnIndex("");
               setSelectedDateColumnIndex("");
+              setSelectedTimeColumnIndex("");
               setDuplicateResult(null);
               setIsDuplicateProcessing(false);
+              clearReport();
             }}
           />
         </section>
@@ -262,6 +294,7 @@ export default function ExcelShell() {
             <AnalysisTab
               hasWorkbook={hasWorkbook}
               analysis={analysis}
+              originalFileName={workbook?.fileName || "analysis-output.xlsx"}
               selectedCountColumnIndex={selectedCountColumnIndex}
               countResult={countResult}
               onSelectCountColumn={handleSelectCountColumn}
@@ -278,6 +311,16 @@ export default function ExcelShell() {
               selectedDateColumnIndex={selectedDateColumnIndex}
               dateResult={dateResult}
               onSelectDateColumn={handleSelectDateColumn}
+              selectedTimeColumnIndex={selectedTimeColumnIndex}
+              timeResult={timeResult}
+              onSelectTimeColumn={handleSelectTimeColumn}
+              reportItems={reportItems}
+              reportItemCount={reportItemCount}
+              hasReportItems={hasReportItems}
+              reportSummaryText={reportSummaryText}
+              onAddReportItem={addReportItem}
+              onRemoveReportItem={removeReportItem}
+              onClearReport={clearReport}
             />
           )}
           <DownloadPanel

@@ -315,6 +315,7 @@ const topicNameMap = {
   "TA Rules": "TA_Rules",
   "NPS Rules": "NPS_Rules",
   Allowances: "HRA_Rules",
+  "LTC Rules": "LTC_Rules",
 };
 
 const clampPercent = (value) => {

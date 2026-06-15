@@ -1,7 +1,7 @@
 import Input from "./Input";
 import Label from "./Label";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import Loading from "./Loading";
@@ -65,6 +65,15 @@ export default function Login({ verifyToken }) {
 
   const handleUserInput = (event) => setUserInput(event.target.value);
   const handlePasswordInput = (event) => setPasswordInput(event.target.value);
+
+  useEffect(() => {
+    if (!loading) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [loading]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50">

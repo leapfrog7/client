@@ -1,11 +1,18 @@
 import PropTypes from "prop-types";
+import AnalysisDownloadButton from "./AnalysisDownloadButton";
+import AnalysisCopyActions from "./AnalysisCopyActions";
+import { buildDuplicateSummaryText } from "../utils/analysisTextFormatters";
+import AnalysisControlBar from "./AnalysisControlBar";
+import AddToReportButton from "./AddToReportButton";
 
 export default function DuplicateAnalysis({
   columns = [],
   selectedColumnIndex = "",
   duplicateResult,
   isProcessing = false,
+  originalFileName = "analysis-output.xlsx",
   onSelectColumn,
+  onAddReportItem,
 }) {
   const identifierFriendlyColumns = columns.filter((column) =>
     ["Identifier", "Text", "Category"].includes(column.role),
@@ -28,19 +35,40 @@ export default function DuplicateAnalysis({
           </p>
         </div>
 
-        <select
-          value={selectedColumnIndex}
-          onChange={(event) => onSelectColumn?.(event.target.value)}
-          disabled={isProcessing}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <option value="">Select column</option>
-          {selectableColumns.map((column) => (
-            <option key={column.columnIndex} value={column.columnIndex}>
-              {column.header}
-            </option>
-          ))}
-        </select>
+        <AnalysisControlBar>
+          <select
+            value={selectedColumnIndex}
+            onChange={(event) => onSelectColumn?.(event.target.value)}
+            disabled={isProcessing}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <option value="">Select column</option>
+            {selectableColumns.map((column) => (
+              <option key={column.columnIndex} value={column.columnIndex}>
+                {column.header}
+              </option>
+            ))}
+          </select>
+
+          <AnalysisDownloadButton
+            result={duplicateResult}
+            analysisType="duplicates"
+            originalFileName={originalFileName}
+            label="Download"
+          />
+          <AddToReportButton
+            result={duplicateResult}
+            type="duplicates"
+            title={`Duplicate check for ${duplicateResult?.columnName || "Column"}`}
+            summaryText={buildDuplicateSummaryText(duplicateResult)}
+            tableRows={duplicateResult?.rows || []}
+            onAddToReport={onAddReportItem}
+          />
+          <AnalysisCopyActions
+            summaryText={buildDuplicateSummaryText(duplicateResult)}
+            tableRows={duplicateResult?.rows || []}
+          />
+        </AnalysisControlBar>
       </div>
 
       {isProcessing ? (
@@ -165,6 +193,8 @@ DuplicateAnalysis.propTypes = {
   }),
   isProcessing: PropTypes.bool,
   onSelectColumn: PropTypes.func,
+  originalFileName: PropTypes.string,
+  onAddReportItem: PropTypes.func,
 };
 
 function SummaryCard({ label, value }) {

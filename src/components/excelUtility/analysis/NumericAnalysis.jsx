@@ -1,5 +1,13 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import AnalysisDownloadButton from "./AnalysisDownloadButton";
+import AnalysisCopyActions from "./AnalysisCopyActions";
+import {
+  buildNumericSummaryText,
+  buildNumericTableRows,
+} from "../utils/analysisTextFormatters";
+import AnalysisControlBar from "./AnalysisControlBar";
+import AddToReportButton from "./AddToReportButton";
 
 const DISPLAY_UNITS = [
   { value: "plain", label: "Plain number", divisor: 1, suffix: "" },
@@ -42,6 +50,8 @@ export default function NumericAnalysis({
   selectedColumnIndex = "",
   numericResult,
   onSelectColumn,
+  originalFileName = "analysis-output.xlsx",
+  onAddReportItem,
 }) {
   const [displayUnit, setDisplayUnit] = useState("plain");
 
@@ -66,7 +76,7 @@ export default function NumericAnalysis({
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <AnalysisControlBar>
           <select
             value={selectedColumnIndex}
             onChange={(event) => onSelectColumn?.(event.target.value)}
@@ -91,7 +101,25 @@ export default function NumericAnalysis({
               </option>
             ))}
           </select>
-        </div>
+          <AnalysisDownloadButton
+            result={numericResult}
+            analysisType="totals"
+            originalFileName={originalFileName}
+            label="Download"
+          />
+          <AddToReportButton
+            result={numericResult}
+            type="totals"
+            title={`Totals for ${numericResult?.columnName || "Column"}`}
+            summaryText={buildNumericSummaryText(numericResult)}
+            tableRows={buildNumericTableRows(numericResult)}
+            onAddToReport={onAddReportItem}
+          />
+          <AnalysisCopyActions
+            summaryText={buildNumericSummaryText(numericResult)}
+            tableRows={buildNumericTableRows(numericResult)}
+          />
+        </AnalysisControlBar>
       </div>
 
       {!numericResult ? (
@@ -170,6 +198,7 @@ NumericAnalysis.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
+  originalFileName: PropTypes.string,
   numericResult: PropTypes.shape({
     type: PropTypes.string,
     columnIndex: PropTypes.number,
@@ -194,6 +223,7 @@ NumericAnalysis.propTypes = {
     }),
   }),
   onSelectColumn: PropTypes.func,
+  onAddReportItem: PropTypes.func,
 };
 
 function SummaryCard({ label, value }) {

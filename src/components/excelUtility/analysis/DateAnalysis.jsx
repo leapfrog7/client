@@ -1,6 +1,14 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { formatDateForDisplay } from "../engine/dateAnalysisEngine";
+import AnalysisDownloadButton from "./AnalysisDownloadButton";
+import AnalysisCopyActions from "./AnalysisCopyActions";
+import {
+  buildDateSummaryText,
+  buildDateTableRows,
+} from "../utils/analysisTextFormatters";
+import AnalysisControlBar from "./AnalysisControlBar";
+import AddToReportButton from "./AddToReportButton";
 
 const DATE_FORMATS = [
   { value: "dd/mm/yyyy", label: "DD/MM/YYYY" },
@@ -15,6 +23,8 @@ export default function DateAnalysis({
   selectedColumnIndex = "",
   dateResult,
   onSelectColumn,
+  originalFileName = "analysis-output.xlsx",
+  onAddReportItem,
 }) {
   const [dateFormat, setDateFormat] = useState("dd/mm/yyyy");
   const [viewMode, setViewMode] = useState("chart");
@@ -48,7 +58,7 @@ export default function DateAnalysis({
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <AnalysisControlBar>
           <select
             value={selectedColumnIndex}
             onChange={(event) => onSelectColumn?.(event.target.value)}
@@ -73,7 +83,25 @@ export default function DateAnalysis({
               </option>
             ))}
           </select>
-        </div>
+          <AnalysisDownloadButton
+            result={dateResult}
+            analysisType="dates"
+            originalFileName={originalFileName}
+            label="Download"
+          />
+          <AddToReportButton
+            result={dateResult}
+            type="dates"
+            title={`Date analysis for ${dateResult?.columnName || "Column"}`}
+            summaryText={buildDateSummaryText(dateResult)}
+            tableRows={buildDateTableRows(dateResult)}
+            onAddToReport={onAddReportItem}
+          />
+          <AnalysisCopyActions
+            summaryText={buildDateSummaryText(dateResult)}
+            tableRows={buildDateTableRows(dateResult)}
+          />
+        </AnalysisControlBar>
       </div>
 
       {!dateResult ? (
@@ -251,6 +279,8 @@ DateAnalysis.propTypes = {
     ),
   }),
   onSelectColumn: PropTypes.func,
+  originalFileName: PropTypes.string,
+  onAddReportItem: PropTypes.func,
 };
 
 function SummaryCard({ label, value }) {

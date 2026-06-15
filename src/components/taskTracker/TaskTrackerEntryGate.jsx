@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useEffect } from "react";
 
 const cards = [
   {
@@ -45,9 +46,38 @@ const cards = [
   },
 ];
 
-export default function TaskTrackerEntryGate({ onLogin, onRegister }) {
+export default function TaskTrackerEntryGate({
+  onLogin,
+  onRegister,
+  blocking = false,
+  blockingText = "Logging you in…",
+}) {
+  useEffect(() => {
+    if (!blocking) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [blocking]);
+
   return (
     <div className="mx-auto w-full max-w-6xl p-4 md:p-6">
+      {blocking && (
+        <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-xl">
+            <div className="flex items-center gap-3">
+              <span className="h-5 w-5 rounded-full border-2 border-slate-300 border-t-slate-900 animate-spin" />
+              <div className="text-sm font-semibold text-slate-900">
+                {blockingText}
+              </div>
+            </div>
+            <div className="mt-1 text-xs text-slate-500">
+              Please wait… checking your account.
+            </div>
+          </div>
+        </div>
+      )}
       <div className="overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-50 px-5 py-5 md:px-7 md:py-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -142,4 +172,6 @@ export default function TaskTrackerEntryGate({ onLogin, onRegister }) {
 TaskTrackerEntryGate.propTypes = {
   onLogin: PropTypes.func.isRequired,
   onRegister: PropTypes.func.isRequired,
+  blocking: PropTypes.bool,
+  blockingText: PropTypes.string,
 };

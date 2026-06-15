@@ -1,4 +1,12 @@
 import PropTypes from "prop-types";
+import AnalysisDownloadButton from "./AnalysisDownloadButton";
+import AnalysisCopyActions from "./AnalysisCopyActions";
+import {
+  buildCountSummaryText,
+  buildCountTableRows,
+} from "../utils/analysisTextFormatters";
+import AnalysisControlBar from "./AnalysisControlBar";
+import AddToReportButton from "./AddToReportButton";
 
 const formatPercentage = (value) => {
   return `${Number(value || 0).toFixed(1)}%`;
@@ -8,7 +16,9 @@ export default function CountAnalysis({
   columns = [],
   selectedColumnIndex = "",
   countResult,
+  originalFileName = "analysis-output.xlsx",
   onSelectColumn,
+  onAddReportItem,
 }) {
   const categoryFriendlyColumns = columns.filter((column) =>
     ["Category", "Status / Flag", "Text"].includes(column.role),
@@ -31,18 +41,39 @@ export default function CountAnalysis({
           </p>
         </div>
 
-        <select
-          value={selectedColumnIndex}
-          onChange={(event) => onSelectColumn?.(event.target.value)}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300"
-        >
-          <option value="">Select column</option>
-          {selectableColumns.map((column) => (
-            <option key={column.columnIndex} value={column.columnIndex}>
-              {column.header}
-            </option>
-          ))}
-        </select>
+        <AnalysisControlBar>
+          <select
+            value={selectedColumnIndex}
+            onChange={(event) => onSelectColumn?.(event.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300"
+          >
+            <option value="">Select column</option>
+            {selectableColumns.map((column) => (
+              <option key={column.columnIndex} value={column.columnIndex}>
+                {column.header}
+              </option>
+            ))}
+          </select>
+
+          <AnalysisDownloadButton
+            result={countResult}
+            analysisType="count"
+            originalFileName={originalFileName}
+            label="Download"
+          />
+          <AddToReportButton
+            result={countResult}
+            type="count"
+            title={`Count by ${countResult?.columnName || "Column"}`}
+            summaryText={buildCountSummaryText(countResult)}
+            tableRows={buildCountTableRows(countResult)}
+            onAddToReport={onAddReportItem}
+          />
+          <AnalysisCopyActions
+            summaryText={buildCountSummaryText(countResult)}
+            tableRows={buildCountTableRows(countResult)}
+          />
+        </AnalysisControlBar>
       </div>
 
       {!countResult ? (
@@ -110,6 +141,7 @@ CountAnalysis.propTypes = {
       role: PropTypes.string,
     }),
   ),
+  originalFileName: PropTypes.string,
   selectedColumnIndex: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
@@ -132,6 +164,7 @@ CountAnalysis.propTypes = {
     ),
   }),
   onSelectColumn: PropTypes.func,
+  onAddReportItem: PropTypes.func,
 };
 
 function SummaryCard({ label, value }) {

@@ -50,6 +50,7 @@ import GFR from "./pages/quiz/GFR";
 import TARules from "./pages/quiz/TARules";
 import NPSRules from "./pages/quiz/NPS";
 import Allowances from "./pages/quiz/Allowances";
+import LTC from "./pages/quiz/LTC";
 import ParliamentaryProcedure from "./pages/quiz/ParliamentaryProcedure";
 import AoBR from "./pages/quiz/AoBR";
 import AddQuestionsForm from "./pages/quiz/AddQuestionsForm";
@@ -198,6 +199,11 @@ const DEFAULT_USER_STATS = {
       title: "Allowances",
       progress: "0",
       path: "/pages/quiz/paper-ii/allowances",
+    },
+    {
+      title: "LTC",
+      progress: "0",
+      path: "/pages/quiz/paper-ii/ltc",
     },
   ],
 };
@@ -457,6 +463,17 @@ const App = () => {
                   progress={userStats.paperII[9].progress}
                   quizAttempted={String(
                     userStats.paperII[9].attemptedQuestions,
+                  )}
+                />
+              }
+            />
+            <Route
+              path="/pages/quiz/paper-ii/ltc"
+              element={
+                <LTC
+                  progress={userStats.paperII[10].progress}
+                  quizAttempted={String(
+                    userStats.paperII[10].attemptedQuestions,
                   )}
                 />
               }

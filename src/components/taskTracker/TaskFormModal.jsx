@@ -58,6 +58,7 @@ export default function TaskFormModal({
   const [categorySearch, setCategorySearch] = useState("");
   const [stageOpen, setStageOpen] = useState(false);
   const [stageSearch, setStageSearch] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   // Animate in/out based on `open`
   useEffect(() => {
@@ -105,9 +106,11 @@ export default function TaskFormModal({
 
   const canSubmit = useMemo(() => safeTrim(title).length > 0, [title]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmit || submitting) return;
+
+    setSubmitting(true);
 
     const dueAt = dueDate
       ? new Date(`${dueDate}T23:59:59`).toISOString()
@@ -125,13 +128,17 @@ export default function TaskFormModal({
       dueAt,
     };
 
-    // ✅ Only set stage at creation time
     if (mode === "create") {
       const cleanStage = safeTrim(stage) || "Pending";
       payload.currentStage = cleanStage;
     }
 
-    onSubmit(payload);
+    try {
+      // ✅ await so modal shows progress until parent finishes API call
+      await Promise.resolve(onSubmit(payload));
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (!render) return null;
@@ -141,9 +148,9 @@ export default function TaskFormModal({
       {/* Backdrop: Darkened slightly and increased blur for better depth */}
       <div
         className={`absolute inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity duration-300 ease-out
-      ${active ? "opacity-100" : "opacity-0"}
-    `}
-        onClick={onClose}
+    ${active ? "opacity-100" : "opacity-0"}
+  `}
+        onClick={submitting ? undefined : onClose}
       />
 
       {/* Dialog Container */}
@@ -451,20 +458,33 @@ export default function TaskFormModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                  disabled={submitting}
+                  className={`w-full sm:w-auto px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-medium transition-colors
+    ${submitting ? "opacity-60 cursor-not-allowed" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"}
+  `}
                 >
                   Cancel ❌️
                 </button>
                 <button
                   type="submit"
-                  disabled={!canSubmit}
-                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98] ${
-                    canSubmit
-                      ? "bg-black text-white shadow-md hover:bg-neutral-800 hover:shadow-lg"
-                      : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  }`}
+                  disabled={!canSubmit || submitting}
+                  className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-[0.98]
+    ${
+      !canSubmit || submitting
+        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+        : "bg-black text-white shadow-md hover:bg-neutral-800 hover:shadow-lg"
+    }`}
                 >
-                  {mode === "edit" ? "Save Changes ⎙" : "Create Task +"}
+                  {submitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-4 w-4 rounded-full border-2 border-white/60 border-t-white animate-spin" />
+                      {mode === "edit" ? "Saving…" : "Creating…"}
+                    </span>
+                  ) : (
+                    <span>
+                      {mode === "edit" ? "Save Changes ⎙" : "Create Task +"}
+                    </span>
+                  )}
                 </button>
               </div>
             </div>

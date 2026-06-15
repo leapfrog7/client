@@ -1,4 +1,9 @@
 import PropTypes from "prop-types";
+import AnalysisDownloadButton from "./AnalysisDownloadButton";
+import AnalysisCopyActions from "./AnalysisCopyActions";
+import { buildMissingSummaryText } from "../utils/analysisTextFormatters";
+import AnalysisControlBar from "./AnalysisControlBar";
+import AddToReportButton from "./AddToReportButton";
 
 const formatPercentage = (value) => `${Number(value || 0).toFixed(1)}%`;
 
@@ -6,7 +11,9 @@ export default function MissingDataAnalysis({
   columns = [],
   selectedColumnIndex = "",
   missingResult,
+  originalFileName = "analysis-output.xlsx",
   onSelectColumn,
+  onAddReportItem,
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -20,18 +27,39 @@ export default function MissingDataAnalysis({
           </p>
         </div>
 
-        <select
-          value={selectedColumnIndex}
-          onChange={(event) => onSelectColumn?.(event.target.value)}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300"
-        >
-          <option value="">Select column</option>
-          {columns.map((column) => (
-            <option key={column.columnIndex} value={column.columnIndex}>
-              {column.header}
-            </option>
-          ))}
-        </select>
+        <AnalysisControlBar>
+          <select
+            value={selectedColumnIndex}
+            onChange={(event) => onSelectColumn?.(event.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-blue-300"
+          >
+            <option value="">Select column</option>
+            {columns.map((column) => (
+              <option key={column.columnIndex} value={column.columnIndex}>
+                {column.header}
+              </option>
+            ))}
+          </select>
+
+          <AnalysisDownloadButton
+            result={missingResult}
+            analysisType="missing"
+            originalFileName={originalFileName}
+            label="Download"
+          />
+          <AddToReportButton
+            result={missingResult}
+            type="missing"
+            title={`Missing values in ${missingResult?.columnName || "Column"}`}
+            summaryText={buildMissingSummaryText(missingResult)}
+            tableRows={missingResult?.rows || []}
+            onAddToReport={onAddReportItem}
+          />
+          <AnalysisCopyActions
+            summaryText={buildMissingSummaryText(missingResult)}
+            tableRows={missingResult?.rows || []}
+          />
+        </AnalysisControlBar>
       </div>
 
       {!missingResult ? (
@@ -119,6 +147,7 @@ MissingDataAnalysis.propTypes = {
     PropTypes.string,
     PropTypes.number,
   ]),
+  originalFileName: PropTypes.string,
   missingResult: PropTypes.shape({
     type: PropTypes.string,
     columnIndex: PropTypes.number,
@@ -130,6 +159,7 @@ MissingDataAnalysis.propTypes = {
     rows: PropTypes.arrayOf(PropTypes.object),
   }),
   onSelectColumn: PropTypes.func,
+  onAddReportItem: PropTypes.func,
 };
 
 function SummaryCard({ label, value }) {
