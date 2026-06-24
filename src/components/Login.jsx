@@ -47,6 +47,15 @@ export default function Login({ verifyToken }) {
       });
 
       localStorage.setItem("jwtToken", response.data.token);
+
+      localStorage.setItem(
+        "registeredUser",
+        JSON.stringify({
+          name: response.data.name || "",
+          mobile: userInput.trim(),
+        }),
+      );
+
       verifyToken?.();
       navigate(returnUrl, { replace: true });
       // Clear only on success

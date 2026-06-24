@@ -22,6 +22,7 @@ import { TbInvoice } from "react-icons/tb";
 import { TbPigMoney } from "react-icons/tb";
 import { GoTasklist } from "react-icons/go";
 import { VscSettings } from "react-icons/vsc";
+import { LuMapPinHouse } from "react-icons/lu";
 
 export const navItems = [
   {
@@ -135,6 +136,11 @@ export const navItems = [
         label: "Allowances",
         path: "/pages/quiz/paper-ii/allowances",
         icon: VscSettings,
+      },
+      {
+        label: "LTC Rules",
+        path: "/pages/quiz/paper-ii/ltc",
+        icon: LuMapPinHouse,
       },
     ],
   },

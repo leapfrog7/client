@@ -12,6 +12,7 @@ import NewCarousel from "../components/NewCarousel";
 import CTA from "../components/CTA";
 import QuickLinksCarousel from "../components/QuickLinksCarousel";
 import PrevYearCTA from "../pages/quiz/previousYear/PrevYearCTA";
+import MockTestPublicCTA from "../components/mocks/MockTestPublicCTA";
 
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
 // const BASE_URL = "http://localhost:5000/api/v1";
@@ -309,6 +310,9 @@ const Home = ({
 
             <Section>
               <PrevYearCTA />
+            </Section>
+            <Section className="hidden">
+              <MockTestPublicCTA />
             </Section>
           </>
         )}

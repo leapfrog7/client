@@ -35,6 +35,9 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    if (pathname.startsWith("/adminDashboard")) {
+      return;
+    }
     window.scrollTo({
       top: 0,
       behavior: "smooth",

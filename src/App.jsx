@@ -9,7 +9,7 @@ Update the userStat in the App.jsx as well
 
 On server-
 edit the file userStats.js
-edit the file */
+edit the file config -> topicConfig.js*/
 
 import "./App.css";
 
@@ -85,6 +85,15 @@ const GeneralFeedbackManagement = lazy(
   () => import("./pages/Admin/GeneralFeedbackManagement"),
 );
 const IdeaManagement = lazy(() => import("./pages/Admin/IdeaManagement"));
+
+const AdminMockRoutes = lazy(
+  () => import("./pages/Admin/mocks/AdminMockRoutes"),
+);
+
+const MockPublicRoutes = lazy(
+  () => import("./pages/mockTests/MockPublicRoutes"),
+);
+
 const SectionEditor = lazy(() => import("./pages/Admin/SectionEditor"));
 const PrevYear = lazy(() => import("./pages/Admin/PrevYear"));
 const DraftingRoutes = lazy(
@@ -588,6 +597,15 @@ const App = () => {
               element={<TopicwisePYQQuiz />}
             />
 
+            <Route
+              path="/mock-tests/*"
+              element={
+                <Suspense fallback={<div className="p-6">Loading…</div>}>
+                  <MockPublicRoutes />
+                </Suspense>
+              }
+            />
+
             <Route path="/adminDashboard" element={<AdminDashboard />}>
               <Route
                 path="users"
@@ -629,6 +647,16 @@ const App = () => {
                   </Suspense>
                 }
               />
+
+              <Route
+                path="mocks/*"
+                element={
+                  <Suspense fallback={<div className="p-6">Loading…</div>}>
+                    <AdminMockRoutes />
+                  </Suspense>
+                }
+              />
+
               <Route
                 path="feedbackMgmt"
                 element={

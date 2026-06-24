@@ -13,7 +13,7 @@ import { HiOutlineBanknotes } from "react-icons/hi2";
 import { MdModeOfTravel } from "react-icons/md";
 import { FiBriefcase } from "react-icons/fi";
 import { TbPigMoney } from "react-icons/tb";
-
+import { LuMapPinHouse } from "react-icons/lu";
 export const paperI_Items = [
   {
     icon: FaGavel,
@@ -25,11 +25,7 @@ export const paperI_Items = [
     title: "RTI Act",
     description: "Right to Information Act, 2005.",
   },
-  {
-    icon: GiReceiveMoney,
-    title: "DFPR, 2024",
-    description: "Delegtion of Financial Power Rules, 2024.",
-  },
+
   {
     icon: GrGroup,
     title: "Parliamentary Procedure",
@@ -46,11 +42,6 @@ export const paperI_Items = [
     title: "Economy & Schemes",
     description: "Indian Economy and Govt. Schemes",
   },
-  {
-    icon: TfiAgenda,
-    title: "FR",
-    description: "Fundamental Rules",
-  },
 ];
 
 export const paperII_Items = [
@@ -64,6 +55,11 @@ export const paperII_Items = [
     title: "CCS CCA Rules",
     description:
       "Central Civil Services (Classification, Control, and Appeal) Rules, 1965.",
+  },
+  {
+    icon: TfiAgenda,
+    title: "FR",
+    description: "Fundamental Rules",
   },
   {
     icon: FaPersonCane,
@@ -81,6 +77,11 @@ export const paperII_Items = [
     description: "General Financial Rules, 2017.",
   },
   {
+    icon: GiReceiveMoney,
+    title: "DFPR, 2024",
+    description: "Delegtion of Financial Power Rules, 2024.",
+  },
+  {
     icon: FiBriefcase,
     title: "CSMOP 2022",
     description: "Manual of Office Procedure (CSMOP).",
@@ -94,6 +95,11 @@ export const paperII_Items = [
     icon: TbPigMoney,
     title: "NPS Rules",
     description: "National Pension and Unified Pension Scheme Rules",
+  },
+  {
+    icon: LuMapPinHouse,
+    title: "LTC Rules",
+    description: "Leave Travel Concession Rules, 1988",
   },
 ];
 

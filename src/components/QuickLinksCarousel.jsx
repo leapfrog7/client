@@ -9,6 +9,7 @@ import {
 import { GiMedicalDrip } from "react-icons/gi";
 import { BsFiletypePdf } from "react-icons/bs";
 import { GoTasklist } from "react-icons/go";
+import { FaPenNib } from "react-icons/fa";
 
 const defaultLinks = [
   {
@@ -49,6 +50,13 @@ const defaultLinks = [
       "Built for Central Govt. officers for tracking tasks and follow-ups",
     url: "/pages/tools/task-tracker",
     icon: GoTasklist,
+  },
+  {
+    title: "Drafting Studio",
+    subtitle:
+      "Prepare drafts through structured blocks, and reuse routine text wherever needed.",
+    url: "/pages/tools/drafting",
+    icon: FaPenNib,
   },
   {
     title: "Resources",

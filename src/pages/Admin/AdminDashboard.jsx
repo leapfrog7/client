@@ -11,6 +11,7 @@ import {
   FaHospital,
   FaRupeeSign,
   FaCommentDots,
+  FaTasks,
 } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 
@@ -50,6 +51,13 @@ const MODULES = [
     desc: "Access previous year questions and answer sets.",
     Icon: FaHistory,
     color: "text-red-500",
+  },
+  {
+    to: "mocks",
+    title: "Mock Tests",
+    desc: "Create and manage LDCE SO/PS mock tests, questions and attempts.",
+    Icon: FaTasks,
+    color: "text-teal-600",
   },
   {
     to: "feedbackMgmt",

@@ -32,7 +32,7 @@ export default function QuizDetails() {
       {/* Stats Section */}
       <div className="w-full bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-lg shadow-lg text-gray-700 text-center">
         <h1 className="text-xl lg:text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-          Stats of Our 8000+ Question Bank
+          Stats of Our 8100+ Question Bank
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-4">
@@ -40,8 +40,8 @@ export default function QuizDetails() {
             icon={FaDatabase}
             color="text-blue-600"
             title="Total Questions"
-            count="4,400+"
-            description="Explore a vast collection of questions covering various topics."
+            count="4,500+"
+            description="Explore a vast collection of questions covering 16 topics of Paper I and II."
             footnote="(excluding AoBR)"
           />
           <StatCard
@@ -56,7 +56,7 @@ export default function QuizDetails() {
             color="text-purple-600"
             title="Previous Year Questions"
             count="1,400+"
-            description="Benchmark your preparation with previous year exams."
+            description="Benchmark your preparation with previous year exams. Analyse the pattern with topic wise question distribution."
           />
         </div>
 
@@ -108,7 +108,7 @@ PaperSection.propTypes = {
       title: PropTypes.string.isRequired,
       description: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
-    })
+    }),
   ).isRequired,
   iconColor: PropTypes.string.isRequired,
 };
