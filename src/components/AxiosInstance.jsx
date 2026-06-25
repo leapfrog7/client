@@ -27,8 +27,8 @@ import axios from "axios";
 
 // ✅ Use the API root, NOT a module path
 const AxiosInstance = axios.create({
-  // baseURL: "https://server-v4dy.onrender.com/api/v1",
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: "https://server-v4dy.onrender.com/api/v1",
+  // baseURL: "http://localhost:5000/api/v1",
 });
 
 // ✅ Attach token on every request
