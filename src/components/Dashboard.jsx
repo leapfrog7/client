@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import DashboardCard from "./DashboardCards";
 import DashboardHeader from "./DashBoardHeader";
+import MockTestPublicCTA from "./mocks/MockTestPublicCTA";
 
 const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
 // const BASE_URL = "http://localhost:5000/api/v1";
@@ -158,8 +159,12 @@ const Dashboard = ({ userStats, userId, onStatsUpdate }) => {
   };
 
   return (
-    <div className="bg-white flex flex-col p-0 mt-2 text-gray-700 md:rounded-md">
+    <div className="bg-white flex flex-col p-0 text-gray-700 md:rounded-md">
       <DashboardHeader userId={userId} />
+
+      <div className="">
+        <MockTestPublicCTA />
+      </div>
 
       {!hasAnyTopics && (
         <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-5 text-center text-sm text-slate-600 shadow-sm">

@@ -22,6 +22,7 @@ function MockTestStartPage() {
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  const [errorTone, setErrorTone] = useState("danger");
   const [fieldErrors, setFieldErrors] = useState({});
   const [registeredIdentity, setRegisteredIdentity] = useState({
     isLoggedIn: false,
@@ -37,6 +38,7 @@ function MockTestStartPage() {
     try {
       setLoading(true);
       setError("");
+      setErrorTone("danger");
 
       const response = await getPublicMockTestById(mockTestId);
       setMockTest(response?.data || null);
@@ -76,6 +78,9 @@ function MockTestStartPage() {
       ...prev,
       [name]: "",
     }));
+
+    setError("");
+    setErrorTone("danger");
   }
 
   async function handleStart(event) {
@@ -129,6 +134,27 @@ function MockTestStartPage() {
         },
       });
     } catch (err) {
+      const status = err?.status;
+      const code = err?.code;
+
+      if (status === 429 && code === "MOCK_ROOM_FULL") {
+        setErrorTone("warning");
+        setError(
+          err?.message ||
+            "The test room is currently full. Please try again after a few minutes.",
+        );
+        return;
+      }
+
+      if (status >= 500 || err?.isNetworkError) {
+        setErrorTone("warning");
+        setError(
+          "The server is busy at the moment. Please wait a few seconds and try again.",
+        );
+        return;
+      }
+
+      setErrorTone("danger");
       setError(err.message || "Failed to start test.");
     } finally {
       setStarting(false);
@@ -182,8 +208,20 @@ function MockTestStartPage() {
               <MockInfoCard mockTest={mockTest} />
 
               {error ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium leading-6 text-red-700">
-                  {error}
+                <div
+                  className={[
+                    "rounded-xl border px-4 py-3 text-sm font-medium leading-6",
+                    errorTone === "warning"
+                      ? "border-amber-200 bg-amber-50 text-amber-900"
+                      : "border-red-200 bg-red-50 text-red-700",
+                  ].join(" ")}
+                >
+                  <p className="font-black">
+                    {errorTone === "warning"
+                      ? "Unable to start right now"
+                      : "Unable to start test"}
+                  </p>
+                  <p className="mt-1">{error}</p>
                 </div>
               ) : null}
 
@@ -218,7 +256,7 @@ function MockTestStartPage() {
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5">
+                <div className="py-2 px-4">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <InstructionStat
                       label="Questions"
@@ -352,7 +390,11 @@ function MockTestStartPage() {
                   className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-3 text-sm font-black text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <FaPlay />
-                  {starting ? "Starting..." : "Start / Resume Test"}
+                  {starting
+                    ? "Checking availability..."
+                    : errorTone === "warning" && error
+                      ? "Try Again"
+                      : "Start / Resume Test"}
                 </button>
 
                 <div className="mt-4 rounded-xl bg-slate-50 px-3 py-3 text-xs leading-5 text-slate-600">

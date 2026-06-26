@@ -189,7 +189,12 @@ function MockAttemptPage() {
           return;
         }
 
-        setError(err.message || "Failed to submit test.");
+        setError(
+          getAttemptActionErrorMessage(
+            err,
+            "Failed to submit test. Please try again.",
+          ),
+        );
       } finally {
         submitInFlightRef.current = false;
         setSubmitting(false);
@@ -541,7 +546,12 @@ function MockAttemptPage() {
 
       lastAutoSavedPayloadRef.current = JSON.stringify(payload);
     } catch (err) {
-      setError(err.message || "Failed to save answers.");
+      setError(
+        getAttemptActionErrorMessage(
+          err,
+          "Failed to save answers. Please try again.",
+        ),
+      );
     } finally {
       setSaving(false);
     }
@@ -556,7 +566,12 @@ function MockAttemptPage() {
 
       navigate("/mock-tests");
     } catch (err) {
-      setError(err.message || "Failed to pause test.");
+      setError(
+        getAttemptActionErrorMessage(
+          err,
+          "Failed to pause test. Please try again.",
+        ),
+      );
     } finally {
       setSaving(false);
     }
@@ -785,8 +800,9 @@ function MockAttemptPage() {
       <div className="mx-auto grid max-w-7xl gap-5 px-3 py-5 sm:px-4 lg:grid-cols-[minmax(0,1fr)_310px] lg:px-6">
         <section ref={questionPanelRef} className="space-y-4 sm:space-y-5">
           {error ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
-              {error}
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium leading-6 text-amber-900 shadow-sm">
+              <p className="font-black">Temporary issue</p>
+              <p className="mt-1">{error}</p>
             </div>
           ) : null}
 
@@ -1375,6 +1391,18 @@ RecoveryTextField.propTypes = {
   autoComplete: PropTypes.string,
   onChange: PropTypes.func.isRequired,
 };
+
+function getAttemptActionErrorMessage(error, fallback) {
+  if (error?.status === 429) {
+    return "The server is busy at the moment. Please wait a few seconds and try again.";
+  }
+
+  if (error?.status >= 500 || error?.isNetworkError) {
+    return "Temporary server load prevented this action. Please try again.";
+  }
+
+  return error?.message || fallback;
+}
 
 function sanitizeUsername(value) {
   return String(value || "")

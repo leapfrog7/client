@@ -230,8 +230,12 @@ const Home = ({
 
         {showGuest && (
           <>
-            <Section className="mt-2 sm:mt-3">
+            <Section className="mt-2">
               <CTA isLoggedIn={false} />
+            </Section>
+
+            <Section>
+              <MockTestPublicCTA />
             </Section>
 
             <Section>
@@ -310,9 +314,6 @@ const Home = ({
 
             <Section>
               <PrevYearCTA />
-            </Section>
-            <Section className="hidden">
-              <MockTestPublicCTA />
             </Section>
           </>
         )}

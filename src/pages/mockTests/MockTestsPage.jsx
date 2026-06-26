@@ -95,7 +95,7 @@ function MockTestsPage() {
   }, [mockTests]);
 
   return (
-    <main className="min-h-screen bg-slate-50 mt-6 mb-12">
+    <main className="min-h-screen bg-white mt-6 mb-12">
       <div className="mx-auto max-w-6xl xlg:max-w-7xl">
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-6 text-white sm:px-6 sm:py-7">
@@ -189,7 +189,7 @@ function MockTestsPage() {
               </p>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-4">
               {mockTests.map((mockTest) => (
                 <MockTestCard
                   key={mockTest._id}
@@ -213,11 +213,11 @@ function MockTestCard({ mockTest, refreshing, onRefresh }) {
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="border-b border-slate-100 bg-white px-3 py-4 sm:px-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-black leading-tight text-slate-950 sm:text-xl">
+      <div className="border-b border-slate-100 px-3 py-4 sm:px-5 bg-slate-100">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between ">
+          <div className="min-w-0 ">
+            <div className="flex flex-wrap items-center gap-2 ">
+              <h2 className="text-lg font-black leading-tight  text-slate-950 sm:text-xl">
                 {mockTest.title || "Mock Test"}
               </h2>
 
@@ -237,7 +237,7 @@ function MockTestCard({ mockTest, refreshing, onRefresh }) {
         ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
+      <div className="flex flex-1 flex-col px-4 py-2">
         <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
           <InfoLine
             icon={<FaCalendarAlt />}
@@ -280,7 +280,7 @@ function MockTestCard({ mockTest, refreshing, onRefresh }) {
           <ScoreBox label="Unattempted" value="0" tone="neutral" />
         </div> */}
 
-        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-700">
+        <div className="mt-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm leading-6 text-slate-700">
           <p>
             <span className="font-bold text-slate-900">Current status:</span>{" "}
             {getComputedStatusLabel(status)}
@@ -289,48 +289,64 @@ function MockTestCard({ mockTest, refreshing, onRefresh }) {
           <p className="mt-1">
             Correct answers carry {mockTest.correctMarks ?? 1.25} marks. Wrong
             answers attract negative marking of{" "}
-            {mockTest.negativeMarks ?? 0.4166667} marks.
+            {mockTest.negativeMarks ?? 0.4166} marks.
           </p>
-        </div>
+          <div className="mt-auto pt-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              {/* Primary action */}
+              {canStart ? (
+                <Link
+                  to={`/mock-tests/${mockTest._id}/start`}
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3.5 text-sm font-black text-white shadow-sm shadow-teal-900/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-teal-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 sm:w-auto sm:min-w-[190px]"
+                >
+                  <FaPlay className="text-xs transition-transform duration-200 group-hover:scale-110" />
+                  Start / Resume Test
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-2xl bg-slate-200 px-5 py-3.5 text-sm font-black text-slate-500 shadow-inner sm:w-auto sm:min-w-[190px]"
+                >
+                  <FaPlay className="text-xs" />
+                  {status === "upcoming" ? "Not Started Yet" : "Test Closed"}
+                </button>
+              )}
 
-        <div className="mt-auto flex flex-col gap-3 pt-5 sm:flex-row sm:flex-wrap">
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={refreshing}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-black text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-          >
-            <FaSyncAlt className={refreshing ? "animate-spin" : ""} />
-            {refreshing ? "Refreshing..." : "Refresh Status"}
-          </button>
-          {canStart ? (
-            <Link
-              to={`/mock-tests/${mockTest._id}/start`}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-3 text-sm font-black text-white shadow-sm hover:bg-teal-800 sm:w-auto"
-            >
-              <FaPlay />
-              Start / Resume Test
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled
-              className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-4 py-3 text-sm font-black text-slate-500 sm:w-auto"
-            >
-              <FaPlay />
-              {status === "upcoming" ? "Not Started Yet" : "Test Closed"}
-            </button>
-          )}
+              {/* Secondary actions */}
+              <div className="grid w-full grid-cols-1 gap-3 sm:flex sm:w-auto sm:flex-wrap sm:items-center">
+                <button
+                  type="button"
+                  onClick={onRefresh}
+                  disabled={refreshing}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-slate-300 bg-white px-5 py-3.5 text-sm font-black text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-sm sm:w-auto"
+                >
+                  <FaSyncAlt
+                    className={refreshing ? "animate-spin text-xs" : "text-xs"}
+                  />
+                  {refreshing ? "Refreshing..." : "Refresh Status"}
+                </button>
 
-          {canViewLeaderboard ? (
-            <Link
-              to={`/mock-tests/${mockTest._id}/leaderboard`}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-black text-amber-900 shadow-sm hover:bg-amber-100 sm:w-auto"
-            >
-              <FaTrophy />
-              Leaderboard
-            </Link>
-          ) : null}
+                {canViewLeaderboard ? (
+                  <Link
+                    to={`/mock-tests/${mockTest._id}/leaderboard`}
+                    className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3.5 text-sm font-black text-amber-900 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-amber-100 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 sm:w-auto"
+                  >
+                    <FaTrophy className="text-xs transition-transform duration-200 group-hover:scale-110" />
+                    Leaderboard
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+
+            {/* Small helper text */}
+            {canStart ? (
+              <p className="mt-3 text-xs font-medium leading-5 text-slate-500">
+                If the test room is busy, please wait a few seconds and try
+                again.
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
     </article>

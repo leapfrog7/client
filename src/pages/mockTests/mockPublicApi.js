@@ -12,12 +12,25 @@ function getErrorMessage(error, fallback = "Something went wrong.") {
   );
 }
 
+function buildPublicApiError(error, fallback = "Something went wrong.") {
+  const responseData = error?.response?.data || {};
+
+  const apiError = new Error(getErrorMessage(error, fallback));
+
+  apiError.status = error?.response?.status || 0;
+  apiError.code = responseData?.code || "";
+  apiError.data = responseData;
+  apiError.isNetworkError = !error?.response;
+
+  return apiError;
+}
+
 export async function getPublicMockTests() {
   try {
     const response = await AxiosInstance.get(TEST_BASE);
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to fetch mock tests."));
+    throw buildPublicApiError(error, "Failed to fetch mock tests.");
   }
 }
 
@@ -26,7 +39,7 @@ export async function getPublicMockTestById(mockTestId) {
     const response = await AxiosInstance.get(`${TEST_BASE}/${mockTestId}`);
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to fetch mock test."));
+    throw buildPublicApiError(error, "Failed to fetch mock test.");
   }
 }
 
@@ -38,7 +51,7 @@ export async function startOrResumeAttempt(mockTestId, payload) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to start or resume test."));
+    throw buildPublicApiError(error, "Failed to start or resume test.");
   }
 }
 
@@ -51,7 +64,7 @@ export async function resumeAttemptById(attemptId, payload) {
 
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to recover attempt."));
+    throw buildPublicApiError(error, "Failed to recover attempt.");
   }
 }
 
@@ -63,7 +76,7 @@ export async function saveAttemptAnswers(attemptId, answers) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to save answers."));
+    throw buildPublicApiError(error, "Failed to save answers.");
   }
 }
 
@@ -75,7 +88,7 @@ export async function pauseAttempt(attemptId, answers) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to save and pause test."));
+    throw buildPublicApiError(error, "Failed to save and pause test.");
   }
 }
 
@@ -105,7 +118,7 @@ export async function submitAttempt(attemptId, answers) {
       };
     }
 
-    throw new Error(getErrorMessage(error, "Failed to submit test."));
+    throw buildPublicApiError(error, "Failed to submit test.");
   }
 }
 
@@ -117,7 +130,7 @@ export async function lookupResults(payload) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to lookup results."));
+    throw buildPublicApiError(error, "Failed to lookup results.");
   }
 }
 
@@ -129,7 +142,7 @@ export async function getAttemptResult(attemptId, payload) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to fetch result."));
+    throw buildPublicApiError(error, "Failed to fetch result.");
   }
 }
 
@@ -140,6 +153,6 @@ export async function getLeaderboard(mockTestId) {
     );
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, "Failed to fetch leaderboard."));
+    throw buildPublicApiError(error, "Failed to fetch leaderboard.");
   }
 }

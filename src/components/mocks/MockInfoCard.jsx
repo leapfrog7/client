@@ -17,7 +17,7 @@ function MockInfoCard({ mockTest }) {
 
   return (
     <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 px-4 py-5 sm:px-5">
+      <div className="border-b border-slate-100 px-5 py-4 sm:px-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -118,7 +118,7 @@ MockInfoCard.propTypes = {
 
 function InfoItem({ icon, label, value }) {
   return (
-    <div className="flex gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+    <div className="flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-2">
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-teal-700 shadow-sm">
         {icon}
       </div>
