@@ -9,6 +9,7 @@ import MockInfoCard from "../../components/mocks/MockInfoCard";
 
 import { getPublicMockTestById, startOrResumeAttempt } from "./mockPublicApi";
 import { getStoredRegisteredIdentity } from "./mockUserIdentity";
+import Seo from "../../components/Seo";
 
 function MockTestStartPage() {
   const { mockTestId } = useParams();
@@ -172,6 +173,12 @@ function MockTestStartPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 px-3 py-5 sm:px-4 sm:py-8">
+      <Seo
+        title="Start LDCE SO/PS Mock Test"
+        description="Start or resume your LDCE SO/PS mock test attempt anytime during the active 36-hour test window."
+        path={`/mock-tests/${mockTestId}/start`}
+        noIndex
+      />
       <div className="mx-auto max-w-6xl space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link

@@ -205,7 +205,7 @@ function MockTestPublicCTA({
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-600">
               <FeaturePill label="⏰ 30 min" />
               <FeaturePill label="🧠 40 questions" />
-              <FeaturePill label="🎯Score review" />
+              <FeaturePill label="🎯 Score review" />
               <FeaturePill label="📛 Negative Marking" />
               <FeaturePill label="🏅 Leaderboard with ranking" />
               <FeaturePill label="🎁 Free access for all" />

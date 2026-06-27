@@ -21,6 +21,7 @@ import {
   formatDateTime,
   getComputedStatusLabel,
 } from "../Admin/mocks/mockFormatters";
+import Seo from "../../components/Seo";
 
 function MockTestsPage() {
   const [mockTests, setMockTests] = useState([]);
@@ -96,9 +97,14 @@ function MockTestsPage() {
 
   return (
     <main className="min-h-screen bg-white mt-6 mb-12">
+      <Seo
+        title="LDCE SO/PS Mock Tests"
+        description="Free Practice for LDCE SO/PS mock tests - 30-minute format, 40 questions,50 marks with negative marking and leaderboard with ranking."
+        path="/mock-tests"
+      />
       <div className="mx-auto max-w-6xl xlg:max-w-7xl">
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-6 text-white sm:px-6 sm:py-7">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-zinc-800 px-4 py-6 text-white sm:px-6 sm:py-7">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-3xl">
                 <p className="text-xs font-bold uppercase tracking-wide text-teal-200">
@@ -173,20 +179,45 @@ function MockTestsPage() {
         ) : null}
 
         {!loading && mockTests.length ? (
-          <section className="space-y-4">
-            <div className="flex flex-col gap-2 mx-4 md:mx-2 sm:flex-row sm:items-end sm:justify-between">
-              <div className="mt-4">
-                <h2 className="text-lg font-black text-slate-950">
-                  Available Mock Tests
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  Select an active test to start or resume your attempt.
+          <section>
+            <div className="my-4 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-black text-slate-950">
+                    Available Mock Tests
+                  </h2>
+
+                  <span className="inline-flex items-center rounded-full bg-teal-50 px-2.5 py-1 text-xs font-black text-teal-700 ring-1 ring-teal-100">
+                    Flexible timing
+                  </span>
+                </div>
+
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-500">
+                  Start or resume any active mock test at your convenience.
                 </p>
               </div>
 
-              <p className="text-sm font-semibold text-slate-500">
-                {mockTests.length} mock test{mockTests.length === 1 ? "" : "s"}
-              </p>
+              <div className="flex flex-col gap-3 sm:items-end">
+                <div className="inline-flex items-center gap-3 rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3 text-teal-800">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-black shadow-sm ring-1 ring-teal-100">
+                    36h
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-xs font-black uppercase tracking-wide text-teal-700">
+                      Open window
+                    </p>
+                    <p className="text-sm font-black leading-5 text-slate-950">
+                      Attempt anytime within 36 hours
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-xs font-bold text-slate-500">
+                  {mockTests.length} mock test
+                  {mockTests.length === 1 ? "" : "s"} available
+                </p>
+              </div>
             </div>
 
             <div className="grid gap-4">

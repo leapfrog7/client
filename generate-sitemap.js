@@ -77,6 +77,11 @@ const links = [
     changefreq: "weekly",
     priority: 0.8,
   },
+  {
+    url: "/mock-tests",
+    changefreq: "weekly",
+    priority: 0.8,
+  },
 ];
 
 const sitemapStream = new SitemapStream({
