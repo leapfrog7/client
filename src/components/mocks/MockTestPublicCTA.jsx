@@ -155,9 +155,15 @@
 import PropTypes from "prop-types";
 import {
   FaBell,
+  FaWhatsapp,
 
   // FaRegCalendarAlt,
 } from "react-icons/fa";
+
+const MOCK_TEST_SHARE_URL = "https://undersigned.in/mock-tests";
+
+const WHATSAPP_SHARE_TEXT =
+  "Upcoming LDCE SO/PS mock tests are being prepared on UnderSigned. Timed practice, 40 questions, score review, negative marking and leaderboard ranking will be available free for all.";
 
 function MockTestPublicCTA({
   title = "Mock tests for the preparation of LDCE 2026",
@@ -165,7 +171,7 @@ function MockTestPublicCTA({
   compact = false,
 }) {
   return (
-    <section className="mb-4 overflow-hidden rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-50 via-white to-emerald-50 shadow-sm">
+    <section className="mb-4 md:mb-6 overflow-hidden rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-50 via-white to-emerald-50 shadow-sm">
       <div className={compact ? "p-4 sm:p-5" : "p-5 sm:p-6"}>
         <div className="flex items-start gap-3 sm:gap-4">
           {/* <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm ring-1 ring-teal-100 sm:h-11 sm:w-11">
@@ -215,7 +221,24 @@ function MockTestPublicCTA({
                 label="Useful near exam"
               /> */}
             </div>
+            <div className="mt-4 flex flex-col gap-2 rounded-xl border border-teal-100 bg-white/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs font-semibold leading-5 text-slate-600">
+                Share this upcoming mock test announcement with your friends
+                preparing for LDCE 2026.
+              </p>
 
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `${WHATSAPP_SHARE_TEXT}\n\n${MOCK_TEST_SHARE_URL}`,
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-green-600 px-3.5 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-green-700"
+              >
+                <FaWhatsapp className="text-sm" />
+                Share on WhatsApp
+              </a>
+            </div>
             {/* {!compact ? (
               <p className="mt-4 max-w-4xl rounded-xl border border-teal-100 bg-white/70 px-4 py-3 text-xs leading-5 text-slate-600">
                 The LDCE SO/PS examination is expected around December. Mock

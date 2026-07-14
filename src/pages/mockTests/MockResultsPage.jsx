@@ -3,12 +3,17 @@ import PropTypes from "prop-types";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
+  FaBullhorn,
   FaCheckCircle,
   FaClock,
+  FaCopy,
+  FaExternalLinkAlt,
   FaMedal,
   FaSearch,
+  FaShareAlt,
   FaTimesCircle,
   FaTrophy,
+  FaUserPlus,
 } from "react-icons/fa";
 
 import AttemptStatusBadge from "../../components/mocks/AttemptStatusBadge";
@@ -23,9 +28,22 @@ import {
   formatScore,
 } from "../Admin/mocks/mockFormatters";
 
+const REGISTER_URL = "http://undersigned.in/register";
+const SUBSCRIBE_URL = "http://undersigned.in/subscribe";
+const MOCK_TESTS_URL = "http://undersigned.in/mock-tests";
+
+function isUserLoggedIn() {
+  try {
+    return Boolean(localStorage.getItem("jwtToken"));
+  } catch {
+    return false;
+  }
+}
+
 function MockResultPage() {
   const { attemptId } = useParams();
   const location = useLocation();
+  const [isLoggedIn] = useState(() => isUserLoggedIn());
 
   const [identity, setIdentity] = useState({
     username: location.state?.username || "",
@@ -176,6 +194,8 @@ function MockResultPage() {
           <>
             <ResultSummary result={result} />
 
+            <ResultEngagementNudge isLoggedIn={isLoggedIn} />
+
             {Array.isArray(result.review) && result.review.length ? (
               <AnswerReviewSection review={result.review} />
             ) : null}
@@ -298,71 +318,84 @@ function ResultSummary({ result }) {
         </div>
 
         <div className="p-4 sm:p-5">
-          <div className="grid gap-4 lg:grid-cols-[1.15fr_1fr]">
-            <div className="rounded-2xl bg-teal-700 p-5 text-white shadow-sm">
-              <p className="text-xs font-black uppercase tracking-wide text-teal-100">
-                Final Score
-              </p>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)]">
+            <div className="overflow-hidden rounded-2xl border border-teal-100 bg-white shadow-sm">
+              <div className="flex flex-col gap-4 bg-gradient-to-br from-teal-700 to-teal-800 p-4 text-white sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-wide text-teal-100">
+                    Final Score
+                  </p>
 
-              <p className="mt-3 text-5xl font-black leading-none">
-                {formatScore(attempt.score)}
-              </p>
+                  <p className="mt-2 text-4xl font-black leading-none tracking-tight sm:text-5xl">
+                    {formatScore(attempt.score)}
+                  </p>
+                </div>
 
-              <p className="mt-3 text-sm leading-6 text-teal-50">
-                Correct:{" "}
-                <span className="font-black">{attempt.correctCount || 0}</span>{" "}
-                · Wrong:{" "}
-                <span className="font-black">{attempt.wrongCount || 0}</span> ·
-                Left:{" "}
-                <span className="font-black">
-                  {attempt.unattemptedCount || 0}
-                </span>
-              </p>
+                <div className="grid grid-cols-3 gap-2 sm:min-w-[230px]">
+                  <ScoreChip
+                    label="Correct"
+                    value={attempt.correctCount || 0}
+                  />
+                  <ScoreChip label="Wrong" value={attempt.wrongCount || 0} />
+                  <ScoreChip
+                    label="Left"
+                    value={attempt.unattemptedCount || 0}
+                  />
+                </div>
+              </div>
             </div>
 
             {leaderboardAvailable && rank && totalParticipants ? (
-              <div className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
-                    <FaMedal />
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
+                      <FaMedal />
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">
+                        Leaderboard
+                      </p>
+                      <h3 className="mt-1 truncate text-lg font-black text-slate-950">
+                        Rank {rank} of {totalParticipants}
+                      </h3>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-wide text-teal-700">
-                      Leaderboard Standing
+                  <div className="shrink-0 rounded-2xl bg-teal-50 px-4 py-2 text-right ring-1 ring-teal-100">
+                    <p className="text-[10px] font-black uppercase tracking-wide text-teal-700">
+                      Percentile
                     </p>
-                    <h3 className="mt-1 text-xl font-black text-slate-950">
-                      Rank {rank} of {totalParticipants}
-                    </h3>
+                    <p className="text-2xl font-black leading-none text-teal-900">
+                      {percentile}
+                    </p>
                   </div>
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-white px-4 py-4 text-center shadow-sm">
-                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
-                    Percentile
-                  </p>
-                  <p className="mt-1 text-4xl font-black text-teal-900">
-                    {percentile}
-                  </p>
-                </div>
-
-                <p className="mt-4 text-sm leading-6 text-slate-600">
+                <p className="mt-3 text-sm leading-6 text-slate-600">
                   You performed better than approximately{" "}
-                  <span className="font-black text-slate-900">
+                  <span className="font-black text-slate-950">
                     {percentile}%
                   </span>{" "}
                   of ranked participants.
                 </p>
               </div>
             ) : (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-                <p className="font-black">
-                  Leaderboard standing not available yet
-                </p>
-                <p className="mt-2">
-                  Rank and percentile will be available after the mock test
-                  window closes.
-                </p>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900 shadow-sm sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-amber-700 ring-1 ring-amber-100">
+                    <FaTrophy />
+                  </div>
+
+                  <div>
+                    <p className="font-black">Leaderboard not available yet</p>
+                    <p className="mt-1">
+                      Rank and percentile will be available after the mock test
+                      window closes.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -387,7 +420,7 @@ function ResultSummary({ result }) {
             />
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {/* <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <MiniResultCard
               label="Correct"
               value={attempt.correctCount || 0}
@@ -403,7 +436,7 @@ function ResultSummary({ result }) {
               value={attempt.unattemptedCount || 0}
               tone="neutral"
             />
-          </div>
+          </div> */}
 
           {leaderboardMockTestId ? (
             <Link
@@ -416,6 +449,134 @@ function ResultSummary({ result }) {
           ) : null}
         </div>
       </section>
+    </section>
+  );
+}
+
+function ResultEngagementNudge({ isLoggedIn }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const shareText =
+      "Try UnderSigned for LDCE SO/PS preparation, topic-wise MCQs, previous year questions, and mock tests.";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "UnderSigned LDCE SO/PS Preparation",
+          text: shareText,
+          url: MOCK_TESTS_URL,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(MOCK_TESTS_URL);
+      setCopied(true);
+
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch {
+      try {
+        await navigator.clipboard.writeText(MOCK_TESTS_URL);
+        setCopied(true);
+
+        window.setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      } catch {
+        setCopied(false);
+      }
+    }
+  }
+
+  if (isLoggedIn) {
+    return (
+      <section className="overflow-hidden rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-50 via-white to-emerald-50 shadow-sm">
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm ring-1 ring-teal-100">
+              <FaShareAlt />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-wide text-teal-700">
+                Help others prepare better
+              </p>
+              <h2 className="mt-1 text-base font-black text-slate-950 sm:text-lg">
+                Share UnderSigned with other LDCE SO/PS aspirants
+              </h2>
+              <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+                If this mock test helped you assess your preparation, share the
+                platform with colleagues who may benefit from topic-wise MCQs,
+                previous year questions, and mock test practice.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-teal-200 bg-white px-4 py-3 text-sm font-black text-teal-800 shadow-sm transition hover:bg-teal-50 sm:w-auto"
+          >
+            {copied ? <FaCopy /> : <FaShareAlt />}
+            {copied ? "Link Copied" : "Share Link"}
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-700 p-4 text-white sm:p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/10">
+              <FaBullhorn />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-wide text-blue-200">
+                Want to improve score?
+              </p>
+              <h2 className="mt-1 text-lg font-black leading-tight sm:text-xl">
+                Use UnderSigned for structured LDCE SO/PS practice
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200">
+                Public mock results are available to everyone. For regular
+                preparation, UnderSigned provides topic-wise MCQs, previous year
+                questions - year and topic wise and progress tracking in one
+                place.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col justify-center gap-3 border-t border-slate-200 bg-slate-50 p-4 sm:p-5 lg:border-l lg:border-t-0">
+          <a
+            href={REGISTER_URL}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-700 px-4 py-3 text-sm font-black text-white shadow-sm transition hover:bg-teal-800"
+          >
+            <FaUserPlus />
+            Register Free
+            <FaExternalLinkAlt className="text-[10px]" />
+          </a>
+
+          <a
+            href={SUBSCRIBE_URL}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-black text-indigo-800 shadow-sm transition hover:bg-slate-100"
+          >
+            View Subscription
+            <FaExternalLinkAlt className="text-[10px]" />
+          </a>
+
+          <p className="text-center text-xs leading-5 text-slate-500">
+            Start with free registration. Subscribe when you are ready for full
+            preparation access.
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
@@ -644,6 +805,26 @@ function TextField({
     </div>
   );
 }
+
+function ScoreChip({ label, value }) {
+  return (
+    <div className="rounded-xl bg-white/10 px-3 py-2 text-center ring-1 ring-white/10">
+      <p className="text-[10px] font-black uppercase tracking-wide text-teal-100">
+        {label}
+      </p>
+      <p className="mt-1 text-lg font-black leading-none text-white">{value}</p>
+    </div>
+  );
+}
+
+ScoreChip.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+};
+
+ResultEngagementNudge.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+};
 
 ResultLookupForm.propTypes = {
   identity: PropTypes.shape({

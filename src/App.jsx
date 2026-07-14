@@ -117,6 +117,7 @@ import FRPage from "./pages/quiz/FR";
 import CghsUnitPublic from "./pages/Tools/CghsUnitPublic";
 import CghsRatesPublic from "./pages/Tools/CghsRatesPublic";
 import PayMatrix from "./pages/Tools/PayMatrix";
+import EighthCPCRealityCheck from "./pages/EighthCPCRealityCheck";
 import NpsEstimator from "./pages/Tools/NpsEstimator";
 import PublicResources from "./pages/PublicResources";
 import ResourceDetail from "./pages/ResourceDetail";
@@ -727,6 +728,11 @@ const App = () => {
               path="/pages/public/7thCPC-paymatrix"
               element={<PayMatrix />}
             />
+            <Route
+              path="/pages/public/8th-CPC-reality-check"
+              element={<EighthCPCRealityCheck />}
+            />
+
             <Route path="/pages/public/nps-or-ups" element={<NpsEstimator />} />
             <Route
               path="/pages/public/resources"

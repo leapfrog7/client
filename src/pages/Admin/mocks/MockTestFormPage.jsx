@@ -56,7 +56,7 @@ function MockTestFormPage() {
           durationMinutes: Number(mockTest.durationMinutes || 30),
           totalQuestions: Number(mockTest.totalQuestions || 40),
           correctMarks: Number(mockTest.correctMarks ?? 1.25),
-          negativeMarks: Number(mockTest.negativeMarks ?? 0.4166667),
+          negativeMarks: Number(mockTest.negativeMarks ?? 0.4166),
           allowResume: Boolean(mockTest.allowResume),
           shuffleQuestions: Boolean(mockTest.shuffleQuestions),
           shuffleOptions: Boolean(mockTest.shuffleOptions),
