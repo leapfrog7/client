@@ -144,6 +144,37 @@ const PayMatrix = () => {
         </p>
       </div>
 
+      <div className="mb-6 flex justify-center">
+        <a
+          href="/pages/public/8th-CPC-reality-check"
+          className="group w-full max-w-7xl rounded-2xl border border-teal-200 bg-gradient-to-r from-teal-50 via-white to-emerald-50 p-4 shadow-sm transition hover:border-teal-300 hover:shadow-md sm:p-5"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 text-left">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-teal-700">
+                Featured analysis
+              </p>
+
+              <h2 className="mt-1 text-base font-extrabold text-slate-950 sm:text-lg">
+                What can the 7th CPC tell us about the 8th CPC?
+              </h2>
+
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Understand fitment factor, DA neutralisation, revised pay and
+                why viral salary projections can be misleading.
+              </p>
+            </div>
+
+            <span
+              aria-hidden="true"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-700 text-lg font-bold text-white transition group-hover:translate-x-1"
+            >
+              →
+            </span>
+          </div>
+        </a>
+      </div>
+
       <div className="overflow-auto max-h-[80vh] rounded-lg shadow-lg mb-8">
         <table className="min-w-max border-collapse relative text-sm">
           <thead>
