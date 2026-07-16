@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
 import { FaArrowAltCircleDown } from "react-icons/fa";
+import PageFeedback from "../components/PageFeedback";
 import {
   FaArrowRight,
   FaChartLine,
@@ -2855,6 +2856,7 @@ function EighthCPCRealityCheck() {
               should not be treated as a salary or pension entitlement.
             </p>
           </footer>
+          <PageFeedback pageSlug="/8th CPC" />
         </article>
       </main>
     </>
