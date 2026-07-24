@@ -162,8 +162,11 @@ import {
 
 const MOCK_TEST_SHARE_URL = "https://undersigned.in/mock-tests";
 
+const MOCK_TEST_START_TEXT = "31 July 2026, 6:00 PM onwards";
+
 const WHATSAPP_SHARE_TEXT =
-  "Upcoming LDCE SO/PS mock tests are being prepared on UnderSigned. Timed practice, 40 questions, score review, negative marking and leaderboard ranking will be available free for all.";
+  `LDCE 2026 mock tests on UnderSigned will commence from ${MOCK_TEST_START_TEXT}. ` +
+  "Timed practice with 40 questions, 30 minutes, score review, negative marking and leaderboard ranking will be available free for all.";
 
 function MockTestPublicCTA({
   title = "Mock tests for the preparation of LDCE 2026",
@@ -207,7 +210,20 @@ function MockTestPublicCTA({
             >
               {description}
             </p>
+            <div className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold leading-5 text-amber-900">
+              <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-amber-700 ring-1 ring-amber-100">
+                Starts from
+              </span>
 
+              <span className="font-black">31 July 2026, 6:00 PM onwards</span>
+
+              <a
+                href={MOCK_TEST_SHARE_URL}
+                className="font-black text-teal-700 underline decoration-teal-300 underline-offset-4 hover:text-teal-900"
+              >
+                View mock test page
+              </a>
+            </div>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-600">
               <FeaturePill label="⏰ 30 min" />
               <FeaturePill label="🧠 40 questions" />
