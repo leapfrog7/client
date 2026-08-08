@@ -6,6 +6,8 @@ import Loading from "../../components/Loading";
 import PageFeedback from "../../components/PageFeedback";
 import { Helmet } from "react-helmet-async";
 import { FiShare2, FiInfo } from "react-icons/fi";
+import CghsCostEstimate from "./CghsCostEstimate";
+import { toast } from "react-hot-toast";
 
 import CghsGuidelinesModal from "./CghsGuidelinesModal"; // adjust path
 // ---------- helpers ----------
@@ -100,6 +102,8 @@ const CghsRatesPublic = () => {
     () => Math.max(1, Math.ceil(total / limit)),
     [total, limit],
   );
+
+  const [estimateItems, setEstimateItems] = useState([]);
 
   useEffect(() => {
     setDetailsMap({});
@@ -261,10 +265,51 @@ const CghsRatesPublic = () => {
     return wards;
   }, [selectedWards]);
 
+  const addToEstimate = ({ procedure, facility, ward, cell }) => {
+    if (!procedure || !cell) return;
+
+    const id = [procedure.cghsCode, tier, facility, ward].join("-");
+
+    setEstimateItems((prev) => {
+      if (prev.some((item) => item.id === id)) {
+        return prev;
+      }
+
+      toast.success("Added to cost estimate");
+
+      return [
+        ...prev,
+        {
+          id,
+          cghsCode: procedure.cghsCode,
+          name: procedure.name,
+          speciality: procedure.speciality || "",
+          tier,
+          facility,
+          ward,
+          amount: cell.amount,
+          raw: cell.raw || "",
+        },
+      ];
+    });
+  };
+
+  const removeFromEstimate = (id) => {
+    setEstimateItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const clearEstimate = () => {
+    setEstimateItems([]);
+  };
+
   if (loading) return <Loading />;
 
   return (
-    <div className="p-2 max-w-6xl mx-auto animate-fade-in">
+    <div
+      className={`p-2 max-w-6xl mx-auto animate-fade-in ${
+        estimateItems.length ? "pb-24" : ""
+      }`}
+    >
       <Helmet>
         {/* Primary */}
         <title>
@@ -608,16 +653,116 @@ const CghsRatesPublic = () => {
                           {row.label}
                         </div>
 
-                        {visibleWards.map((w) => (
-                          <div
-                            key={w}
-                            className="px-2 py-2 text-center bg-white"
-                          >
-                            <div className="text-[12px] md:text-base text-gray-900">
-                              {formatCell(get(row.key, w))}
+                        {visibleWards.map((w) => {
+                          const cell = get(row.key, w);
+
+                          const estimateId = [
+                            it.cghsCode,
+                            tier,
+                            row.key,
+                            w,
+                          ].join("-");
+
+                          const alreadyAdded = estimateItems.some(
+                            (item) => item.id === estimateId,
+                          );
+
+                          const hasRate =
+                            cell &&
+                            ((cell.amount !== null &&
+                              cell.amount !== undefined) ||
+                              String(cell.raw || "").trim());
+
+                          return (
+                            <div
+                              key={w}
+                              role={hasRate ? "button" : undefined}
+                              tabIndex={hasRate ? 0 : undefined}
+                              onClick={() => {
+                                if (!hasRate || alreadyAdded) return;
+
+                                addToEstimate({
+                                  procedure: proc,
+                                  facility: row.key,
+                                  ward: w,
+                                  cell,
+                                });
+                              }}
+                              onKeyDown={(e) => {
+                                if (
+                                  hasRate &&
+                                  !alreadyAdded &&
+                                  (e.key === "Enter" || e.key === " ")
+                                ) {
+                                  e.preventDefault();
+
+                                  addToEstimate({
+                                    procedure: proc,
+                                    facility: row.key,
+                                    ward: w,
+                                    cell,
+                                  });
+                                }
+                              }}
+                              className={`
+        group relative px-2 py-2 text-center bg-white
+        ${hasRate ? "cursor-pointer" : ""}
+        ${alreadyAdded ? "bg-green-50/40" : ""}
+      `}
+                            >
+                              <div
+                                className={`
+          text-[12px] md:text-base
+          ${alreadyAdded ? "text-green-700" : "text-gray-900"}
+        `}
+                              >
+                                {formatCell(cell)}
+                              </div>
+
+                              {/* Mobile: only show a tiny confirmation after adding */}
+                              {alreadyAdded && (
+                                <div className="mt-1 text-[10px] font-medium text-green-600 md:hidden">
+                                  ✓ Added
+                                </div>
+                              )}
+
+                              {/* Desktop: contextual action appears only on hover */}
+                              {hasRate && !alreadyAdded && (
+                                <div
+                                  className="
+      hidden md:block
+      mt-1
+      text-[11px] font-medium text-blue-600
+      opacity-0
+      group-hover:opacity-100
+      transition-opacity
+    "
+                                >
+                                  + Add to estimate
+                                </div>
+                              )}
+
+                              {/* Desktop added state */}
+                              {alreadyAdded && (
+                                <div
+                                  className="
+            hidden md:flex
+            absolute inset-0
+            items-center justify-center
+            rounded-md
+            bg-green-50/95
+            text-xs font-semibold text-green-700
+            opacity-0
+            group-hover:opacity-100
+            transition-opacity
+          "
+                                >
+                                  ✓ Added
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ))}
                   </div>
@@ -873,6 +1018,12 @@ const CghsRatesPublic = () => {
           </button>
         </div>
       )}
+
+      <CghsCostEstimate
+        items={estimateItems}
+        onRemove={removeFromEstimate}
+        onClear={clearEstimate}
+      />
 
       <PageFeedback pageSlug="/cghs-rates" />
 
