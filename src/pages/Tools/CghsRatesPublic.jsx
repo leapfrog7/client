@@ -48,16 +48,6 @@ function getRateCell(proc, tier, facility, ward) {
   return proc?.rates?.[tier]?.[facility]?.[ward] || null;
 }
 
-// Small debounce (no library)
-function useDebouncedValue(value, delayMs = 350) {
-  const [deb, setDeb] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDeb(value), delayMs);
-    return () => clearTimeout(t);
-  }, [value, delayMs]);
-  return deb;
-}
-
 const chipBase =
   "px-3 py-1.5 rounded-full text-sm border transition whitespace-nowrap";
 const chipOn = "bg-blue-600 text-white border-blue-600";
@@ -77,7 +67,7 @@ const CghsRatesPublic = () => {
 
   // filters
   const [q, setQ] = useState("");
-  const dq = useDebouncedValue(q, 350);
+  const [searchQuery, setSearchQuery] = useState("");
   const [guidelinesOpen, setGuidelinesOpen] = useState(false);
   const [tier, setTier] = useState("TIER_I"); // default Tier I
   // const [ward, setWard] = useState("PRIVATE"); // default Private
@@ -111,32 +101,51 @@ const CghsRatesPublic = () => {
     [total, limit],
   );
 
+  useEffect(() => {
+    setDetailsMap({});
+  }, [activeRateSet?._id]);
+
+  useEffect(() => {
+    const trimmed = q.trim();
+
+    // Empty or fewer than 3 characters:
+    // show the normal unfiltered list.
+    if (trimmed.length < 3) {
+      setSearchQuery("");
+      return;
+    }
+
+    // Only debounce actual searches of 3+ characters.
+    const timer = setTimeout(() => {
+      setSearchQuery(trimmed);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [q]);
+
   // reset paging when filters change
   useEffect(() => {
     setPage(1);
-  }, [dq, tier, selectedWards.join("|")]);
+  }, [searchQuery]);
 
   // fetch list
   useEffect(() => {
+    const controller = new AbortController();
+
     const run = async () => {
       try {
-        setLoading(page === 1 && !items.length);
         setLoadingRows(true);
 
-        // NOTE: your existing publicController uses page/limit style.
-        // But your earlier UI used skip/limit. We'll support both patterns safely:
-        // If your backend currently expects page/limit, it will ignore skip.
-        // If it expects skip/limit, it will ignore page.
         const res = await axios.get(`${API}/search`, {
           params: {
-            q: dq || "",
+            q: searchQuery,
             page,
             limit,
             skip,
           },
+          signal: controller.signal,
         });
 
-        // Try to read response in either format:
         const apiItems = res.data?.items || [];
         const apiTotal =
           typeof res.data?.total === "number"
@@ -148,59 +157,84 @@ const CghsRatesPublic = () => {
         setActiveRateSet(res.data?.activeRateSet || null);
         setItems(apiItems);
         setTotal(apiTotal);
-
-        // keep already fetched details for caching; just collapse all on new search/page
       } catch (e) {
-        console.error(e);
-        setItems([]);
-        setTotal(0);
+        if (e.code !== "ERR_CANCELED") {
+          console.error(e);
+          setItems([]);
+          setTotal(0);
+        }
       } finally {
-        setLoading(false);
-        setLoadingRows(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+          setLoadingRows(false);
+        }
       }
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [API, dq, page, limit, skip]);
+
+    return () => controller.abort();
+  }, [API, searchQuery, page, limit, skip]);
 
   // fetch details for visible items (so cards can show NABH + SS without expanding)
+  // Fetch details only for visible procedures that are not already cached
   useEffect(() => {
+    const controller = new AbortController();
+
     const run = async () => {
       if (!items.length) return;
 
-      // fetch only missing
       const missing = items
-        .map((x) => x.cghsCode)
+        .map((item) => item.cghsCode)
         .filter((code) => code && !detailsMap[code]);
 
-      if (missing.length === 0) return;
+      if (!missing.length) return;
 
       try {
         const results = await Promise.all(
           missing.map((code) =>
             axios
-              .get(`${API}/procedure/${code}`)
-              .then((r) => r.data)
-              .catch(() => null),
+              .get(`${API}/procedure/${code}`, {
+                signal: controller.signal,
+              })
+              .then((response) => response.data)
+              .catch((error) => {
+                if (error.code === "ERR_CANCELED") {
+                  return null;
+                }
+
+                console.error(`Failed to fetch procedure ${code}`, error);
+                return null;
+              }),
           ),
         );
 
+        if (controller.signal.aborted) return;
+
         setDetailsMap((prev) => {
           const next = { ...prev };
+
           results.forEach((doc) => {
-            if (doc?.cghsCode) next[doc.cghsCode] = doc;
+            if (doc?.cghsCode) {
+              next[doc.cghsCode] = doc;
+            }
           });
+
           return next;
         });
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        if (error.code !== "ERR_CANCELED") {
+          console.error(error);
+        }
       }
     };
 
     run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
+
+    return () => {
+      controller.abort();
+    }; // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, API]);
 
   const pageInfo = useMemo(() => {
     if (!total) return "0 results";
@@ -212,6 +246,20 @@ const CghsRatesPublic = () => {
   // const toggleExpanded = (code) => {
   //   setExpanded((p) => ({ ...p, [code]: !p[code] }));
   // };
+
+  const visibleWards = useMemo(() => {
+    const wards = ["PRIVATE"];
+
+    if (selectedWards.includes("SEMI_PRIVATE")) {
+      wards.push("SEMI_PRIVATE");
+    }
+
+    if (selectedWards.includes("GENERAL")) {
+      wards.push("GENERAL");
+    }
+
+    return wards;
+  }, [selectedWards]);
 
   if (loading) return <Loading />;
 
@@ -489,19 +537,19 @@ const CghsRatesPublic = () => {
 
       {/* Results */}
       <div className="mt-4 space-y-3">
-        {loadingRows ? (
-          <div className="py-8 text-center text-gray-500">Loading…</div>
-        ) : items.length === 0 ? (
+        {loadingRows && (
+          <div className="text-center text-xs text-blue-600 py-1">
+            Updating results…
+          </div>
+        )}
+
+        {items.length === 0 && !loadingRows ? (
           <div className="py-8 text-center text-gray-500">No results.</div>
         ) : (
           items.map((it) => {
             const proc = detailsMap[it.cghsCode];
 
             // Visible ward columns: Private always + optional selected
-            const visibleWards = ["PRIVATE"];
-            if (selectedWards.includes("SEMI_PRIVATE"))
-              visibleWards.push("SEMI_PRIVATE");
-            if (selectedWards.includes("GENERAL")) visibleWards.push("GENERAL");
 
             const get = (facility, ward) =>
               getRateCell(proc, tier, facility, ward);
@@ -586,7 +634,7 @@ const CghsRatesPublic = () => {
           <summary className="flex items-center justify-between cursor-pointer px-4 py-3 text-sm md:text-base font-semibold text-blue-800">
             <span>📍 CGHS Cities (Tier-wise)</span>
             <span className="text-gray-400 group-open:rotate-180 transition-transform">
-              ▼
+              ▲
             </span>
           </summary>
 
