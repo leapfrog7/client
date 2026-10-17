@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import AddCghsUnitForm from "./cghsComponents/AddCghsUnitForm";
 import CghsUnitList from "./cghsComponents/CghsUnitList";
 import EditCghsUnitModal from "./cghsComponents/EditCghsUnitModal";
@@ -10,7 +11,7 @@ const CghsUnitManagement = () => {
   const [editingUnit, setEditingUnit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const token = localStorage.getItem("jwtToken");
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/cghsUnitManagement";
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1/cghsUnitManagement");
   // const BASE_URL = "http://localhost:5000/api/v1/cghsUnitManagement";
 
   const [units, setUnits] = useState([]);

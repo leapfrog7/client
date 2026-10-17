@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "./util/serverConfig.js";
 // To add a new dashboard tile -
 /*Files to be changed- 
 
@@ -65,6 +66,7 @@ import EmailOtpReset from "./pages/EmailOtpReset";
 import CurrentAffairs from "./pages/currentAffairs/CurrentAffairs";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+const PibImport = lazy(() => import("./pages/Admin/pib/PibImport"));
 const UserManagement = lazy(() => import("./pages/Admin/UserManagement"));
 const MCQManagement = lazy(() => import("./pages/Admin/MCQ_Management"));
 const RevenueManagement = lazy(() => import("./pages/Admin/RevenueManagement"));
@@ -126,7 +128,7 @@ import PDFUtility from "./pages/Tools/PDFUtility";
 import TaskTrackerHome from "./pages/Tools/taskTracker/TaskTrackerHome";
 import ShareTaskView from "./pages/Tools/taskTracker/TaskShareView";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const DEFAULT_USER_STATS = {
@@ -608,6 +610,7 @@ const App = () => {
             />
 
             <Route path="/adminDashboard" element={<AdminDashboard />}>
+              <Route path="pib" element={<Suspense fallback={<div className="p-6">Loading...</div>}><PibImport /></Suspense>} />
               <Route
                 path="users"
                 element={

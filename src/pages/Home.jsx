@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -14,7 +15,7 @@ import QuickLinksCarousel from "../components/QuickLinksCarousel";
 import PrevYearCTA from "../pages/quiz/previousYear/PrevYearCTA";
 import MockTestPublicCTA from "../components/mocks/MockTestPublicCTA";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const authHeaders = () => {
@@ -208,6 +209,10 @@ const Home = ({
           <>
             <Section className="mt-3 sm:mt-4">
               <AccountActivationNotice />
+            </Section>
+
+            <Section>
+              <MockTestPublicCTA />
             </Section>
 
             <Section>

@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 // ResourceDetail.jsx — Infinite scroll with anchor compatibility and swipe view
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import { FaArrowLeft, FaRegImages, FaListUl } from "react-icons/fa";
 import SectionCardFull from "./SectionCard";
 import SwipeView from "./SwipeView"; // Re-integrated swipe view
 
-const BASE_URL = "https://server-v4dy.onrender.com";
+const BASE_URL = SERVER_ORIGIN;
 const itemsPerLoad = 10;
 
 const ResourceDetail = () => {

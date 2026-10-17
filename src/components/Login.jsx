@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import Input from "./Input";
 import Label from "./Label";
 import axios from "axios";
@@ -29,7 +30,7 @@ export default function Login({ verifyToken }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1");
   // const BASE_URL = "http://localhost:5000/api/v1";
 
   const canSubmit =

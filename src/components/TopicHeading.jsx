@@ -1,4 +1,6 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 // // // import PropTypes from "prop-types";
+import { QUIZ_SUBMITTED_EVENT } from "./quiz/quizEvents";
 
 // // // TopicHeading.propTypes = {
 // // //   topicName: PropTypes.string,
@@ -297,7 +299,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import PropTypes from "prop-types";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const topicNameMap = {
@@ -335,6 +337,7 @@ export default function TopicHeading({ topicName }) {
   const [error, setError] = useState("");
   const [loadingTopic, setLoadingTopic] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(false);
+  const [progressVersion, setProgressVersion] = useState(0);
 
   const mappedTopicName = useMemo(
     () => topicNameMap[topicName] || topicName,
@@ -433,19 +436,25 @@ export default function TopicHeading({ topicName }) {
         if (cancelled) return;
         console.error("Error fetching topic progress:", err);
         setError("Unable to fetch topic progress.");
-        setAttemptedQuestions(0);
-        setProgress(0);
       } finally {
         if (!cancelled) setLoadingProgress(false);
       }
     };
 
+    const onQuizSubmitted = (event) => {
+      if (event.detail?.userId === userId && event.detail?.topicId === topicId) {
+        setProgressVersion((version) => version + 1);
+      }
+    };
+
+    window.addEventListener(QUIZ_SUBMITTED_EVENT, onQuizSubmitted);
     fetchTopicProgress();
 
     return () => {
       cancelled = true;
+      window.removeEventListener(QUIZ_SUBMITTED_EVENT, onQuizSubmitted);
     };
-  }, [topicId]);
+  }, [topicId, progressVersion]);
 
   const getProgressColor = () => {
     if (progressValue < 30) return "bg-rose-400";
@@ -467,7 +476,18 @@ export default function TopicHeading({ topicName }) {
           aria-label="Loading topic details"
         />
       ) : error ? (
-        <p className="text-sm text-red-500 md:text-base">{error}</p>
+        <div className="text-sm text-red-500 md:text-base">
+          <p>{error}</p>
+          {topicId && (
+            <button
+              type="button"
+              className="mt-1 underline"
+              onClick={() => setProgressVersion((version) => version + 1)}
+            >
+              Retry progress
+            </button>
+          )}
+        </div>
       ) : (
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-5">
           <div className="flex items-center gap-2 text-sm md:text-base">

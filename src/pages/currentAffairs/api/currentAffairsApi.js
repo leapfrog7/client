@@ -1,6 +1,7 @@
+import { SERVER_ORIGIN } from "../../../util/serverConfig.js";
 import axios from "axios";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const authHeader = () => {

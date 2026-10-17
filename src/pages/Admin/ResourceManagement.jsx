@@ -1,9 +1,10 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const BASE_URL = "https://server-v4dy.onrender.com";
+const BASE_URL = SERVER_ORIGIN;
 // const BASE_URL = "http://localhost:5000";
 
 const ResourceManagement = () => {

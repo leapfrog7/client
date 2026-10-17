@@ -1,3 +1,5 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // import { useState, useEffect } from "react";
 // import { FiBarChart2 } from "react-icons/fi";
 // // import { FaCheckCircle } from "react-icons/fa";
@@ -167,7 +169,6 @@ const DashboardHeader = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
   // const BASE_URL = "http://localhost:5000/api/v1";
 
   useEffect(() => {

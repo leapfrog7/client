@@ -1,10 +1,11 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // src/pages/Admin/RevenueManagement.jsx
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1/");
 // const BASE_URL = "http://localhost:5000/api/v1/";
 
 export default function RevenueManagement() {

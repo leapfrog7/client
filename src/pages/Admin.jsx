@@ -1,3 +1,5 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { MdDelete } from "react-icons/md";
@@ -6,7 +8,6 @@ const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
   //   const BASE_URL = "http://localhost:5000/api/v1";
 
   useEffect(() => {

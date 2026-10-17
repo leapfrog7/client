@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { MdNavigateBefore, MdNavigateNext, MdCancel } from "react-icons/md";
@@ -57,7 +58,7 @@ const chipOff = "bg-white text-gray-700 border-gray-200 hover:bg-gray-50";
 
 const CghsRatesPublic = () => {
   // keep old link working (same component path unchanged)
-  const BASE_URL = "https://server-v4dy.onrender.com";
+  const BASE_URL = SERVER_ORIGIN;
   // const BASE_URL = "http://localhost:5000";
 
   // IMPORTANT: your app.js mounts public V2 here:

@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -22,7 +23,7 @@ export default function PageFeedback({ pageSlug }) {
 
   //   const [visible, setVisible] = useState(true);
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1"); //This is the Server Base URL
   //   const BASE_URL = "http://localhost:5000/api/v1";
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // src/pages/admin/IdeaManagement.jsx
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
@@ -12,7 +13,7 @@ import {
 import PropTypes from "prop-types";
 
 // ====== Config ======
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const STATUSES = [

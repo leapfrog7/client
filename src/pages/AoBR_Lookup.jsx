@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -9,7 +10,7 @@ const SearchWorkAllocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/"; //This is the Server Base URL
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1/"); //This is the Server Base URL
   //   const BASE_URL = "http://localhost:5000/api/v1/";
 
   // Debounced function to fetch results

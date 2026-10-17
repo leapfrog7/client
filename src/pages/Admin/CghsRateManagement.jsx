@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -14,7 +15,7 @@ const STATUS_BADGE = (status) => {
 
 const CghsRateManagementV2 = () => {
   // ===== Config =====
-  const BASE_URL = "https://server-v4dy.onrender.com";
+  const BASE_URL = SERVER_ORIGIN;
   // const BASE_URL = "http://localhost:5000";
   const token = localStorage.getItem("jwtToken");
 

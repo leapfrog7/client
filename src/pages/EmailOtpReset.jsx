@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useState } from "react";
 import axios from "axios";
 
@@ -10,7 +11,7 @@ const EmailOtpReset = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const BASE_URL = "https://server-v4dy.onrender.com";
+  const BASE_URL = SERVER_ORIGIN;
   //   const BASE_URL = "http://localhost:5000";
 
   const sendOtp = async () => {

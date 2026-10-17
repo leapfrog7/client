@@ -1,3 +1,5 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // // import { useState, useEffect } from "react";
 // // import axios from "axios";
 // // import PropTypes from "prop-types";
@@ -403,7 +405,6 @@ const BookmarkComponent = ({ userId, topicId, attemptedIds = [] }) => {
 
   const searchInputRef = useRef(null);
   const token = localStorage.getItem("jwtToken");
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
 
   const [confirm, setConfirm] = useState({ open: false, id: null });
 

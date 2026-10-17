@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
@@ -11,7 +12,7 @@ const reactions = [
   { label: "Challenging", emoji: "💡" },
 ];
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const QuestionFeedback = ({ questionId }) => {

@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaNewspaper } from "react-icons/fa";
@@ -7,7 +8,7 @@ import DashboardCard from "./DashboardCards";
 import DashboardHeader from "./DashBoardHeader";
 import MockTestPublicCTA from "./mocks/MockTestPublicCTA";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1";
 
 const Dashboard = ({ userStats, userId, onStatsUpdate }) => {

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { BASE_URL, TOKEN, uuid, isAxiosCanceled } from "./quizUtils";
 import { loadState, saveState } from "./quizStorage";
+import { QUIZ_SUBMITTED_EVENT } from "./quizEvents";
 
 export default function useQuizSession({ userId, topicName, topicId }) {
   const [quizData, setQuizData] = useState([]);
@@ -60,6 +61,8 @@ export default function useQuizSession({ userId, topicName, topicId }) {
   ]);
 
   const fetchUnattemptedQuestions = useCallback(async () => {
+    if (!userId || !topicId) return;
+
     const fetchId = ++fetchIdRef.current;
     setLoading(true);
     setError(null);
@@ -100,9 +103,10 @@ export default function useQuizSession({ userId, topicName, topicId }) {
     }
   }, [userId, topicName, topicId, showAllQuestions]);
 
-  const fetchBookmarks = useCallback(async () => {
+  const fetchBookmarks = useCallback(async (signal) => {
     try {
       const response = await axios.get(`${BASE_URL}/quiz/fetchAllBookmarks`, {
+        signal,
         params: { userId, topicId },
         headers: { Authorization: `Bearer ${TOKEN()}` },
       });
@@ -119,18 +123,21 @@ export default function useQuizSession({ userId, topicName, topicId }) {
         setBookmarkedQuestions([]);
       }
     } catch (err) {
+      if (isAxiosCanceled(err)) return;
       console.error("Failed to fetch bookmarks:", err);
     }
   }, [userId, topicId]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !topicId) return;
 
+    const bookmarksController = new AbortController();
     fetchUnattemptedQuestions();
-    fetchBookmarks();
+    fetchBookmarks(bookmarksController.signal);
 
     return () => {
       if (fetchAbortRef.current) fetchAbortRef.current.abort();
+      bookmarksController.abort();
     };
   }, [
     userId,
@@ -261,13 +268,16 @@ export default function useQuizSession({ userId, topicName, topicId }) {
       setFinalScore(data?.result?.correct ?? 0);
       submittedOnce.current = true;
       setIsSubmitted(true);
+      window.dispatchEvent(
+        new CustomEvent(QUIZ_SUBMITTED_EVENT, { detail: { userId, topicId } }),
+      );
     } catch (err) {
       console.error("Failed to submit quiz:", err);
       setError("Failed to submit quiz");
     } finally {
       setIsSubmitting(false);
     }
-  }, [quizData, selectedAnswers, topicName, userId]);
+  }, [quizData, selectedAnswers, topicName, userId, topicId]);
 
   const resetAndRefetch = useCallback(() => {
     setIsSubmitted(false);
@@ -295,6 +305,8 @@ export default function useQuizSession({ userId, topicName, topicId }) {
   }, []);
 
   useEffect(() => {
+    setIsSubmitted(false);
+    submittedOnce.current = false;
     setSelectedAnswers({});
     setFlagged(new Set());
     setCurrentQuestionIndex(0);

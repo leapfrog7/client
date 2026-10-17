@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,7 +11,7 @@ import {
 import { Helmet } from "react-helmet-async";
 import PageFeedback from "../components/PageFeedback";
 
-const BASE_URL = "https://server-v4dy.onrender.com";
+const BASE_URL = SERVER_ORIGIN;
 // const BASE_URL = "http://localhost:5000";
 
 const getIconForRule = (rule) => {

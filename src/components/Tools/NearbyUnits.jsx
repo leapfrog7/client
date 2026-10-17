@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // import { useState, useEffect } from "react";
 // import axios from "axios";
 // import PropTypes from "prop-types";
@@ -179,7 +180,7 @@ import CghsUnitTable from "./CghsUnitTable";
 import { RiMapPinRangeLine } from "react-icons/ri";
 import { MdNavigateBefore, MdNavigateNext, MdCancel } from "react-icons/md";
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1/public/cghsUnits");
 
 const NearbyUnits = ({ userLocation, error, onMoreOptions }) => {
   const [radiusKm, setRadiusKm] = useState(5000);

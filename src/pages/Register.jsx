@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import Input from "../components/Input";
 import Label from "../components/Label";
 import { useState } from "react";
@@ -47,7 +48,7 @@ export default function Register() {
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
     useState(false);
 
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 
   function handleNameChange(e) {
     setName(e.target.value);

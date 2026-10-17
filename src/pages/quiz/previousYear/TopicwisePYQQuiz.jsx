@@ -1,10 +1,11 @@
+import { SERVER_ORIGIN } from "../../../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 // import useAuthGuard from "../../../assets/useAuthGuard"
 
 // const BASE_URL = "http://localhost:5000/api/v1/";
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1/");
 const ALL_YEARS = ["2016-17", "2018", "2019-20", "2021-22", "2023", "2024"];
 
 const getAuthConfig = () => {

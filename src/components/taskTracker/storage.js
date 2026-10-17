@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // Phase 1: API-backed storage (MongoDB) using jwtToken
 // Endpoints (mounted in app.js):
 // GET    /api/v1/public/task-tracker
@@ -7,7 +8,7 @@
 // POST   /api/v1/public/task-tracker/:id/events
 // DELETE /api/v1/public/task-tracker/:id
 
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1");
 // const BASE_URL = "http://localhost:5000/api/v1"; // IMPORTANT: no trailing slash
 
 const TASK_API = `${BASE_URL.replace(/\/$/, "")}/public/task-tracker`;

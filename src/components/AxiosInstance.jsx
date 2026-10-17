@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
 // import axios from "axios";
 
 // // Create an instance of axios
@@ -27,7 +28,7 @@ import axios from "axios";
 
 // ✅ Use the API root, NOT a module path
 const AxiosInstance = axios.create({
-  baseURL: "https://server-v4dy.onrender.com/api/v1",
+  baseURL: (SERVER_ORIGIN + "/api/v1"),
   // baseURL: "http://localhost:5000/api/v1",
 });
 

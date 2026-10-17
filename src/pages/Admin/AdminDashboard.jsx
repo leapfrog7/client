@@ -17,6 +17,7 @@ import { VscFeedback } from "react-icons/vsc";
 
 // -------- Module registry (single source of truth) --------
 const MODULES = [
+  { to: "pib", title: "PIB Import", desc: "Collect and review monthly PIB headlines for current affairs.", Icon: FaBook, color: "text-teal-600" },
   {
     to: "users",
     title: "User Management",

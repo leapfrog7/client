@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import CghsUnitTable from "../../components/Tools/CghsUnitTable";
@@ -31,7 +32,7 @@ const validCities = [
 ];
 
 // const BASE_URL = "http://localhost:5000/api/v1/public/cghsUnits"; // Replace with your live URL
-const BASE_URL = "https://server-v4dy.onrender.com/api/v1/public/cghsUnits";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1/public/cghsUnits");
 
 function CitySelect({
   cityOptions,

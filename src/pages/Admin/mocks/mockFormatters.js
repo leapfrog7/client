@@ -1,33 +1,7 @@
-export function formatDateTime(value) {
-  if (!value) return "-";
+import { formatMockDateForInput, formatMockDateTime } from "../../../util/mockSchedule";
 
-  try {
-    return new Intl.DateTimeFormat("en-IN", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(value));
-  } catch {
-    return "-";
-  }
-}
-
-export function formatDateForInput(value) {
-  if (!value) return "";
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) return "";
-
-  const pad = (num) => String(num).padStart(2, "0");
-
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
+export const formatDateTime = formatMockDateTime;
+export const formatDateForInput = formatMockDateForInput;
 
 export function formatDuration(seconds) {
   const totalSeconds = Math.max(0, Number(seconds || 0));

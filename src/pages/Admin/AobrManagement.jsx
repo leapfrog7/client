@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaSave, FaPlus, FaTimes } from "react-icons/fa";
@@ -14,7 +15,7 @@ const MinistryWorkAllocation = () => {
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   const token = localStorage.getItem("jwtToken");
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/"; //This is the Server Base URL
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1/"); //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1/";
 
   useEffect(() => {

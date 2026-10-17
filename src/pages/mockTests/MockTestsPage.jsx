@@ -1,3 +1,4 @@
+import MockTestSchedule from "../../components/mocks/MockTestSchedule";
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
@@ -144,9 +145,11 @@ function MockTestsPage() {
           <div className="grid gap-3 border-t border-slate-100 bg-white px-4 py-4 sm:grid-cols-3 sm:px-6">
             <PatternItem label="Questions" value="40" />
             <PatternItem label="Duration" value="30 minutes" />
-            <PatternItem label="Marking" value="+1.25 / -1⁄3" />
+            <PatternItem label="Marking" value="+1.25 / -0.4167" />
           </div>
         </section>
+
+        <MockTestSchedule />
 
         {error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-4 text-sm font-medium leading-6 text-red-700 shadow-sm">

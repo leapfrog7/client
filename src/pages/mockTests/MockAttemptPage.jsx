@@ -42,6 +42,7 @@ function MockAttemptPage() {
   const lastAutoSavedPayloadRef = useRef("");
   const autoSaveInFlightRef = useRef(false);
   const latestAnswersRef = useRef([]);
+  const timerDeadlineRef = useRef(null);
 
   const [attempt, setAttempt] = useState(location.state?.attempt || null);
   const [mockTest, setMockTest] = useState(location.state?.mockTest || null);
@@ -151,7 +152,7 @@ function MockAttemptPage() {
         setAutoSubmitTriggered(true);
         autoSubmitTriggeredRef.current = true;
 
-        const finalizedStatus = response?.data?.status;
+        const finalizedStatus = response?.data?.attempt?.status || response?.data?.status;
 
         const resultAttemptId =
           response?.data?.attemptId ||
@@ -208,62 +209,60 @@ function MockAttemptPage() {
   }, [answers]);
 
   useEffect(() => {
-    const stateAttempt = location.state?.attempt;
-    const stateQuestions = Array.isArray(location.state?.questions)
-      ? location.state.questions
-      : [];
-
-    const stateMockTest = location.state?.mockTest || null;
-
-    if (stateAttempt && stateQuestions.length) {
-      setError("");
-      setAttempt(stateAttempt);
-      setQuestions(stateQuestions);
-      setMockTest(stateMockTest);
-
-      const existingAnswers = Array.isArray(stateAttempt.answers)
-        ? stateAttempt.answers
-        : [];
-
-      setAnswers(
-        stateQuestions.map((question) => {
-          const questionId = question._id || question.id;
-
-          const existing = existingAnswers.find(
-            (answer) => String(answer.questionId) === String(questionId),
-          );
-
-          return {
-            questionId,
-            selectedOptionIndex: hasSelectedOption(
-              existing?.selectedOptionIndex,
-            )
-              ? Number(existing.selectedOptionIndex)
-              : null,
-          };
-        }),
-      );
-
-      const initialRemainingSeconds = getInitialRemainingSeconds(
-        stateAttempt,
-        stateMockTest,
-      );
-
-      setRemainingSeconds(initialRemainingSeconds);
-      setTimerHydrated(true);
-      setAutoSubmitTriggered(false);
-      autoSubmitTriggeredRef.current = false;
-      submitInFlightRef.current = false;
-      setCurrentQuestionIndex(0);
-      setMobileNavigatorOpen(false);
+    let cancelled = false;
+    setLoading(true);
+    setTimerHydrated(false);
+    if (location.state?.username && location.state?.mobile) {
+      identityRef.current = { username: location.state.username, mobile: location.state.mobile };
+    }
+    if (!identityRef.current.username || !identityRef.current.mobile) {
+      setQuestions([]);
       setLoading(false);
       return;
     }
-
-    setLoading(false);
-    setTimerHydrated(false);
-    setError("");
-  }, [location.state]);
+    async function recoverSavedAttempt() {
+      try {
+        // Browser history state can survive refresh with outdated answers and timing.
+        const response = await resumeAttemptById(attemptId, identityRef.current);
+        if (cancelled) return;
+        const recovered = normalizeStartAttemptResponse(response);
+        const savedAttempt = recovered.attempt;
+        if (["submitted", "auto_submitted", "expired", "disqualified"].includes(savedAttempt?.status)) {
+          navigate("/mock-tests/result/" + (savedAttempt?._id || attemptId), {
+            replace: true, state: { ...identityRef.current, autoSubmitted: savedAttempt.status === "auto_submitted" },
+          });
+          return;
+        }
+        if (!savedAttempt || !recovered.questions.length) throw new Error("Saved attempt could not be recovered.");
+        setError("");
+        setAttempt(savedAttempt);
+        setQuestions(recovered.questions);
+        setMockTest(recovered.mockTest);
+        setAnswers(recovered.questions.map((question) => {
+          const questionId = question._id || question.id;
+          const saved = (savedAttempt.answers || []).find((answer) => String(answer.questionId) === String(questionId));
+          return { questionId, selectedOptionIndex: hasSelectedOption(saved?.selectedOptionIndex) ? Number(saved.selectedOptionIndex) : null };
+        }));
+        const remaining = getInitialRemainingSeconds(savedAttempt, recovered.mockTest);
+        timerDeadlineRef.current = Date.now() + remaining * 1000;
+        setRemainingSeconds(remaining);
+        setTimerHydrated(true);
+        setAutoSubmitTriggered(false);
+        autoSubmitTriggeredRef.current = false;
+        submitInFlightRef.current = false;
+        setCurrentQuestionIndex(0);
+        setMobileNavigatorOpen(false);
+      } catch (error) {
+        if (cancelled) return;
+        setQuestions([]);
+        setError(error.message || "Failed to recover saved attempt.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    recoverSavedAttempt();
+    return () => { cancelled = true; };
+  }, [attemptId, location.state, navigate]);
 
   useEffect(() => {
     const canAutoSave =
@@ -279,7 +278,7 @@ function MockAttemptPage() {
     }
 
     const intervalId = window.setInterval(async () => {
-      if (autoSaveInFlightRef.current) return;
+      if (autoSaveInFlightRef.current || timerDeadlineRef.current - Date.now() <= 5000) return;
 
       const payload = latestAnswersRef.current.map((answer) => ({
         questionId: answer.questionId,
@@ -297,13 +296,11 @@ function MockAttemptPage() {
       try {
         autoSaveInFlightRef.current = true;
 
-        console.log("Auto-save triggered:", payload);
 
         await saveAttemptAnswers(attemptId, payload);
 
         lastAutoSavedPayloadRef.current = payloadSignature;
 
-        console.log("Auto-save completed");
       } catch (err) {
         console.error("Auto-save failed:", err);
       } finally {
@@ -347,7 +344,7 @@ function MockAttemptPage() {
       setRemainingSeconds((prev) => {
         if (prev === null) return prev;
 
-        return Math.max(0, prev - 1);
+        return Math.max(0, Math.ceil((timerDeadlineRef.current - Date.now()) / 1000));
       });
     }, 1000);
 
@@ -481,6 +478,7 @@ function MockAttemptPage() {
         mockTest,
       );
 
+      timerDeadlineRef.current = Date.now() + initialRemainingSeconds * 1000;
       setRemainingSeconds(initialRemainingSeconds);
       setTimerHydrated(true);
       setAutoSubmitTriggered(false);
@@ -1443,35 +1441,14 @@ function validateRecoveryForm(form) {
 }
 
 function getInitialRemainingSeconds(attempt, mockTest) {
-  if (
-    attempt?.remainingSeconds !== undefined &&
-    attempt?.remainingSeconds !== null
-  ) {
-    return Math.max(0, Number(attempt.remainingSeconds));
-  }
-
-  const durationSeconds =
-    Number(attempt?.durationSeconds) ||
-    Number(mockTest?.durationMinutes) * 60 ||
-    Number(attempt?.durationMinutes) * 60 ||
-    30 * 60;
-
-  const usedSeconds = Number(attempt?.usedSeconds || 0);
-
-  if (!attempt?.startedAt) {
-    return Math.max(0, durationSeconds - usedSeconds);
-  }
-
-  const startedAtMs = new Date(attempt.startedAt).getTime();
-
-  if (Number.isNaN(startedAtMs)) {
-    return Math.max(0, durationSeconds - usedSeconds);
-  }
-
-  const elapsedSeconds = Math.floor((Date.now() - startedAtMs) / 1000);
-  const effectiveUsedSeconds = Math.max(usedSeconds, elapsedSeconds);
-
-  return Math.max(0, durationSeconds - effectiveUsedSeconds);
+  const windowEnd = new Date(mockTest?.endAt).getTime();
+  const windowRemaining = Number.isFinite(windowEnd)
+    ? Math.max(0, Math.floor((windowEnd - Date.now()) / 1000)) : Infinity;
+  const durationSeconds = Number(attempt?.durationSeconds) || Number(mockTest?.durationMinutes) * 60 || 1800;
+  const reported = attempt?.remainingSeconds;
+  const remaining = reported !== undefined && reported !== null
+    ? Math.max(0, Number(reported)) : Math.max(0, durationSeconds - Number(attempt?.usedSeconds || 0));
+  return Math.min(windowRemaining, remaining);
 }
 
 export default MockAttemptPage;

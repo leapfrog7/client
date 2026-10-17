@@ -162,15 +162,16 @@ import {
 
 const MOCK_TEST_SHARE_URL = "https://undersigned.in/mock-tests";
 
-const MOCK_TEST_START_TEXT = "31 July 2026, 6:00 PM onwards";
+import { MOCK_SERIES_START_TEXT as MOCK_TEST_START_TEXT } from "../../util/mockSchedule";
+import { Link } from "react-router-dom";
 
 const WHATSAPP_SHARE_TEXT =
   `LDCE 2026 mock tests on UnderSigned will commence from ${MOCK_TEST_START_TEXT}. ` +
-  "Timed practice with 40 questions, 30 minutes, score review, negative marking and leaderboard ranking will be available free for all.";
+  "Each test is open for 36 hours. Free timed practice: 40 questions, 30 minutes, score review, negative marking and leaderboard ranking. See the full schedule.";
 
 function MockTestPublicCTA({
   title = "Mock tests for the preparation of LDCE 2026",
-  description = "Timed LDCE SO/PS mock tests are being prepared to help you check speed, accuracy, and exam readiness closer to the actual exam.",
+  description = "LDCE SO/PS mock tests restart on 31 October for the December 2026 exam. Each test is open for 36 hours; see the full schedule.",
   compact = false,
 }) {
   return (
@@ -184,12 +185,12 @@ function MockTestPublicCTA({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[11px] font-black uppercase tracking-wide text-teal-700">
-                Upcoming Practice Support
+                LDCE 2026 Practice
               </p>
 
               <span className="inline-flex items-center gap-1 rounded-full border border-teal-100 bg-white px-2 py-0.5 text-[11px] font-black text-rose-700 shadow-sm animate-pulse">
                 <FaBell className="text-[10px] " />
-                Coming soon
+                October–December series
               </span>
             </div>
 
@@ -215,16 +216,17 @@ function MockTestPublicCTA({
                 Starts from
               </span>
 
-              <span className="font-black">31 July 2026, 6:00 PM onwards</span>
+              <span className="font-black">{MOCK_TEST_START_TEXT}</span>
 
-              <a
-                href={MOCK_TEST_SHARE_URL}
+              <Link
+                to="/mock-tests"
                 className="font-black text-teal-700 underline decoration-teal-300 underline-offset-4 hover:text-teal-900"
               >
-                View mock test page
-              </a>
+                View schedule and mock tests
+              </Link>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-600">
+              <FeaturePill label="36-hour test window" />
               <FeaturePill label="⏰ 30 min" />
               <FeaturePill label="🧠 40 questions" />
               <FeaturePill label="🎯 Score review" />

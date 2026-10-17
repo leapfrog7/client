@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -7,7 +8,7 @@ const USERS_PER_PAGE = 10;
 const MAX_PAGE_BUTTONS = 5;
 
 const UserManagement = () => {
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1/";
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1/");
   // const BASE_URL = "http://localhost:5000/api/v1/";
 
   const token = localStorage.getItem("jwtToken");

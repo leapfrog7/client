@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -5,7 +6,7 @@ import { toast } from "react-hot-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-const BASE_URL = "https://server-v4dy.onrender.com";
+const BASE_URL = SERVER_ORIGIN;
 // const BASE_URL = "http://localhost:5000";
 
 const SectionEditor = () => {

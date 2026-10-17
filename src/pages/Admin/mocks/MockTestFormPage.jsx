@@ -1,3 +1,4 @@
+import { MOCK_TEST_SCHEDULE, MOCK_TEST_WINDOW_MS, parseMockInput, getMockEndInput } from "../../../util/mockSchedule";
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -77,12 +78,24 @@ function MockTestFormPage() {
     setForm((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "startAt" ? { endAt: getMockEndInput(value) } : {}),
     }));
 
     setFieldErrors((prev) => ({
       ...prev,
       [name]: "",
     }));
+  }
+
+  function selectSchedule(value) {
+    const slot = MOCK_TEST_SCHEDULE.find((item) => item.startAt === value);
+    if (!slot) return;
+    setForm((prev) => ({ ...prev,
+      title: !prev.title || MOCK_TEST_SCHEDULE.some((item) => item.title === prev.title) ? slot.title : prev.title,
+      startAt: formatDateForInput(slot.startAt),
+      endAt: formatDateForInput(slot.endAt),
+    }));
+    setFieldErrors({});
   }
 
   function validateForm() {
@@ -105,8 +118,8 @@ function MockTestFormPage() {
     }
 
     if (form.startAt && form.endAt) {
-      const startDate = new Date(form.startAt);
-      const endDate = new Date(form.endAt);
+      const startDate = parseMockInput(form.startAt);
+      const endDate = parseMockInput(form.endAt);
 
       if (Number.isNaN(startDate.getTime())) {
         errors.startAt = "Start date/time is invalid.";
@@ -116,8 +129,8 @@ function MockTestFormPage() {
         errors.endAt = "End date/time is invalid.";
       }
 
-      if (!errors.startAt && !errors.endAt && endDate <= startDate) {
-        errors.endAt = "End date/time must be after start date/time.";
+      if (!errors.startAt && !errors.endAt && endDate - startDate !== MOCK_TEST_WINDOW_MS) {
+        errors.endAt = "Each mock test must remain open for exactly 36 hours. Select its start time again.";
       }
     }
 
@@ -148,8 +161,8 @@ function MockTestFormPage() {
       examName: form.examName.trim(),
       description: form.description.trim(),
       instructions: form.instructions.trim(),
-      startAt: new Date(form.startAt).toISOString(),
-      endAt: new Date(form.endAt).toISOString(),
+      startAt: parseMockInput(form.startAt).toISOString(),
+      endAt: parseMockInput(form.endAt).toISOString(),
       durationMinutes: Number(form.durationMinutes),
       totalQuestions: Number(form.totalQuestions),
       correctMarks: Number(form.correctMarks),
@@ -223,6 +236,20 @@ function MockTestFormPage() {
         onSubmit={handleSubmit}
         className="rounded-lg border bg-white p-5 shadow-sm"
       >
+        <div className="rounded-lg border border-teal-200 bg-teal-50 p-4">
+          <label htmlFor="mockSchedule" className="block text-sm font-semibold text-slate-800">
+            Use a scheduled test date (IST)
+          </label>
+          <select id="mockSchedule" className="mt-2 w-full rounded-md border p-2"
+            value={MOCK_TEST_SCHEDULE.find((slot) => formatDateForInput(slot.startAt) === form.startAt)?.startAt || ""}
+            onChange={(event) => selectSchedule(event.target.value)}>
+            <option value="">Choose a scheduled date or enter a start time below</option>
+            {MOCK_TEST_SCHEDULE.map((slot) => (
+              <option key={slot.startAt} value={slot.startAt}>{slot.title}: {slot.dateLabel}, 9:00 AM IST</option>
+            ))}
+          </select>
+          <p className="mt-2 text-sm text-slate-600">All times are IST. The closing time is automatically set to 36 hours after the start. Save as a draft, add questions, then publish when ready.</p>
+        </div>
         <div className="grid gap-5 lg:grid-cols-2">
           <TextField
             label="Mock Test Title"
@@ -244,7 +271,7 @@ function MockTestFormPage() {
           />
 
           <DateTimeField
-            label="Start Date/Time"
+            label="Start Date/Time (IST)"
             name="startAt"
             value={form.startAt}
             error={fieldErrors.startAt}
@@ -253,9 +280,10 @@ function MockTestFormPage() {
           />
 
           <DateTimeField
-            label="End Date/Time"
+            label="End Date/Time (IST, 36 hours later)"
             name="endAt"
             value={form.endAt}
+            readOnly
             error={fieldErrors.endAt}
             required
             onChange={updateField}
@@ -295,7 +323,7 @@ function MockTestFormPage() {
             value={form.negativeMarks}
             error={fieldErrors.negativeMarks}
             min={0}
-            step="0.0001"
+            step="any"
             onChange={updateField}
           />
 
@@ -429,6 +457,7 @@ function TextField({
 }
 
 function DateTimeField({
+  readOnly = false,
   label,
   name,
   value,
@@ -441,6 +470,7 @@ function DateTimeField({
       <input
         id={name}
         type="datetime-local"
+        readOnly={readOnly}
         value={value}
         onChange={(event) => onChange(name, event.target.value)}
         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -534,6 +564,7 @@ TextField.propTypes = {
 };
 
 DateTimeField.propTypes = {
+  readOnly: PropTypes.bool,
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,

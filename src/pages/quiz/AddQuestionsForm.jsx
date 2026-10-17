@@ -1,3 +1,4 @@
+import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useState } from "react";
 import axios from "axios";
 
@@ -11,7 +12,7 @@ const AddQuestionsForm = () => {
       explanation: "",
     },
   ]);
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
+  const BASE_URL = (SERVER_ORIGIN + "/api/v1"); //This is the Server Base URL
 
   const handleQuestionChange = (index, field, value) => {
     const newQuestions = [...questions];

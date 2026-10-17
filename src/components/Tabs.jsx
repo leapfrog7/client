@@ -1,8 +1,11 @@
+import { SERVER_ORIGIN } from "../util/serverConfig.js";
+const BASE_URL = (SERVER_ORIGIN + "/api/v1"); //This is the Server Base URL
 import { useState, useEffect } from "react";
 import QuizComponent from "./QuizComponent";
 import axios from "axios";
 import PropTypes from "prop-types";
 import BookmarksComponent from "./BookmarksComponent";
+import { QuizSkeleton } from "./quiz/QuizStateViews";
 
 const Tabs = ({ userId, topicName }) => {
   const [activeTab, setActiveTab] = useState("quiz");
@@ -10,7 +13,6 @@ const Tabs = ({ userId, topicName }) => {
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("jwtToken");
-  const BASE_URL = "https://server-v4dy.onrender.com/api/v1"; //This is the Server Base URL
   // const BASE_URL = "http://localhost:5000/api/v1";
 
   const handleTabClick = (tab) => {
@@ -18,8 +20,12 @@ const Tabs = ({ userId, topicName }) => {
   };
 
   useEffect(() => {
+    let cancelled = false;
+    setTopicId(null);
+    setError("");
+    if (!userId || !token) return;
+
     const fetchTopicId = async () => {
-      console.log(topicName);
       try {
         const response = await axios.get(`${BASE_URL}/quiz/getTopicId`, {
           params: { topicName },
@@ -27,18 +33,25 @@ const Tabs = ({ userId, topicName }) => {
             Authorization: `Bearer ${token}`,
           },
         });
+        if (cancelled) return;
+        if (!response.data?.topicId) {
+          setError("Topic not found or an error occurred");
+          return;
+        }
         setTopicId(response.data.topicId);
-        console.log("topic id", response.data.topicId);
         setError("");
       } catch (err) {
+        if (cancelled) return;
         console.error("Error fetching topic ID:", err);
         setError("Topic not found or an error occurred");
-        console.log(error);
         setTopicId(null);
       }
     };
     fetchTopicId();
-  }, [topicName, topicId, error]);
+    return () => {
+      cancelled = true;
+    };
+  }, [topicName, token, userId]);
 
   return (
     <div className="min-h-screen w-full md:w-4/5 bg-gradient-to-t from-slate-50 to-sky-50 mx-auto">
@@ -65,14 +78,17 @@ const Tabs = ({ userId, topicName }) => {
         </button>
       </div>
       <div>
-        {activeTab === "quiz" && (
+        {error ? (
+          <p role="alert" className="p-4 text-red-700">{error}</p>
+        ) : !topicId || !userId ? (
+          <QuizSkeleton />
+        ) : activeTab === "quiz" ? (
           <QuizComponent
             userId={userId}
             topicName={topicName}
             topicId={topicId}
           />
-        )}
-        {activeTab === "bookmarked" && (
+        ) : (
           <BookmarksComponent userId={userId} topicId={topicId} />
         )}
       </div>
