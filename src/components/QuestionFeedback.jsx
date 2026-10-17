@@ -1,3 +1,4 @@
+import { authFetch } from "../auth/session";
 import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
@@ -44,7 +45,7 @@ const QuestionFeedback = ({ questionId }) => {
       if (!userId || !questionId) return;
 
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${BASE_URL}/quiz/QuestionFeedback?userId=${userId}&questionId=${questionId}`,
           {
             method: "GET",
@@ -90,7 +91,7 @@ const QuestionFeedback = ({ questionId }) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/quiz/QuestionFeedback`, {
+      const response = await authFetch(`${BASE_URL}/quiz/QuestionFeedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +138,7 @@ const QuestionFeedback = ({ questionId }) => {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/quiz/QuestionFeedback`, {
+      const response = await authFetch(`${BASE_URL}/quiz/QuestionFeedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

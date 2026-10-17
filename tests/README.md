@@ -38,3 +38,5 @@ node --test tests/quiz-flow.test.cjs tests/mock-schedule.test.cjs
 
 The schedule suite covers guest/paid/unpaid banners, API-failure/mobile rendering and IST-correct Admin draft creation in a non-Indian browser timezone.
 Backend and integrated browser checks are in server/tests/mock-flow.test.cjs; see the workspace MOCK-TEST-RESTART.md for safe local-only database setup and commands.
+
+Authentication/trial regressions: tests/auth-session.test.cjs also runs against a local production vite preview via TEST_BASE_URL. Every API call is intercepted; synthetic credentials only. Covers expiry/relogin preserving quiz+URL, expired-page open,401/402/403, trial timer/payment activation, network failures and stale responses, cross-tab signout, autofill/safe redirects, free tools and cross-account draft isolation.

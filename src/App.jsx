@@ -1,3 +1,5 @@
+import { SESSION_CHANGED, currentToken, readSession } from "./auth/session";
+import TrialEnded from "./pages/TrialEnded";
 import { SERVER_ORIGIN } from "./util/serverConfig.js";
 // To add a new dashboard tile -
 /*Files to be changed- 
@@ -15,7 +17,7 @@ edit the file config -> topicConfig.js*/
 import "./App.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, useEffect, lazy, Suspense, useCallback } from "react";
+import { useState, useEffect, lazy, Suspense, useCallback, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
@@ -229,6 +231,9 @@ const App = () => {
   const [userStats, setUserStats] = useState(DEFAULT_USER_STATS);
   const [authReady, setAuthReady] = useState(false);
   const [userId, setUserId] = useState("");
+  const [access, setAccess] = useState({tier:"resolving"});
+  const accessRequest = useRef(null);
+  const lastAccess = useRef({token:null, time:0});
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((prev) => !prev);
@@ -241,6 +246,8 @@ const App = () => {
     setUserId("");
     setUserType("ordinary");
     setUserStats(DEFAULT_USER_STATS);
+    setAccess({tier:"guest"});
+    lastAccess.current = {token:null,time:0};
   }, []);
 
   const verifyClientToken = useCallback(() => {
@@ -257,12 +264,12 @@ const App = () => {
       const currentTime = Date.now() / 1000;
 
       if (!decodedToken?.exp || decodedToken.exp < currentTime) {
-        localStorage.removeItem("jwtToken");
         resetSessionState();
         setAuthReady(true);
         return false;
       }
 
+      if (lastAccess.current.token !== token) setAccess({tier:"resolving"});
       setIsLoggedIn(true);
       setUserId(decodedToken?.userId || "");
       setUsername(decodedToken?.name || "");
@@ -281,7 +288,36 @@ const App = () => {
 
   useEffect(() => {
     verifyClientToken();
+    window.addEventListener(SESSION_CHANGED, verifyClientToken);
+    return () => window.removeEventListener(SESSION_CHANGED, verifyClientToken);
   }, [verifyClientToken]);
+
+  const refreshAccess = useCallback(async (force = false) => {
+    const token = currentToken();
+    if (!readSession(token)) return null;
+    if (accessRequest.current?.token === token) return accessRequest.current.promise;
+    if (!force && lastAccess.current.token === token && Date.now() - lastAccess.current.time < 30000) return null;
+    const promise = axios.get(BASE_URL + "/auth/access", {headers:{Authorization:"Bearer " + token}})
+      .then(({data}) => {
+        if (currentToken() !== token) return null;
+        lastAccess.current = {token,time:Date.now()};
+        setAccess(data);
+        if (typeof data.paymentMade === "boolean") setIsPaymentMade(data.paymentMade);
+        if (data.userType) setUserType(data.userType);
+        return data;
+      }).catch(error => {
+        if (currentToken() === token && error.response?.status !== 401) {
+          setAccess(previous => previous.tier === "resolving" || previous.tier === "guest" ? {tier:"unknown"} : previous);
+        }
+        return null;
+      }).finally(() => {if(accessRequest.current?.token === token) accessRequest.current=null;});
+    accessRequest.current = {token,promise};
+    return promise;
+  }, []);
+  const onTrialEnded = useCallback(() => {
+    setIsPaymentMade(false);
+    setAccess(previous => ({...previous,tier:"trial_expired"}));
+  }, []);
 
   const fetchUserStats = useCallback(async () => {
     const token = localStorage.getItem("jwtToken");
@@ -294,24 +330,20 @@ const App = () => {
         },
       });
 
-      setUserStats(response.data || DEFAULT_USER_STATS);
+      if (currentToken() === token) setUserStats(response.data || DEFAULT_USER_STATS);
     } catch (err) {
       console.error("Failed to fetch user stats", err);
 
-      const status = err?.response?.status;
-      if (status === 401 || status === 403) {
-        localStorage.removeItem("jwtToken");
-        resetSessionState();
-      }
+      // The shared interceptor handles only failures belonging to the current session.
     }
-  }, [isLoggedIn, resetSessionState]);
+  }, [isLoggedIn]);
 
   const accessStatus =
     String(userType).toLowerCase() === "admin"
       ? "admin"
       : isPaymentMade
         ? "paid"
-        : "free";
+        : access.tier === "trial_active" ? "trial" : "free";
 
   if (!authReady) {
     return null;
@@ -353,7 +385,7 @@ const App = () => {
           verifyClientToken={verifyClientToken}
         />
 
-        <AuthExpiryHandler />
+        <AuthExpiryHandler access={access} refreshAccess={refreshAccess} onTrialEnded={onTrialEnded} verifySession={verifyClientToken} />
 
         <div className="flex-grow min-h-screen">
           <Routes>
@@ -363,6 +395,8 @@ const App = () => {
               path="/"
               element={
                 <Home
+                  access={access}
+                  refreshAccess={refreshAccess}
                   isLoggedIn={isLoggedIn}
                   username={username}
                   userId={userId}
@@ -391,6 +425,7 @@ const App = () => {
             <Route path="/pages/Unauthorized" element={<Unauthorized />} />
             <Route path="/pages/NotLoggedIn" element={<NotLoggedIn />} />
             <Route path="/pages/token-expired" element={<TokenExpired />} />
+            <Route path="/pages/trial-ended" element={<TrialEnded refreshAccess={refreshAccess} />} />
             <Route path="/pages/aobr/complete" element={<AoBR_Full />} />
             <Route path="/pages/aobr/lookup" element={<AoBR_Lookup />} />
             <Route path="/pages/quiz/SampleQuiz" element={<SampleQuiz />} />

@@ -1,10 +1,11 @@
+import { safeReturnUrl } from "../auth/session";
 import { Link, useLocation } from "react-router-dom";
 import { FaSignInAlt, FaHome } from "react-icons/fa";
 
 const TokenExpired = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const returnUrl = params.get("returnUrl") || "/";
+  const returnUrl = safeReturnUrl(params.get("returnUrl"));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-blue-50 flex items-center justify-center p-4">

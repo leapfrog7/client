@@ -1,3 +1,4 @@
+import { expireSession, handleAuthFailure } from "../../auth/session";
 import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // Phase 1: API-backed storage (MongoDB) using jwtToken
 // Endpoints (mounted in app.js):
@@ -48,7 +49,7 @@ function authHeaders() {
   if (!token) throw new Error("Missing auth token (jwtToken). Please login.");
 
   if (isTokenExpired()) {
-    localStorage.removeItem("jwtToken");
+    expireSession(token);
     throw new Error("Session expired. Please login again.");
   }
 
@@ -85,17 +86,7 @@ async function http(method, url, body) {
       (typeof data === "string" ? data : null) ||
       `Request failed: ${res.status} ${res.statusText}`;
 
-    const lower = String(msg).toLowerCase();
-
-    if (
-      res.status === 401 ||
-      lower.includes("auth") ||
-      lower.includes("token") ||
-      lower.includes("login") ||
-      lower.includes("expired")
-    ) {
-      localStorage.removeItem("jwtToken");
-    }
+    handleAuthFailure(res.status, data, url, headers.Authorization);
 
     throw new Error(msg);
   }

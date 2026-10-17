@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { BASE_URL, TOKEN, uuid, isAxiosCanceled } from "./quizUtils";
 import { loadState, saveState } from "./quizStorage";
+import { currentToken, readSession } from "../../auth/session";
 import { QUIZ_SUBMITTED_EVENT } from "./quizEvents";
 
 export default function useQuizSession({ userId, topicName, topicId }) {
@@ -14,7 +15,11 @@ export default function useQuizSession({ userId, topicName, topicId }) {
   const [loading, setLoading] = useState(true);
   const [loadingBM, setLoadingBM] = useState(false);
   const [error, setError] = useState(null);
-  const [showAllQuestions, setShowAllQuestions] = useState(false);
+  const draftKey = "quiz-login-draft:" + userId + ":" + topicId;
+  const loginDraft = useMemo(() => {try {return JSON.parse(localStorage.getItem(draftKey));} catch {return null;}}, [draftKey]);
+  const recoveredDraft = useRef(loginDraft);
+  const skipInitialReset = useRef(Boolean(loginDraft));
+  const [showAllQuestions, setShowAllQuestions] = useState(Boolean(loginDraft?.showAllQuestions));
   const [serverResult, setServerResult] = useState(null);
   const [serverComparison, setServerComparison] = useState(null);
   const [flagged, setFlagged] = useState(new Set());
@@ -26,7 +31,7 @@ export default function useQuizSession({ userId, topicName, topicId }) {
   const fetchIdRef = useRef(0);
 
   useEffect(() => {
-    const persisted = loadState(userId, topicId);
+    const persisted = recoveredDraft.current || loadState(userId, topicId);
     if (persisted) {
       setSelectedAnswers(persisted.selectedAnswers || {});
       setCurrentQuestionIndex(persisted.currentQuestionIndex || 0);
@@ -60,6 +65,20 @@ export default function useQuizSession({ userId, topicName, topicId }) {
     flagged,
   ]);
 
+  useEffect(() => {
+    function saveBeforeLogin() {
+      const user = readSession(currentToken());
+      // Expired JWTs no longer decode as a live session; the mounted user/topic still scope the draft.
+      if (!quizData.length || isSubmitted || !userId || (user && user.userId !== userId)) return;
+      try {
+        localStorage.setItem(draftKey, JSON.stringify({quizData, selectedAnswers, currentQuestionIndex,
+          showAllQuestions, flagged:[...flagged]}));
+      } catch { /* Unavailable browser storage must not block reauthentication. */ }
+    }
+    window.addEventListener("auth:expiring", saveBeforeLogin);
+    return () => window.removeEventListener("auth:expiring", saveBeforeLogin);
+  }, [quizData, isSubmitted, userId, draftKey, selectedAnswers, currentQuestionIndex, showAllQuestions, flagged]);
+
   const fetchUnattemptedQuestions = useCallback(async () => {
     if (!userId || !topicId) return;
 
@@ -84,7 +103,10 @@ export default function useQuizSession({ userId, topicName, topicId }) {
 
       if (fetchId !== fetchIdRef.current) return;
 
-      const data = response.data || [];
+      const draft = recoveredDraft.current;
+      const data = draft?.quizData?.length && draft.showAllQuestions === showAllQuestions ? draft.quizData : response.data || [];
+      recoveredDraft.current = null;
+      localStorage.removeItem(draftKey);
       setQuizData(data);
       setCurrentQuestionIndex((idx) => (data && idx >= data.length ? 0 : idx));
     } catch (err) {
@@ -92,8 +114,10 @@ export default function useQuizSession({ userId, topicName, topicId }) {
 
       console.error("Failed to fetch questions:", err);
       setError(
-        err?.response?.status === 401 || err?.response?.status === 403
+        err?.response?.status === 401
           ? "Session expired. Please sign in again."
+          : err?.response?.status === 403 ? "You do not have permission to access these questions."
+          : err?.response?.status === 402 ? "Your trial has ended. Activate your account to continue."
           : "Failed to fetch questions",
       );
     } finally {
@@ -101,7 +125,7 @@ export default function useQuizSession({ userId, topicName, topicId }) {
         setLoading(false);
       }
     }
-  }, [userId, topicName, topicId, showAllQuestions]);
+  }, [userId, topicName, topicId, showAllQuestions, draftKey]);
 
   const fetchBookmarks = useCallback(async (signal) => {
     try {
@@ -305,6 +329,7 @@ export default function useQuizSession({ userId, topicName, topicId }) {
   }, []);
 
   useEffect(() => {
+    if (skipInitialReset.current) {skipInitialReset.current = false; return;}
     setIsSubmitted(false);
     submittedOnce.current = false;
     setSelectedAnswers({});

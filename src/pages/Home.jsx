@@ -1,7 +1,6 @@
-import { SERVER_ORIGIN } from "../util/serverConfig.js";
+import TrialCountdown from "../components/TrialCountdown";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import PropTypes from "prop-types";
 import { Helmet } from "react-helmet-async";
 
@@ -14,14 +13,6 @@ import CTA from "../components/CTA";
 import QuickLinksCarousel from "../components/QuickLinksCarousel";
 import PrevYearCTA from "../pages/quiz/previousYear/PrevYearCTA";
 import MockTestPublicCTA from "../components/mocks/MockTestPublicCTA";
-
-const BASE_URL = (SERVER_ORIGIN + "/api/v1");
-// const BASE_URL = "http://localhost:5000/api/v1";
-
-const authHeaders = () => {
-  const token = localStorage.getItem("jwtToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
 const formatTrialDate = (value) => {
   if (!value) return "";
@@ -58,6 +49,8 @@ SoftStatusPanel.propTypes = {
 };
 
 const Home = ({
+  access,
+  refreshAccess,
   isLoggedIn,
   userId,
   isPaymentMade,
@@ -65,53 +58,23 @@ const Home = ({
   userStats,
   setUserStats,
 }) => {
-  const [isTrialActive, setIsTrialActive] = useState(false);
-  const [trialEndsAt, setTrialEndsAt] = useState(null);
-  const [accessResolved, setAccessResolved] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!isLoggedIn) {
-      setIsTrialActive(false);
-      setTrialEndsAt(null);
-      setAccessResolved(true);
-      return;
-    }
-
-    setAccessResolved(false);
-
-    axios
-      .get(`${BASE_URL}/auth/access`, { headers: authHeaders() })
-      .then(({ data }) => {
-        if (cancelled) return;
-
-        const active = data?.tier === "trial_active";
-        setIsTrialActive(active);
-        setTrialEndsAt(active ? data?.trialExpiresAt : null);
-        setAccessResolved(true);
-      })
-      .catch((error) => {
-        console.error("Failed to resolve access state:", error);
-        if (cancelled) return;
-
-        setIsTrialActive(false);
-        setTrialEndsAt(null);
-        setAccessResolved(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isLoggedIn]);
-
+  const [checkingActivation,setCheckingActivation] = useState(false);
+  const [activationMessage,setActivationMessage] = useState("");
+  async function checkActivation() {
+    setCheckingActivation(true); setActivationMessage("");
+    const result = await refreshAccess(true);
+    setCheckingActivation(false);
+    setActivationMessage(result ? "Activation is still pending. You can continue using the free tools below." : "Could not check activation. Please retry.");
+  }
+  const trialEndsAt = access.trialExpiresAt;
   const accessTier = useMemo(() => {
     if (!isLoggedIn) return "guest";
-    if (!accessResolved) return "resolving";
-    if (isPaymentMade) return "paid";
-    if (isTrialActive) return "trial";
-    return "unpaid";
-  }, [isLoggedIn, accessResolved, isPaymentMade, isTrialActive]);
+    if (access.tier === "resolving" || access.tier === "guest") return "resolving";
+    if (access.tier === "paid" || (isPaymentMade && access.tier !== "trial_expired")) return "paid";
+    if (access.tier === "trial_active") return "trial";
+    if (["trial_expired", "trial_not_started"].includes(access.tier)) return "unpaid";
+    return "unknown";
+  }, [isLoggedIn, isPaymentMade, access.tier]);
 
   useEffect(() => {
     if (accessTier === "paid" || accessTier === "trial") {
@@ -209,6 +172,10 @@ const Home = ({
           <>
             <Section className="mt-3 sm:mt-4">
               <AccountActivationNotice />
+              <div className="mx-auto mt-4 max-w-xl text-center">
+                <button className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50" disabled={checkingActivation} onClick={checkActivation}>{checkingActivation ? "Checking..." : "Check activation status"}</button>
+                {activationMessage && <p role="status" className="mt-2 text-sm">{activationMessage}</p>}
+              </div>
             </Section>
 
             <Section>
@@ -302,7 +269,7 @@ const Home = ({
                     </div>
 
                     <div className="mt-2 self-start rounded-full bg-white px-3 py-1 text-xs font-medium text-amber-800 ring-1 ring-amber-200 sm:mt-0">
-                      Trial access
+                      <TrialCountdown expiresAt={trialEndsAt} />
                     </div>
                   </div>
                 </div>
@@ -344,6 +311,8 @@ const Home = ({
 };
 
 Home.propTypes = {
+  access: PropTypes.object.isRequired,
+  refreshAccess: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool,
   userId: PropTypes.string,
   isPaymentMade: PropTypes.bool,

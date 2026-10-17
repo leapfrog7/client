@@ -1,3 +1,4 @@
+import { installAuthInterceptor } from "../auth/session";
 import { SERVER_ORIGIN } from "../util/serverConfig.js";
 // import axios from "axios";
 
@@ -44,40 +45,6 @@ AxiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ✅ Catch expired/invalid token responses centrally
-AxiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error?.response?.status;
-
-    if (status === 401) {
-      localStorage.removeItem("jwtToken");
-      window.dispatchEvent(
-        new CustomEvent("auth:expired", {
-          detail: {
-            status,
-            url: error?.config?.url,
-            method: error?.config?.method,
-          },
-        }),
-      );
-    }
-
-    if (status === 403) {
-      // keep token (they are logged in), just not allowed
-      window.dispatchEvent(
-        new CustomEvent("auth:forbidden", {
-          detail: {
-            status,
-            url: error?.config?.url,
-            method: error?.config?.method,
-          },
-        }),
-      );
-    }
-
-    return Promise.reject(error);
-  },
-);
+installAuthInterceptor(AxiosInstance);
 
 export default AxiosInstance;

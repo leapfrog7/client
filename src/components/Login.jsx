@@ -1,3 +1,4 @@
+import { safeReturnUrl, notifySessionChanged } from "../auth/session";
 import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import Input from "./Input";
 import Label from "./Label";
@@ -19,11 +20,7 @@ export default function Login({ verifyToken }) {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const returnUrl =
-    params.get("returnUrl") ||
-    location.state?.from ||
-    "/" ||
-    "/pages/tools/task-tracker"; // or "/"
+  const returnUrl = safeReturnUrl(params.get("returnUrl") || location.state?.from || "/");
   const [userInput, setUserInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
   const [msg, setMsg] = useState("");
@@ -57,13 +54,13 @@ export default function Login({ verifyToken }) {
         }),
       );
 
+      notifySessionChanged();
       verifyToken?.();
       navigate(returnUrl, { replace: true });
       // Clear only on success
       setUserInput("");
       setPasswordInput("");
     } catch (error) {
-      console.log(error);
       const serverMsg =
         error?.response?.data?.msg ||
         "Login failed. Please check your credentials and try again.";
@@ -144,7 +141,8 @@ export default function Login({ verifyToken }) {
                     onChange={handleUserInput}
                     value={userInput}
                     inputMode="numeric"
-                    autoComplete="tel"
+                    name="username"
+                    autoComplete="username"
                     aria-label="Mobile number"
                   />
                   <Label labelText="Mobile" />
@@ -157,6 +155,7 @@ export default function Login({ verifyToken }) {
                     type={showPassword ? "text" : "password"}
                     onChange={handlePasswordInput}
                     value={passwordInput}
+                    name="password"
                     autoComplete="current-password"
                     aria-label="Password"
                   />

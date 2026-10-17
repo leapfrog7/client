@@ -1,3 +1,4 @@
+import { authFetch } from "../../../auth/session";
 import { SERVER_ORIGIN } from "../../../util/serverConfig.js";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
@@ -80,7 +81,7 @@ const EditCghsUnitModal = ({ isOpen, onClose, unit, onUpdate }) => {
     setRefreshError("");
 
     try {
-      const res = await fetch(`${BASE_URL}/${unit._id}/fetchGoogleData`, {
+      const res = await authFetch(`${BASE_URL}/${unit._id}/fetchGoogleData`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

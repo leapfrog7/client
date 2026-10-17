@@ -1,3 +1,4 @@
+import { notifySessionChanged } from "../auth/session";
 import { useNavigate } from "react-router-dom";
 import { PiSignOutLight } from "react-icons/pi";
 import { jwtDecode } from "jwt-decode";
@@ -19,6 +20,7 @@ const SignOutButton = ({ verifyToken }) => {
 
   const handleSignOut = () => {
     localStorage.removeItem("jwtToken");
+    notifySessionChanged();
     verifyToken?.();
     navigate("/", { replace: true });
   };
