@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
+import usePYQExport from "./hooks/usePYQExport";
 import { FiAward, FiTarget, FiClock, FiPieChart } from "react-icons/fi";
 import {
   FaHome,
@@ -12,7 +13,7 @@ const FULL_DURATION = 2 * 60 * 60;
 const PAGE_SIZE = 12;
 
 const formatTime = (sec) => {
-  const s = Math.max(0, Number(sec ?? 0));
+  const s = Math.floor(Math.max(0, Number(sec ?? 0)));
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
   const r = s % 60;
@@ -75,6 +76,8 @@ export default function Results({
   remainingTime,
   onGoHome,
   onRetake,
+  resultKind = "paper", exportPath, contextCaption = "",
+  assistedCount = 0, usedSeconds, durationSeconds = FULL_DURATION, onRetryWrong, onRetryUnanswered,
 }) {
   const safeQuestions = useMemo(
     () => (Array.isArray(questions) ? questions : EMPTY),
@@ -92,8 +95,8 @@ export default function Results({
   );
 
   const timeTaken = useMemo(
-    () => Math.max(0, FULL_DURATION - frozenRemaining),
-    [frozenRemaining],
+    () => usedSeconds === null ? null : usedSeconds !== undefined ? usedSeconds : Math.max(0, durationSeconds - frozenRemaining),
+    [usedSeconds, durationSeconds, frozenRemaining],
   );
 
   const qById = useMemo(
@@ -146,6 +149,18 @@ export default function Results({
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false), [downloadError, setDownloadError] = useState("");
+  const exportAccess = usePYQExport(exportPath), exportBusy = useRef(false);
+  const downloadPDF = async () => {
+    if (exportBusy.current) return; exportBusy.current = true; setIsDownloading(true); setDownloadError("");
+    try {
+      const saved = await exportAccess.authorize();
+      const { downloadAttemptPDF } = await import("./utils/attemptPDF");
+      await downloadAttemptPDF({ questions: saved.questions, evaluatedResponses: saved.result.evaluatedResponses, score: saved.result.score,
+        caption: [saved.paperType, saved.topic || "Full paper", saved.years.join(", ")].join(" · "), submittedAt: saved.submittedAt, attemptId: saved._id, assistedCount: saved.revealed.length });
+    } catch (error) { setDownloadError(error?.response?.data?.message || error.message || "PDF could not be prepared. Please retry."); }
+    finally { exportBusy.current = false; setIsDownloading(false); }
+  };
 
   const filtered = useMemo(() => {
     switch (filter) {
@@ -188,15 +203,15 @@ export default function Results({
   };
 
   const handleDownloadPDF = async () => {
-    setIsPrinting(true);
-
-    setTimeout(() => {
+    if (exportBusy.current) return; exportBusy.current = true; setIsDownloading(true); setDownloadError("");
+    try {
+      await exportAccess.authorize();
+      setIsPrinting(true);
+      await new Promise(resolve => setTimeout(resolve, 250));
       window.print();
-
-      setTimeout(() => {
-        setIsPrinting(false);
-      }, 300);
-    }, 250);
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) { setDownloadError(error?.response?.data?.message || error.message || "Printing could not be prepared. Please retry."); }
+    finally { setIsPrinting(false); setIsDownloading(false); exportBusy.current = false; }
   };
 
   return (
@@ -208,7 +223,7 @@ export default function Results({
             Quiz Results
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Review your performance and revisit weak areas.
+            Review your performance and revisit weak areas. Answered {attempted}/{safeQuestions.length} · Coverage {safeQuestions.length ? Math.round(attempted / safeQuestions.length * 100) : 0}%.
           </p>
         </div>
 
@@ -221,14 +236,18 @@ export default function Results({
             See All PYQs
           </button>
 
+          {resultKind === "paper" && exportAccess.canExport && (<>
           <button
             className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-black"
+            disabled={isDownloading || isPrinting}
             onClick={handleDownloadPDF}
           >
             <FaFilePdf className="text-sm" />
             Save/Print Results
           </button>
 
+          </>)}
+          {resultKind === "topic" && exportAccess.canExport && <button disabled={isDownloading} className="rounded-xl bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-50" onClick={downloadPDF}>{isDownloading ? "Preparing PDF..." : "Download attempt PDF"}</button>}
           {typeof onRetake === "function" && (
             <button
               className="hidden rounded-xl bg-pink-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-pink-700"
@@ -240,6 +259,13 @@ export default function Results({
         </div>
       </div>
 
+      {contextCaption && <p className="mb-3 text-sm font-semibold">{contextCaption}</p>}
+      {assistedCount > 0 && <p className="mb-3 text-sm text-amber-800">Practice with answers revealed: {assistedCount} questions. Treat this as assisted practice.</p>}
+      {resultKind === "topic" && exportAccess.canExport && <p className="mb-3 text-sm text-slate-600">Download all questions, your answers and correct answers here or when reopening this saved result.</p>}
+      {exportAccess.denied && <p className="mb-3 text-sm text-slate-600">PDF download and printing are available to paid members. You can continue reviewing your result online.</p>}
+      {exportAccess.accessError && <p role="alert" className="mb-3 text-red-700">{exportAccess.accessError} <button className="underline" onClick={exportAccess.refresh}>Retry download access</button></p>}
+      {downloadError && <p role="alert" className="mb-3 text-red-700">{downloadError}</p>}
+      <div className="mb-4 flex flex-wrap gap-3">{onRetryWrong && <button className="rounded border px-3 py-2 text-sm" onClick={onRetryWrong}>Retry wrong questions</button>}{onRetryUnanswered && <button className="rounded border px-3 py-2 text-sm" onClick={onRetryUnanswered}>Practice unanswered questions</button>}</div>
       {/* Summary hero */}
       <div className="mb-5 rounded-2xl border border-slate-200 bg-gradient-to-tl from-yellow-50 via-white to-rose-50 p-4 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -294,8 +320,8 @@ export default function Results({
         <StatCard
           icon={<FiClock />}
           title="Time Taken"
-          value={formatTime(timeTaken)}
-          subtitle={`${Math.round((timeTaken / FULL_DURATION) * 100)}% of allotted`}
+          value={timeTaken === null ? "Unavailable for this older result" : formatTime(timeTaken)}
+          subtitle={durationSeconds && timeTaken !== null ? `${Math.round((timeTaken / durationSeconds) * 100)}% of allotted` : "Practice time"}
         />
 
         <StatCard
@@ -521,6 +547,9 @@ export default function Results({
 }
 
 Results.propTypes = {
+  resultKind: PropTypes.string, exportPath: PropTypes.string, contextCaption: PropTypes.string,
+  submittedAt: PropTypes.string, attemptId: PropTypes.string, assistedCount: PropTypes.number,
+  usedSeconds: PropTypes.number, durationSeconds: PropTypes.number, onRetryWrong: PropTypes.func, onRetryUnanswered: PropTypes.func,
   questions: PropTypes.arrayOf(
     PropTypes.shape({
       _id: PropTypes.oneOfType([

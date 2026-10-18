@@ -82,7 +82,7 @@ function MockInfoCard({ mockTest }) {
           <BooleanInfoItem
             icon={<FaRedo />}
             label="Resume allowed"
-            value={Boolean(mockTest.allowResume)}
+            value={true}
           />
 
           {/* <BooleanInfoItem

@@ -42,7 +42,7 @@ export default function Login({ verifyToken }) {
       const response = await axios.post(`${BASE_URL}/login`, {
         mobile: userInput.trim(),
         password: passwordInput,
-      });
+      }, { timeout: 20000 });
 
       localStorage.setItem("jwtToken", response.data.token);
 
@@ -62,7 +62,7 @@ export default function Login({ verifyToken }) {
       setPasswordInput("");
     } catch (error) {
       const serverMsg =
-        error?.response?.data?.msg ||
+        error?.response?.data?.msg || error?.response?.data?.message ||
         "Login failed. Please check your credentials and try again.";
       setMsg(serverMsg);
     } finally {

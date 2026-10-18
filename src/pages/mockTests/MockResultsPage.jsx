@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
-  FaArrowLeft,
   FaBullhorn,
   FaCheckCircle,
   FaClock,
   FaCopy,
   FaExternalLinkAlt,
   FaMedal,
-  FaSearch,
   FaShareAlt,
   FaTimesCircle,
   FaTrophy,
@@ -19,6 +17,7 @@ import {
 import AttemptStatusBadge from "../../components/mocks/AttemptStatusBadge";
 import LoadingState from "../../components/mocks/LoadingState";
 
+import MockParticipantAccess from "./MockParticipantAccess";
 import { getAttemptResult } from "./mockPublicApi";
 
 import {
@@ -28,9 +27,9 @@ import {
   formatScore,
 } from "../Admin/mocks/mockFormatters";
 
-const REGISTER_URL = "http://undersigned.in/register";
-const SUBSCRIBE_URL = "http://undersigned.in/subscribe";
-const MOCK_TESTS_URL = "http://undersigned.in/mock-tests";
+const REGISTER_URL = "https://undersigned.in/register";
+const SUBSCRIBE_URL = "https://undersigned.in/subscribe";
+const MOCK_TESTS_URL = "https://undersigned.in/mock-tests";
 
 function isUserLoggedIn() {
   try {
@@ -42,239 +41,45 @@ function isUserLoggedIn() {
 
 function MockResultPage() {
   const { attemptId } = useParams();
-  const location = useLocation();
   const [isLoggedIn] = useState(() => isUserLoggedIn());
-
-  const [identity, setIdentity] = useState({
-    username: location.state?.username || "",
-    mobile: location.state?.mobile || "",
-  });
-
-  const [result, setResult] = useState(null);
-  const [formVisible, setFormVisible] = useState(
-    !location.state?.username || !location.state?.mobile,
-  );
-
-  const [loading, setLoading] = useState(Boolean(location.state?.username));
-  const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState({});
-
-  async function loadResult(payload) {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await getAttemptResult(attemptId, payload);
-
-      setResult(response?.data || null);
-      setFormVisible(false);
-    } catch (err) {
-      setError(err.message || "Failed to load result.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
+  const [session, setSession] = useState(null), [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false), [error, setError] = useState("");
   useEffect(() => {
-    if (location.state?.username && location.state?.mobile) {
-      loadResult({
-        username: location.state.username,
-        mobile: location.state.mobile,
-      });
+    let cancelled = false, timer;
+    setResult(null); setError("");
+    if (!session) return;
+    async function load() {
+      setLoading(true);
+      try {
+        const response = await getAttemptResult(attemptId);
+        if (!cancelled) {
+          setResult(response.data); setError("");
+          if (response.data.submissionPending) timer = setTimeout(load, 1500);
+        }
+      } catch (err) { if (!cancelled) setError(err.message); }
+      finally { if (!cancelled) setLoading(false); }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attemptId]);
-
-  function updateField(name, value) {
-    setIdentity((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setFieldErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
-  }
-
-  function validateForm() {
-    const errors = {};
-
-    const username = identity.username.trim();
-    const mobile = identity.mobile.trim();
-
-    if (!username) {
-      errors.username = "Name is required.";
-    } else if (username.length < 2) {
-      errors.username = "Name must be at least 2 characters.";
-    }
-
-    if (!mobile) {
-      errors.mobile = "Mobile number is required.";
-    } else if (!/^[6-9]\d{9}$/.test(mobile)) {
-      errors.mobile = "Enter a valid 10-digit Indian mobile number.";
-    }
-
-    setFieldErrors(errors);
-
-    return Object.keys(errors).length === 0;
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-
-    if (!validateForm()) return;
-
-    loadResult({
-      username: identity.username.trim(),
-      mobile: identity.mobile.trim(),
-    });
-  }
-
-  return (
-    <main className="min-h-screen bg-slate-50 px-3 py-5 sm:px-4 sm:py-8">
-      <div className="mx-auto max-w-6xl space-y-5">
-        <div className="flex items-center justify-between gap-3">
-          <Link
-            to="/mock-tests"
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 sm:px-4 sm:text-sm"
-          >
-            <FaArrowLeft />
-            Back
-            <span className="hidden sm:inline">to Mock Tests</span>
-          </Link>
-
-          {result?.mockTest?._id ? (
-            <Link
-              to={`/mock-tests/${result.mockTest._id}/leaderboard`}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-slate-800 sm:px-4 sm:text-sm"
-            >
-              <FaTrophy />
-              Leaderboard
-            </Link>
-          ) : null}
-        </div>
-
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="bg-slate-900 px-4 py-6 text-white sm:px-6">
-            <p className="text-xs font-black uppercase tracking-wide text-teal-200">
-              Mock Test Result
-            </p>
-
-            <h1 className="mt-2 text-2xl font-black sm:text-3xl">
-              Your attempt summary
-            </h1>
-
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200">
-              Score is calculated on the basis of +1.25 for every correct answer
-              and one-third negative marking for every wrong answer.
-            </p>
-          </div>
-        </section>
-
-        {formVisible ? (
-          <ResultLookupForm
-            identity={identity}
-            fieldErrors={fieldErrors}
-            loading={loading}
-            onChange={updateField}
-            onSubmit={handleSubmit}
-          />
-        ) : null}
-
-        {error ? (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold leading-6 text-red-700 shadow-sm">
-            {error}
-          </div>
-        ) : null}
-
-        {loading ? <LoadingState message="Loading result..." /> : null}
-
-        {!loading && result ? (
-          <>
-            <ResultSummary result={result} />
-
-            <ResultEngagementNudge isLoggedIn={isLoggedIn} />
-
-            {Array.isArray(result.review) && result.review.length ? (
-              <AnswerReviewSection review={result.review} />
-            ) : null}
-          </>
-        ) : null}
-      </div>
-    </main>
-  );
-}
-
-function ResultLookupForm({
-  identity,
-  fieldErrors,
-  loading,
-  onChange,
-  onSubmit,
-}) {
-  return (
-    <form
-      onSubmit={onSubmit}
-      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-    >
-      <div className="flex items-start gap-3">
-        <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 sm:flex">
-          <FaSearch />
-        </div>
-
-        <div>
-          <p className="text-base font-black text-slate-950">
-            Verify participant details
-          </p>
-          <p className="mt-1 text-sm leading-6 text-slate-500">
-            Enter the same name and mobile number used for the attempt.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-start">
-        <TextField
-          label="Name"
-          name="username"
-          value={identity.username}
-          error={fieldErrors.username}
-          placeholder="Enter your name"
-          maxLength={16}
-          onChange={(name, value) =>
-            onChange(
-              name,
-              String(value || "")
-                .replace(/[^a-zA-Z0-9 ]/g, "")
-                .replace(/\s+/g, " ")
-                .slice(0, 16),
-            )
-          }
-        />
-
-        <TextField
-          label="Mobile Number"
-          name="mobile"
-          value={identity.mobile}
-          error={fieldErrors.mobile}
-          placeholder="10-digit mobile number"
-          inputMode="numeric"
-          maxLength={10}
-          onChange={(name, value) =>
-            onChange(name, value.replace(/\D/g, "").slice(0, 10))
-          }
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex h-12 items-center justify-center rounded-xl bg-teal-700 px-5 text-sm font-black text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60 md:mt-6"
-        >
-          {loading ? "Loading..." : "View Result"}
-        </button>
-      </div>
-    </form>
-  );
+    load();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [attemptId, session]);
+  return <main className="min-h-screen bg-slate-50 p-4"><div className="mx-auto max-w-6xl space-y-5">
+    <Link to="/mock-tests" className="underline">Back to Mock Tests</Link>
+    <h1 className="text-2xl font-black">Your attempt summary</h1>
+    <MockParticipantAccess onReady={setSession} />
+    {error ? <p role="alert" className="text-red-700">{error}</p> : null}
+    {loading && !result ? <LoadingState message="Loading result..." /> : null}
+    {result && !result.isFinal ? <div className="rounded-xl border bg-white p-4">
+      <p>{result.submissionPending ? "The deadline has passed. Final submission is being processed; please wait for confirmation." : "Your attempt is still in progress."}</p>
+      {!result.submissionPending ? <Link className="underline" to={"/mock-tests/attempt/" + attemptId}>Resume attempt</Link> : null}
+    </div> : null}
+    {result?.isFinal ? <>
+      <p role="status" className="rounded-lg bg-teal-50 p-3 text-teal-900">Submission confirmed · Receipt {result.attemptId}</p>
+      {result.scoreAvailable === false ? <p className="rounded-lg bg-amber-50 p-3">Your score will be available after the test window closes.</p> : null}
+      <ResultSummary result={result} />
+      <ResultEngagementNudge isLoggedIn={isLoggedIn} />
+      {result.review?.length ? <AnswerReviewSection review={result.review} /> : null}
+    </> : null}
+  </div></main>;
 }
 
 function ResultSummary({ result }) {
@@ -309,7 +114,7 @@ function ResultSummary({ result }) {
               </p>
 
               <p className="mt-2 text-sm font-bold text-slate-800">
-                {attempt.username || result.username || "Participant"}
+                {attempt.usernameSnapshot || attempt.username || result.username || "Participant"}
               </p>
             </div>
 
@@ -327,19 +132,19 @@ function ResultSummary({ result }) {
                   </p>
 
                   <p className="mt-2 text-4xl font-black leading-none tracking-tight sm:text-5xl">
-                    {formatScore(attempt.score)}
+                    {attempt.scoreAvailable === false ? "Pending" : formatScore(attempt.score)}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 sm:min-w-[230px]">
                   <ScoreChip
                     label="Correct"
-                    value={attempt.correctCount || 0}
+                    value={attempt.scoreAvailable === false ? "—" : attempt.correctCount || 0}
                   />
-                  <ScoreChip label="Wrong" value={attempt.wrongCount || 0} />
+                  <ScoreChip label="Wrong" value={attempt.scoreAvailable === false ? "—" : attempt.wrongCount || 0} />
                   <ScoreChip
                     label="Left"
-                    value={attempt.unattemptedCount || 0}
+                    value={attempt.scoreAvailable === false ? "—" : attempt.unattemptedCount || 0}
                   />
                 </div>
               </div>
@@ -403,7 +208,7 @@ function ResultSummary({ result }) {
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               label="Accuracy"
-              value={formatAccuracy(attempt.accuracy)}
+              value={attempt.scoreAvailable === false ? "Pending" : formatAccuracy(attempt.accuracy)}
             />
             <MetricCard
               label="Used Time"
@@ -423,17 +228,17 @@ function ResultSummary({ result }) {
           {/* <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <MiniResultCard
               label="Correct"
-              value={attempt.correctCount || 0}
+              value={attempt.scoreAvailable === false ? "—" : attempt.correctCount || 0}
               tone="success"
             />
             <MiniResultCard
               label="Wrong"
-              value={attempt.wrongCount || 0}
+              value={attempt.scoreAvailable === false ? "—" : attempt.wrongCount || 0}
               tone="danger"
             />
             <MiniResultCard
               label="Unattempted"
-              value={attempt.unattemptedCount || 0}
+              value={attempt.scoreAvailable === false ? "—" : attempt.unattemptedCount || 0}
               tone="neutral"
             />
           </div> */}
@@ -759,53 +564,6 @@ function StatusChip({ label, tone }) {
   );
 }
 
-function TextField({
-  label,
-  name,
-  value,
-  error,
-  placeholder = "",
-  inputMode = "text",
-  maxLength,
-  onChange,
-}) {
-  return (
-    <div>
-      <div className="mb-1 flex items-center justify-between gap-3">
-        <label htmlFor={name} className="text-sm font-bold text-slate-700">
-          {label}
-        </label>
-
-        {maxLength ? (
-          <span className="text-xs font-semibold text-slate-400">
-            {String(value || "").length}/{maxLength}
-          </span>
-        ) : null}
-      </div>
-
-      <input
-        id={name}
-        type="text"
-        value={value}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        maxLength={maxLength}
-        onChange={(event) => onChange(name, event.target.value)}
-        className={[
-          "w-full rounded-xl border bg-white px-3 py-3 text-sm font-semibold text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2",
-          error
-            ? "border-red-300 focus:border-red-400 focus:ring-red-100"
-            : "border-slate-300 focus:border-teal-500 focus:ring-teal-100",
-        ].join(" ")}
-      />
-
-      {error ? (
-        <p className="mt-1.5 text-xs font-semibold text-red-600">{error}</p>
-      ) : null}
-    </div>
-  );
-}
-
 function ScoreChip({ label, value }) {
   return (
     <div className="rounded-xl bg-white/10 px-3 py-2 text-center ring-1 ring-white/10">
@@ -826,19 +584,6 @@ ResultEngagementNudge.propTypes = {
   isLoggedIn: PropTypes.bool.isRequired,
 };
 
-ResultLookupForm.propTypes = {
-  identity: PropTypes.shape({
-    username: PropTypes.string.isRequired,
-    mobile: PropTypes.string.isRequired,
-  }).isRequired,
-  fieldErrors: PropTypes.shape({
-    username: PropTypes.string,
-    mobile: PropTypes.string,
-  }).isRequired,
-  loading: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-};
 
 ResultSummary.propTypes = {
   result: PropTypes.shape({
@@ -900,15 +645,5 @@ StatusChip.propTypes = {
   tone: PropTypes.oneOf(["success", "danger", "neutral"]).isRequired,
 };
 
-TextField.propTypes = {
-  label: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  error: PropTypes.string,
-  placeholder: PropTypes.string,
-  inputMode: PropTypes.string,
-  maxLength: PropTypes.number,
-  onChange: PropTypes.func.isRequired,
-};
 
 export default MockResultPage;

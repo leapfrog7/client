@@ -1,158 +1,30 @@
-import AxiosInstance from "../../components/PublicAxiosInstance";
-
-const TEST_BASE = "/mocks/tests";
-const ATTEMPT_BASE = "/mocks/attempts";
-
-function getErrorMessage(error, fallback = "Something went wrong.") {
-  return (
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    error?.message ||
-    fallback
-  );
-}
-
-function buildPublicApiError(error, fallback = "Something went wrong.") {
-  const responseData = error?.response?.data || {};
-
-  const apiError = new Error(getErrorMessage(error, fallback));
-
-  apiError.status = error?.response?.status || 0;
-  apiError.code = responseData?.code || "";
-  apiError.data = responseData;
-  apiError.isNetworkError = !error?.response;
-
-  return apiError;
-}
-
-export async function getPublicMockTests() {
+import axios from "axios";
+import { SERVER_ORIGIN } from "../../util/serverConfig";
+import { getMockSession } from "./mockSession";
+// Deliberately separate from site auth interceptors: mock failures never expire membership.
+const client = axios.create({ baseURL: SERVER_ORIGIN + "/api/v1", timeout: 8000 });
+export async function mockRequest(method, url, data, options = {}) {
   try {
-    const response = await AxiosInstance.get(TEST_BASE);
+    const session = getMockSession();
+    const response = await client.request({ method, url, data, ...options,
+      headers: { ...(session ? { "X-Mock-Session": session.token } : {}), ...options.headers } });
     return response.data;
   } catch (error) {
-    throw buildPublicApiError(error, "Failed to fetch mock tests.");
+    throw Object.assign(new Error(error.response?.data?.message || "Connection interrupted. Your submission is not confirmed; please retry."), {
+      status: error.response?.status || 0, code: error.response?.data?.code || "",
+      data: error.response?.data, isNetworkError: !error.response,
+    });
   }
 }
-
-export async function getPublicMockTestById(mockTestId) {
-  try {
-    const response = await AxiosInstance.get(`${TEST_BASE}/${mockTestId}`);
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to fetch mock test.");
-  }
-}
-
-export async function startOrResumeAttempt(mockTestId, payload) {
-  try {
-    const response = await AxiosInstance.post(
-      `${ATTEMPT_BASE}/${mockTestId}/start`,
-      payload,
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to start or resume test.");
-  }
-}
-
-export async function resumeAttemptById(attemptId, payload) {
-  try {
-    const response = await AxiosInstance.post(
-      `${ATTEMPT_BASE}/${attemptId}/resume`,
-      payload,
-    );
-
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to recover attempt.");
-  }
-}
-
-export async function saveAttemptAnswers(attemptId, answers) {
-  try {
-    const response = await AxiosInstance.patch(
-      `${ATTEMPT_BASE}/${attemptId}/save`,
-      { answers },
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to save answers.");
-  }
-}
-
-export async function pauseAttempt(attemptId, answers) {
-  try {
-    const response = await AxiosInstance.patch(
-      `${ATTEMPT_BASE}/${attemptId}/pause`,
-      { answers },
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to save and pause test.");
-  }
-}
-
-export async function submitAttempt(attemptId, answers) {
-  try {
-    const response = await AxiosInstance.post(
-      `${ATTEMPT_BASE}/${attemptId}/submit`,
-      { answers },
-    );
-
-    return response.data;
-  } catch (error) {
-    const responseData = error?.response?.data;
-
-    if (
-      error?.response?.status === 400 &&
-      responseData?.message === "Attempt is already finalized." &&
-      ["submitted", "auto_submitted", "expired"].includes(
-        responseData?.data?.status,
-      )
-    ) {
-      return {
-        success: true,
-        message: responseData.message,
-        data: responseData.data,
-        alreadyFinalized: true,
-      };
-    }
-
-    throw buildPublicApiError(error, "Failed to submit test.");
-  }
-}
-
-export async function lookupResults(payload) {
-  try {
-    const response = await AxiosInstance.post(
-      `${ATTEMPT_BASE}/results/lookup`,
-      payload,
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to lookup results.");
-  }
-}
-
-export async function getAttemptResult(attemptId, payload) {
-  try {
-    const response = await AxiosInstance.post(
-      `${ATTEMPT_BASE}/${attemptId}/result`,
-      payload,
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to fetch result.");
-  }
-}
-
-export async function getLeaderboard(mockTestId) {
-  try {
-    const response = await AxiosInstance.get(
-      `${ATTEMPT_BASE}/${mockTestId}/leaderboard`,
-    );
-    return response.data;
-  } catch (error) {
-    throw buildPublicApiError(error, "Failed to fetch leaderboard.");
-  }
-}
+export const openMockSession = (payload, token) => mockRequest("post", "/mocks/attempts/session", payload,
+  { headers: token ? { Authorization: "Bearer " + token } : {} });
+export const getPublicMockTests = () => mockRequest("get", "/mocks/tests");
+export const getPublicMockTestById = id => mockRequest("get", "/mocks/tests/" + id);
+export const startOrResumeAttempt = id => mockRequest("post", "/mocks/attempts/" + id + "/start", {});
+export const resumeAttemptById = id => mockRequest("post", "/mocks/attempts/" + id + "/resume", {});
+export const saveAttemptAnswers = (id, answers, metadata = {}) => mockRequest("patch", "/mocks/attempts/" + id + "/save", { answers, ...metadata }, { timeout: 4000 });
+export const pauseAttempt = (id, answers, metadata = {}) => mockRequest("patch", "/mocks/attempts/" + id + "/pause", { answers, ...metadata }, { timeout: 4000 });
+export const submitAttempt = (id, answers, metadata = {}) => mockRequest("post", "/mocks/attempts/" + id + "/submit", { answers, ...metadata });
+export const lookupResults = () => mockRequest("post", "/mocks/attempts/results/lookup", {});
+export const getAttemptResult = id => mockRequest("post", "/mocks/attempts/" + id + "/result", {});
+export const getLeaderboard = (id, params = {}) => mockRequest("get", "/mocks/attempts/" + id + "/leaderboard", undefined, { params });

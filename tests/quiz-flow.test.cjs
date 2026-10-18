@@ -115,7 +115,7 @@ test("successful submission refreshes counters without replacing submitted quest
     assert.match(await f.heading.innerText(), /Attempted Questions:\s*21/);
     const submission = f.calls.find((c) => c.endpoint === "/quiz/submitQuiz");
     assert.deepEqual(submission.body.attemptedQuestions, [questionId]);
-    assert.deepEqual(submission.body.responses, [{ questionId, selected: null }]);
+    assert.deepEqual(submission.body.responses, [{ questionId, selected: null, selectedOptionIndex: null }]);
     assert.deepEqual(f.pageErrors, []);
   } finally { await f.context.close(); }
 });
@@ -125,7 +125,7 @@ test("failed submission leaves counters unchanged and does not trigger progress 
   try {
     await f.waitForProgress(20);
     await f.page.getByRole("button", { name: "Submit", exact: true }).click();
-    await f.page.getByText("Failed to submit quiz", { exact: true }).waitFor();
+    await f.page.getByRole("button", { name: "Retry submission", exact: true }).waitFor();
     assert.equal(f.calls.filter((c) => c.endpoint.startsWith("/quiz/progress/")).length, 1);
     assert.match(await f.heading.innerText(), /Attempted Questions:\s*20/);
     assert.equal(await f.page.getByText("Quiz Results", { exact: true }).count(), 0);

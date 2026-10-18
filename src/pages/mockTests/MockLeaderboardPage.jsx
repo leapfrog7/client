@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -43,100 +43,41 @@ const leaderboardEntryShape = PropTypes.shape({
 
 function MockLeaderboardPage() {
   const { mockTestId } = useParams();
-
-  const [mockTest, setMockTest] = useState(null);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const [mockTest, setMockTest] = useState(null), [leaderboard, setLeaderboard] = useState([]), [topThree, setTopThree] = useState([]);
+  const [summary, setSummary] = useState(null), [pagination, setPagination] = useState({ total: 0, pages: 1 });
+  const [loading, setLoading] = useState(true), [refreshing, setRefreshing] = useState(false), [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""), [query, setQuery] = useState(""), [currentPage, setCurrentPage] = useState(1);
+  const requestSequence = useRef(0), retryTimer = useRef(null);
   const PAGE_SIZE = 10;
-
-  async function loadLeaderboard({ silent = false } = {}) {
+  const loadLeaderboard = useCallback(async ({ silent = false } = {}) => {
+    const sequence = ++requestSequence.current;
+    clearTimeout(retryTimer.current);
+    if (silent) setRefreshing(true); else setLoading(true);
+    setError("");
     try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
+      const response = await getLeaderboard(mockTestId, { page: currentPage, limit: PAGE_SIZE, search: query });
+      if (sequence !== requestSequence.current) return;
+      setMockTest(response.mockTest); setLeaderboard(response.data);
+      setTopThree(response.topThree || response.data.slice(0, 3)); setSummary(response.summary);
+      setPagination(response.pagination || { total: response.data.length, pages: 1 });
+      if (response.finalizing) {
+        setError("Some attempts are still being finalized. Rankings will refresh shortly.");
+        retryTimer.current = setTimeout(() => loadLeaderboard({ silent: true }), 5000);
       }
-
-      setError("");
-
-      const response = await getLeaderboard(mockTestId);
-
-      setMockTest(response?.mockTest || response?.data?.mockTest || null);
-
-      setLeaderboard(
-        Array.isArray(response?.data)
-          ? response.data
-          : Array.isArray(response?.data?.leaderboard)
-            ? response.data.leaderboard
-            : [],
-      );
-
-      setSummary(response?.summary || response?.data?.summary || null);
-    } catch (err) {
-      setError(err.message || "Failed to load leaderboard.");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }
-
+    } catch (err) { if (sequence === requestSequence.current) setError(err.message); }
+    finally { if (sequence === requestSequence.current) { setLoading(false); setRefreshing(false); } }
+  }, [mockTestId, currentPage, query]);
+  const cancelRequests = useCallback(() => { requestSequence.current++; clearTimeout(retryTimer.current); }, []);
   useEffect(() => {
     loadLeaderboard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mockTestId]);
-
-  const rankedLeaderboard = useMemo(() => {
-    return leaderboard.map((entry, index) => ({
-      ...entry,
-      displayRank: Number(entry.rank || index + 1),
-    }));
-  }, [leaderboard]);
-
-  const topThree = useMemo(() => {
-    return rankedLeaderboard.slice(0, 3);
-  }, [rankedLeaderboard]);
-
-  const filteredLeaderboard = useMemo(() => {
-    const query = searchTerm.trim().toLowerCase();
-
-    if (!query) return rankedLeaderboard;
-
-    return rankedLeaderboard.filter((entry) => {
-      const name = String(entry.username || "").toLowerCase();
-      const mobile = String(entry.mobileMasked || "").toLowerCase();
-      const rank = String(entry.displayRank || "");
-
-      return (
-        name.includes(query) || mobile.includes(query) || rank.includes(query)
-      );
-    });
-  }, [rankedLeaderboard, searchTerm]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredLeaderboard.length / PAGE_SIZE),
-  );
-
-  const paginatedLeaderboard = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredLeaderboard.slice(start, start + PAGE_SIZE);
-  }, [filteredLeaderboard, currentPage]);
-
-  function updateSearch(value) {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  }
-
-  function goToPage(page) {
-    setCurrentPage(Math.min(Math.max(page, 1), totalPages));
-  }
-
+    return cancelRequests;
+  }, [loadLeaderboard, cancelRequests]);
+  useEffect(() => { const timer = setTimeout(() => { setQuery(searchTerm); setCurrentPage(1); }, 350); return () => clearTimeout(timer); }, [searchTerm]);
+  const rankedLeaderboard = leaderboard.map(entry => ({ ...entry, displayRank: entry.rank }));
+  const filteredLeaderboard = rankedLeaderboard, paginatedLeaderboard = rankedLeaderboard;
+  const totalPages = pagination.pages;
+  const goToPage = page => setCurrentPage(Math.min(Math.max(page, 1), totalPages));
+  const updateSearch = value => setSearchTerm(value);
   return (
     <main className="min-h-screen bg-slate-50 px-3 py-5 sm:px-4 sm:py-8">
       <div className="mx-auto max-w-6xl space-y-5">
@@ -247,14 +188,14 @@ function MockLeaderboardPage() {
             <LeaderboardToolbar
               searchTerm={searchTerm}
               onSearchChange={updateSearch}
-              totalCount={rankedLeaderboard.length}
-              filteredCount={filteredLeaderboard.length}
+              totalCount={summary?.totalRanked || 0}
+              filteredCount={pagination.total}
             />
 
             {!filteredLeaderboard.length ? (
               <EmptyMockState
                 title="No matching participant found"
-                message="Try searching with a different name, masked mobile number, or rank."
+                message="Try searching with a different participant name."
               />
             ) : (
               <>
@@ -264,7 +205,7 @@ function MockLeaderboardPage() {
                 <LeaderboardPagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  totalItems={filteredLeaderboard.length}
+                  totalItems={pagination.total}
                   pageSize={PAGE_SIZE}
                   onPageChange={goToPage}
                 />
@@ -522,7 +463,7 @@ function LeaderboardToolbar({
             type="search"
             value={searchTerm}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search name, mobile or rank"
+            placeholder="Search participant name"
             className="w-full rounded-xl border border-slate-300 bg-white py-3 pl-9 pr-3 text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
           />
         </div>

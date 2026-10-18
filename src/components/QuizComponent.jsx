@@ -1403,7 +1403,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     isSubmitting,
     loading,
     loadingBM,
-    error,
+    error, errorType, retryError, isLocked, canStartAnotherSet,
     showAllQuestions,
     serverResult,
     serverComparison,
@@ -1413,7 +1413,6 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     setIsSubmitted,
     setShowAllQuestions,
 
-    fetchUnattemptedQuestions,
 
     handleOptionClick,
     clearSelection,
@@ -1504,8 +1503,8 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
     );
   }
 
-  if (error) {
-    return <QuizErrorView error={error} onRetry={fetchUnattemptedQuestions} />;
+  if (error && !quizData.length) {
+    return <QuizErrorView error={error} onRetry={retryError} />;
   }
 
   if (!loading && (!quizData || quizData.length === 0)) {
@@ -1519,6 +1518,10 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
 
   return (
     <div className="min-h-screen">
+      {error && <div role="alert" className="m-3 rounded-lg border border-amber-300 bg-amber-50 p-3">
+        <p>{error}</p><button type="button" disabled={isSubmitting} className="mt-2 underline" onClick={retryError}>{errorType === "submit" ? "Retry submission" : errorType === "bookmark" ? "Reload bookmarks" : "Retry loading"}</button>
+        {canStartAnotherSet && <button type="button" className="ml-4 underline" onClick={resetAndRefetch}>Start another set</button>}
+      </div>}
       <QuizToolbar
         showAllQuestions={showAllQuestions}
         onToggleShowAllQuestions={onToggleShowAllQuestions}
@@ -1527,7 +1530,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
       {!isSubmitted ? (
         <>
           <>
-            <div className="bg-white p-3 ">
+            <fieldset disabled={isLocked} className="min-w-0"><div className="bg-white p-3 ">
               <div className="space-y-4">
                 <QuestionCard
                   currentQuestion={currentQuestion}
@@ -1594,7 +1597,7 @@ const QuizComponent = ({ userId, topicName, topicId }) => {
                 userAnswer={userAnswer}
               />
             </div>
-            <div className=" bg-white py-4">
+            </fieldset><div className=" bg-white py-4">
               <QuestionFeedback questionId={currentQuestion._id} />
             </div>
           </>

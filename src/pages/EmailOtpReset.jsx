@@ -21,7 +21,7 @@ const EmailOtpReset = () => {
     try {
       const res = await axios.post(`${BASE_URL}/api/v1/auth/send-reset-otp`, {
         email,
-      });
+      }, { timeout: 20000 });
       setOtpSent(true);
       setMessage(res.data.message);
     } catch (err) {
@@ -40,7 +40,7 @@ const EmailOtpReset = () => {
         email,
         otp,
         newPassword,
-      });
+      }, { timeout: 20000 });
       setMessage(res.data.message);
       setOtpSent(false);
       setOtp("");

@@ -90,37 +90,7 @@ export default function PaperListTable({
         </div>
       </div>
 
-      <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 shadow-sm">
-        <p className="text-sm font-semibold text-amber-800">
-          Important update for existing users
-        </p>
-
-        <p className="mt-1 text-xs md:text-sm leading-5 text-amber-700">
-          The Previous Year Exam module has been upgraded. If you had an older
-          saved exam state from before this update, you may notice occasional
-          compatibility issues. If that happens, please reset that paper once
-          and start again for the best experience.
-        </p>
-
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-xs md:text-sm leading-5 text-amber-700">
-          <li>
-            You can now view your latest submitted result directly from this
-            page.
-          </li>
-          {/* <li>Only your latest submitted result for each paper is retained.</li> */}
-          {/* <li>
-            Saved progress and submitted results are now managed more clearly.
-          </li> */}
-          <li>
-            The interface has been refined to improve usability on mobile and
-            desktop.
-          </li>
-          <li>
-            Resetting an older saved paper once should usually fix any legacy
-            state issue.
-          </li>
-        </ul>
-      </div>
+      <p className="mb-4 text-sm text-slate-600">New attempts keep separate results. Older saved attempts and latest scores remain available. Save and exit pauses practice.</p>
 
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">

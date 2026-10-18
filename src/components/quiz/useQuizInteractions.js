@@ -119,7 +119,9 @@ export default function useQuizInteractions({
 
   useEffect(() => {
     const onKey = (e) => {
-      if (isSubmitted) return;
+      if (isSubmitted || e.defaultPrevented || e.isComposing || e.ctrlKey || e.altKey || e.metaKey ||
+          e.target?.closest?.('input, textarea, select, [role="textbox"], [contenteditable="true"], [role="dialog"]') ||
+          document.querySelector('[role="dialog"][aria-modal="true"]')) return;
 
       if (e.key === "ArrowRight") {
         goNext();

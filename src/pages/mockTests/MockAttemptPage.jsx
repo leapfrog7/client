@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaCheckCircle,
@@ -24,688 +24,202 @@ import {
 } from "./mockPublicApi";
 
 import { formatDuration } from "../Admin/mocks/mockFormatters";
-import { normalizeStartAttemptResponse } from "./mockPublicMappers";
+import MockParticipantAccess from "./MockParticipantAccess";
+import { getMockSession, clearMockSession, readMockDraft, writeMockDraft, clearMockDraft } from "./mockSession";
+
 
 function MockAttemptPage() {
-  const { attemptId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const identityRef = useRef({
-    username: location.state?.username || "",
-    mobile: location.state?.mobile || "",
-  });
-
-  const submitInFlightRef = useRef(false);
-  const autoSubmitTriggeredRef = useRef(false);
-  const questionPanelRef = useRef(null);
-  const lastAutoSavedPayloadRef = useRef("");
-  const autoSaveInFlightRef = useRef(false);
-  const latestAnswersRef = useRef([]);
-  const timerDeadlineRef = useRef(null);
-
-  const [attempt, setAttempt] = useState(location.state?.attempt || null);
-  const [mockTest, setMockTest] = useState(location.state?.mockTest || null);
-  const [questions, setQuestions] = useState(location.state?.questions || []);
-  const [answers, setAnswers] = useState([]);
-
-  const [recovering, setRecovering] = useState(false);
-  const [recoveryForm, setRecoveryForm] = useState({
-    username: identityRef.current.username || "",
-    mobile: identityRef.current.mobile || "",
-  });
-  const [recoveryErrors, setRecoveryErrors] = useState({});
-
-  const [remainingSeconds, setRemainingSeconds] = useState(null);
-  const [timerHydrated, setTimerHydrated] = useState(false);
-  const [autoSubmitTriggered, setAutoSubmitTriggered] = useState(false);
-
-  const [loading, setLoading] = useState(!location.state?.attempt);
-  const [saving, setSaving] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
+  const { attemptId } = useParams(), navigate = useNavigate();
+  const [session, setSession] = useState(getMockSession);
+  const [attempt, setAttempt] = useState(null), [mockTest, setMockTest] = useState(null);
+  const [questions, setQuestions] = useState([]), [answers, setAnswers] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [mobileNavigatorOpen, setMobileNavigatorOpen] = useState(false);
-
-  const [confirmState, setConfirmState] = useState({
-    open: false,
-    type: "",
-  });
-
-  const answeredCount = useMemo(() => {
-    return answers.filter((answer) =>
-      hasSelectedOption(answer.selectedOptionIndex),
-    ).length;
-  }, [answers]);
-
-  const totalQuestions = questions.length;
-  const unansweredCount = Math.max(totalQuestions - answeredCount, 0);
-
-  const progressPercent = useMemo(() => {
-    if (!totalQuestions) return 0;
-    return Math.round((answeredCount / totalQuestions) * 100);
-  }, [answeredCount, totalQuestions]);
-
-  const currentQuestion = questions[currentQuestionIndex] || null;
-
-  const currentQuestionId = currentQuestion
-    ? currentQuestion._id || currentQuestion.id
-    : null;
-
-  const currentAnswer = currentQuestionId
-    ? answers.find(
-        (answer) => String(answer.questionId) === String(currentQuestionId),
-      )
-    : null;
-
-  const canGoPrevious = currentQuestionIndex > 0;
-  const canGoNext = currentQuestionIndex < totalQuestions - 1;
-
-  const currentStatus = attempt?.status;
-
-  const isFinished = ["submitted", "auto_submitted", "expired"].includes(
-    currentStatus,
-  );
-
-  const isLowTime =
-    remainingSeconds !== null &&
-    remainingSeconds <= 300 &&
-    remainingSeconds > 0;
-
-  const isTimeOver = remainingSeconds !== null && remainingSeconds <= 0;
-
-  const buildAnswerPayload = useCallback(() => {
-    return answers.map((answer) => ({
-      questionId: answer.questionId,
-      selectedOptionIndex: hasSelectedOption(answer.selectedOptionIndex)
-        ? Number(answer.selectedOptionIndex)
-        : null,
-    }));
-  }, [answers]);
-
-  const navigateToResult = useCallback(
-    ({ resultAttemptId, auto = false }) => {
-      navigate(`/mock-tests/result/${resultAttemptId || attemptId}`, {
-        state: {
-          username: identityRef.current.username,
-          mobile: identityRef.current.mobile,
-          autoSubmitted: auto,
-        },
-      });
-    },
-    [attemptId, navigate],
-  );
-
-  const handleSubmitAttempt = useCallback(
-    async ({ auto = false } = {}) => {
-      if (submitting || isFinished || submitInFlightRef.current) return;
-
-      submitInFlightRef.current = true;
-
-      try {
-        setSubmitting(true);
-        setError("");
-
-        const response = await submitAttempt(attemptId, buildAnswerPayload());
-
-        setAutoSubmitTriggered(true);
-        autoSubmitTriggeredRef.current = true;
-
-        const finalizedStatus = response?.data?.attempt?.status || response?.data?.status;
-
-        const resultAttemptId =
-          response?.data?.attemptId ||
-          response?.data?._id ||
-          response?.data?.attempt?._id ||
-          attemptId;
-
-        navigateToResult({
-          resultAttemptId,
-          auto:
-            auto ||
-            response?.alreadyFinalized ||
-            finalizedStatus === "auto_submitted",
-        });
-      } catch (err) {
-        const finalizedAttempt =
-          err?.response?.data?.data ||
-          err?.data?.data ||
-          err?.response?.data?.attempt ||
-          null;
-
-        const finalizedStatus = finalizedAttempt?.status;
-
-        if (
-          ["submitted", "auto_submitted", "expired"].includes(finalizedStatus)
-        ) {
-          setAutoSubmitTriggered(true);
-          autoSubmitTriggeredRef.current = true;
-
-          navigateToResult({
-            resultAttemptId: finalizedAttempt?._id || attemptId,
-            auto: finalizedStatus === "auto_submitted" || auto,
-          });
-
-          return;
-        }
-
-        setError(
-          getAttemptActionErrorMessage(
-            err,
-            "Failed to submit test. Please try again.",
-          ),
-        );
-      } finally {
-        submitInFlightRef.current = false;
-        setSubmitting(false);
-      }
-    },
-    [attemptId, buildAnswerPayload, isFinished, navigateToResult, submitting],
-  );
-
-  useEffect(() => {
-    latestAnswersRef.current = answers;
-  }, [answers]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setTimerHydrated(false);
-    if (location.state?.username && location.state?.mobile) {
-      identityRef.current = { username: location.state.username, mobile: location.state.mobile };
-    }
-    if (!identityRef.current.username || !identityRef.current.mobile) {
-      setQuestions([]);
-      setLoading(false);
-      return;
-    }
-    async function recoverSavedAttempt() {
-      try {
-        // Browser history state can survive refresh with outdated answers and timing.
-        const response = await resumeAttemptById(attemptId, identityRef.current);
-        if (cancelled) return;
-        const recovered = normalizeStartAttemptResponse(response);
-        const savedAttempt = recovered.attempt;
-        if (["submitted", "auto_submitted", "expired", "disqualified"].includes(savedAttempt?.status)) {
-          navigate("/mock-tests/result/" + (savedAttempt?._id || attemptId), {
-            replace: true, state: { ...identityRef.current, autoSubmitted: savedAttempt.status === "auto_submitted" },
-          });
-          return;
-        }
-        if (!savedAttempt || !recovered.questions.length) throw new Error("Saved attempt could not be recovered.");
-        setError("");
-        setAttempt(savedAttempt);
-        setQuestions(recovered.questions);
-        setMockTest(recovered.mockTest);
-        setAnswers(recovered.questions.map((question) => {
-          const questionId = question._id || question.id;
-          const saved = (savedAttempt.answers || []).find((answer) => String(answer.questionId) === String(questionId));
-          return { questionId, selectedOptionIndex: hasSelectedOption(saved?.selectedOptionIndex) ? Number(saved.selectedOptionIndex) : null };
-        }));
-        const remaining = getInitialRemainingSeconds(savedAttempt, recovered.mockTest);
-        timerDeadlineRef.current = Date.now() + remaining * 1000;
-        setRemainingSeconds(remaining);
-        setTimerHydrated(true);
-        setAutoSubmitTriggered(false);
-        autoSubmitTriggeredRef.current = false;
-        submitInFlightRef.current = false;
-        setCurrentQuestionIndex(0);
-        setMobileNavigatorOpen(false);
-      } catch (error) {
-        if (cancelled) return;
-        setQuestions([]);
-        setError(error.message || "Failed to recover saved attempt.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    recoverSavedAttempt();
-    return () => { cancelled = true; };
-  }, [attemptId, location.state, navigate]);
-
-  useEffect(() => {
-    const canAutoSave =
-      !loading &&
-      !submitting &&
-      !isFinished &&
-      timerHydrated &&
-      Boolean(attemptId) &&
-      questions.length > 0;
-
-    if (!canAutoSave) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(async () => {
-      if (autoSaveInFlightRef.current || timerDeadlineRef.current - Date.now() <= 5000) return;
-
-      const payload = latestAnswersRef.current.map((answer) => ({
-        questionId: answer.questionId,
-        selectedOptionIndex: hasSelectedOption(answer.selectedOptionIndex)
-          ? Number(answer.selectedOptionIndex)
-          : null,
-      }));
-
-      const payloadSignature = JSON.stringify(payload);
-
-      if (payloadSignature === lastAutoSavedPayloadRef.current) {
-        return;
-      }
-
-      try {
-        autoSaveInFlightRef.current = true;
-
-
-        await saveAttemptAnswers(attemptId, payload);
-
-        lastAutoSavedPayloadRef.current = payloadSignature;
-
-      } catch (err) {
-        console.error("Auto-save failed:", err);
-      } finally {
-        autoSaveInFlightRef.current = false;
-      }
-    }, 30000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [
-    loading,
-    submitting,
-    isFinished,
-    timerHydrated,
-    attemptId,
-    questions.length,
-  ]);
-
-  useEffect(() => {
-    if (!questions.length) return;
-
-    setCurrentQuestionIndex((prev) =>
-      Math.min(Math.max(prev, 0), questions.length - 1),
-    );
-  }, [questions.length]);
-
-  useEffect(() => {
-    if (
-      loading ||
-      isFinished ||
-      submitting ||
-      !timerHydrated ||
-      remainingSeconds === null ||
-      remainingSeconds <= 0
-    ) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setRemainingSeconds((prev) => {
-        if (prev === null) return prev;
-
-        return Math.max(0, Math.ceil((timerDeadlineRef.current - Date.now()) / 1000));
-      });
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, [loading, isFinished, submitting, timerHydrated, remainingSeconds]);
-
-  useEffect(() => {
-    if (
-      loading ||
-      isFinished ||
-      submitting ||
-      autoSubmitTriggered ||
-      autoSubmitTriggeredRef.current ||
-      submitInFlightRef.current ||
-      !timerHydrated ||
-      remainingSeconds === null ||
-      remainingSeconds > 0 ||
-      !questions.length
-    ) {
-      return;
-    }
-
-    setAutoSubmitTriggered(true);
-    autoSubmitTriggeredRef.current = true;
-
-    handleSubmitAttempt({ auto: true });
-  }, [
-    autoSubmitTriggered,
-    handleSubmitAttempt,
-    isFinished,
-    loading,
-    questions.length,
-    remainingSeconds,
-    submitting,
-    timerHydrated,
-  ]);
-
-  function updateRecoveryField(name, value) {
-    setRecoveryForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setRecoveryErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+  const [remainingSeconds, setRemainingSeconds] = useState(null);
+  const [loading, setLoading] = useState(true), [saving, setSaving] = useState(false), [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(""), [saveState, setSaveState] = useState("Saved"), [conflict, setConflict] = useState(false);
+  const [confirmState, setConfirmState] = useState({ open: false, type: "" });
+  const live = useRef({ answers: [], currentQuestionIndex: 0 }), revision = useRef(0);
+  const deadlineRef = useRef(0), inFlight = useRef(null), submitInFlight = useRef(false);
+  const confirmedSignature = useRef(""), pendingSubmission = useRef(null), lastRetry = useRef(0);
+  const submitRef = useRef(null), saveRef = useRef(null), questionPanelRef = useRef(null);
+  const mounted = useRef(true), recoverySequence = useRef(0);
+  const invalidateRecovery = useCallback(() => { recoverySequence.current++; }, []);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; invalidateRecovery(); }; }, [invalidateRecovery]);
+  const sessionRef = useRef(session); sessionRef.current = session;
+  const conflictRef = useRef(conflict); conflictRef.current = conflict;
+  function signature(value) { return JSON.stringify(value); }
+  function persist(value = live.current) {
+    if (!sessionRef.current) return;
+    const ok = writeMockDraft(sessionRef.current.account.id, attemptId, {
+      ...value, revision: revision.current, pending: signature(value) !== confirmedSignature.current,
+      submissionPending: Boolean(pendingSubmission.current), deadlineAt: attempt?.deadlineAt,
+    });
+    if (!ok) setError("This browser could not keep a local backup. Keep the page open and check that answers are saved.");
   }
-
-  async function handleRecoverAttempt(event) {
-    event.preventDefault();
-
-    const cleanedForm = {
-      username: sanitizeUsername(recoveryForm.username).trim(),
-      mobile: sanitizeMobile(recoveryForm.mobile),
-    };
-
-    const errors = validateRecoveryForm(cleanedForm);
-
-    if (Object.keys(errors).length) {
-      setRecoveryErrors(errors);
-      return;
-    }
-
+  function applyAnswers(value) {
+    live.current = value; setAnswers(value.answers); setCurrentQuestionIndex(value.currentQuestionIndex);
+  }
+  function actionFailure(err) {
+    if (err.code === "ANSWER_CONFLICT") { conflictRef.current = true; setConflict(true); setSaveState("Newer answers exist in another tab"); }
+    else setSaveState(navigator.onLine ? "Not saved — retry pending" : "Offline — changes pending");
+    setError(err.message);
+    if (err.code === "MOCK_SESSION_REQUIRED") { clearMockSession(); setSession(null); setQuestions([]); }
+  }
+  async function recover(discardLocal = false) {
+    const sequence = ++recoverySequence.current;
+    if (!getMockSession()) { setSession(null); setQuestions([]); setLoading(false); return; }
+    setLoading(true); setError("");
     try {
-      setRecovering(true);
-      setError("");
-      setRecoveryErrors({});
-
-      const response = await resumeAttemptById(attemptId, cleanedForm);
-      const {
-        attemptId: recoveredAttemptId,
-        attempt,
-        questions,
-        mockTest,
-      } = normalizeStartAttemptResponse(response);
-
-      const finalAttemptId = recoveredAttemptId || attempt?._id || attemptId;
-
-      if (
-        ["submitted", "auto_submitted", "expired"].includes(attempt?.status)
-      ) {
-        navigate(`/mock-tests/result/${finalAttemptId}`, {
-          state: {
-            username: cleanedForm.username,
-            mobile: cleanedForm.mobile,
-            autoSubmitted: attempt?.status === "auto_submitted",
-          },
-        });
-        return;
+      const response = await resumeAttemptById(attemptId), data = response.data, saved = data.attempt;
+      if (!mounted.current || sequence !== recoverySequence.current) return;
+      if (saved.isFinal) {
+        clearMockDraft(getMockSession().account.id, attemptId);
+        navigate("/mock-tests/result/" + attemptId, { replace: true }); return;
       }
+      revision.current = saved.answerRevision;
+      const serverValue = { answers: (saved.answers || []).map(a => ({
+        questionId: a.questionId, selectedOptionIndex: a.selectedOptionIndex ?? null,
+        isVisited: Boolean(a.isVisited), isMarkedForReview: Boolean(a.isMarkedForReview),
+      })), currentQuestionIndex: Math.min(saved.currentQuestionIndex || 0, data.questions.length - 1) };
+      confirmedSignature.current = signature(serverValue);
+      const draft = discardLocal ? null : readMockDraft(getMockSession().account.id, attemptId);
+      let value = serverValue;
+      const usable = draft?.pending || draft?.submissionPending;
+      const differs = usable && signature({ answers: draft.answers, currentQuestionIndex: draft.currentQuestionIndex }) !== confirmedSignature.current;
+      const conflicting = differs && draft.revision !== saved.answerRevision;
+      if (differs && !conflicting) value = { answers: draft.answers, currentQuestionIndex: Math.min(draft.currentQuestionIndex || 0, data.questions.length - 1) };
+      pendingSubmission.current = draft?.submissionPending && !conflicting ? value : null;
+      conflictRef.current = Boolean(conflicting); setConflict(Boolean(conflicting));
+      setSaveState(conflicting ? "Newer answers exist in another tab" : differs ? "Restored local changes — waiting to save" : "Saved");
+      if (conflicting) setError("Another tab saved a newer version. Your local backup was kept. Use Reload saved answers to continue with the server version.");
+      setAttempt(saved); setMockTest(data.mockTest); setQuestions(data.questions); applyAnswers(value);
+      deadlineRef.current = performance.now() + Math.max(0, new Date(saved.deadlineAt) - new Date(saved.serverNow));
+      setRemainingSeconds(Math.max(0, Math.ceil((deadlineRef.current - performance.now()) / 1000)));
+    } catch (err) { if (mounted.current && sequence === recoverySequence.current) { actionFailure(err); setQuestions([]); } }
+    finally { if (mounted.current && sequence === recoverySequence.current) setLoading(false); }
+  }
+  useEffect(() => {
+    // Session credentials are never passed in browser history.
+    recover();
+    return invalidateRecovery;
+    // Each attempt/session hydrates from its authoritative server snapshot.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attemptId, session?.account?.id, invalidateRecovery]);
 
-      if (!attempt || !Array.isArray(questions) || !questions.length) {
-        throw new Error("Attempt could not be recovered. Please start again.");
+  async function saveNow({ pause = false } = {}) {
+    if (inFlight.current) return inFlight.current;
+    if (submitInFlight.current || conflictRef.current || !questions.length || performance.now() >= deadlineRef.current) return;
+    const sequence = recoverySequence.current;
+    const snapshot = { ...live.current, answers: live.current.answers.map(a => ({ ...a })) };
+    if (!pause && signature(snapshot) === confirmedSignature.current) return;
+    setSaving(true); setSaveState("Saving...");
+    const operation = (async () => {
+      try {
+        const response = await (pause ? pauseAttempt : saveAttemptAnswers)(attemptId, snapshot.answers,
+          { revision: revision.current, currentQuestionIndex: snapshot.currentQuestionIndex });
+        if (!mounted.current || sequence !== recoverySequence.current) return;
+        const saved = response.data.attempt;
+        if (saved.isFinal) { navigate("/mock-tests/result/" + attemptId); return; }
+        if (response.code === "MOCK_DEADLINE") return;
+        revision.current = saved.answerRevision;
+        confirmedSignature.current = signature(snapshot);
+        setSaveState(signature(live.current) === confirmedSignature.current ? "Saved at " + new Date().toLocaleTimeString() : "Changes pending");
+        setError(""); persist();
+        if (pause) navigate("/mock-tests");
+      } catch (err) { if (mounted.current && sequence === recoverySequence.current) actionFailure(err); throw err; }
+      finally { if (mounted.current && sequence === recoverySequence.current) setSaving(false); }
+    })();
+    inFlight.current = operation;
+    try { await operation; } finally { inFlight.current = null; }
+  }
+  saveRef.current = saveNow;
+  async function handleSubmitAttempt() {
+    if (submitInFlight.current || conflictRef.current || !questions.length) return;
+    const sequence = recoverySequence.current;
+    submitInFlight.current = true; setSubmitting(true); setError("");
+    pendingSubmission.current ||= { ...live.current, answers: live.current.answers.map(a => ({ ...a })) };
+    persist();
+    try {
+      // Autosave stops eight seconds before expiry and has a four-second timeout.
+      if (inFlight.current) await inFlight.current;
+      if (conflictRef.current) return;
+      const response = await submitAttempt(attemptId, pendingSubmission.current.answers, { revision: revision.current });
+      if (!mounted.current || sequence !== recoverySequence.current) return;
+      if (!response.data.attempt.isFinal) throw new Error("Submission is still pending. Please retry.");
+      clearMockDraft(sessionRef.current.account.id, attemptId);
+      navigate("/mock-tests/result/" + attemptId, { replace: true });
+    } catch (err) { if (mounted.current && sequence === recoverySequence.current) { actionFailure(err); setError(err.message + " Submission is not confirmed. Retry submission when connected."); } }
+    finally { submitInFlight.current = false; if (mounted.current && sequence === recoverySequence.current) setSubmitting(false); lastRetry.current = Date.now(); }
+  }
+  submitRef.current = handleSubmitAttempt;
+
+  useEffect(() => {
+    if (loading || !questions.length) return;
+    const timer = setInterval(() => {
+      const left = Math.max(0, Math.ceil((deadlineRef.current - performance.now()) / 1000));
+      setRemainingSeconds(left);
+      if (!left && Date.now() - lastRetry.current > 5000 && !conflictRef.current) submitRef.current();
+    }, 250);
+    const retryOnline = () => { if (pendingSubmission.current || performance.now() >= deadlineRef.current) submitRef.current(); else saveRef.current().catch(() => {}); };
+    const warnUnsaved = event => {
+      if (signature(live.current) !== confirmedSignature.current || pendingSubmission.current) {
+        event.preventDefault(); event.returnValue = "";
       }
+    };
+    window.addEventListener("online", retryOnline);
+    window.addEventListener("beforeunload", warnUnsaved);
+    return () => { clearInterval(timer); window.removeEventListener("online", retryOnline); window.removeEventListener("beforeunload", warnUnsaved); };
+  }, [loading, questions.length]);
 
-      identityRef.current = {
-        username: cleanedForm.username,
-        mobile: cleanedForm.mobile,
-      };
-
-      setAttempt(attempt);
-      setMockTest(mockTest || null);
-      setQuestions(questions);
-
-      const existingAnswers = Array.isArray(attempt.answers)
-        ? attempt.answers
-        : [];
-
-      setAnswers(
-        questions.map((question) => {
-          const questionId = question._id || question.id;
-
-          const existing = existingAnswers.find(
-            (answer) => String(answer.questionId) === String(questionId),
-          );
-
-          return {
-            questionId,
-            selectedOptionIndex: hasSelectedOption(
-              existing?.selectedOptionIndex,
-            )
-              ? Number(existing.selectedOptionIndex)
-              : null,
-          };
-        }),
-      );
-
-      const initialRemainingSeconds = getInitialRemainingSeconds(
-        attempt,
-        mockTest,
-      );
-
-      timerDeadlineRef.current = Date.now() + initialRemainingSeconds * 1000;
-      setRemainingSeconds(initialRemainingSeconds);
-      setTimerHydrated(true);
-      setAutoSubmitTriggered(false);
-      autoSubmitTriggeredRef.current = false;
-      submitInFlightRef.current = false;
-      setCurrentQuestionIndex(0);
-      setMobileNavigatorOpen(false);
-    } catch (err) {
-      setError(err.message || "Failed to recover attempt.");
-    } finally {
-      setRecovering(false);
-    }
-  }
-
-  function goToQuestion(index) {
-    if (index < 0 || index >= totalQuestions) return;
-
-    setCurrentQuestionIndex(index);
-    setMobileNavigatorOpen(false);
-
-    window.setTimeout(() => {
-      questionPanelRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 0);
-  }
+  useEffect(() => {
+    if (loading || !questions.length || submitting || conflict) return;
+    const run = () => { if (deadlineRef.current - performance.now() > 8000 && !pendingSubmission.current) saveRef.current().catch(() => {}); };
+    const debounce = setTimeout(run, 1500), maximum = setInterval(run, 10000);
+    return () => { clearTimeout(debounce); clearInterval(maximum); };
+  }, [answers, currentQuestionIndex, loading, questions.length, submitting, conflict]);
 
   function updateAnswer(questionId, selectedOptionIndex) {
-    setAnswers((prev) =>
-      prev.map((answer) =>
-        String(answer.questionId) === String(questionId)
-          ? {
-              ...answer,
-              selectedOptionIndex,
-            }
-          : answer,
-      ),
-    );
+    if (remainingSeconds <= 0 || submitting || pendingSubmission.current || conflict) return;
+    const value = { ...live.current, answers: live.current.answers.map(a =>
+      String(a.questionId) === String(questionId) ? { ...a, selectedOptionIndex, isVisited: true } : a) };
+    applyAnswers(value); persist(value); setSaveState("Changes pending");
   }
-
-  function clearAnswer(questionId) {
-    setAnswers((prev) =>
-      prev.map((answer) =>
-        String(answer.questionId) === String(questionId)
-          ? {
-              ...answer,
-              selectedOptionIndex: null,
-            }
-          : answer,
-      ),
-    );
+  function clearAnswer(questionId) { updateAnswer(questionId, null); }
+  function goToQuestion(index) {
+    if (index < 0 || index >= questions.length) return;
+    const value = { currentQuestionIndex: index, answers: live.current.answers.map((a, i) => i === index ? { ...a, isVisited: true } : a) };
+    applyAnswers(value); persist(value); setMobileNavigatorOpen(false);
+    questionPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
-
-  async function handleSave() {
-    try {
-      setSaving(true);
-      setError("");
-
-      const payload = buildAnswerPayload();
-
-      await saveAttemptAnswers(attemptId, payload);
-
-      lastAutoSavedPayloadRef.current = JSON.stringify(payload);
-    } catch (err) {
-      setError(
-        getAttemptActionErrorMessage(
-          err,
-          "Failed to save answers. Please try again.",
-        ),
-      );
-    } finally {
-      setSaving(false);
-    }
+  function toggleReview() {
+    if (remainingSeconds <= 0 || pendingSubmission.current || conflict) return;
+    const value = { ...live.current, answers: live.current.answers.map((a, i) => i === currentQuestionIndex ? { ...a, isMarkedForReview: !a.isMarkedForReview } : a) };
+    applyAnswers(value); persist(value); setSaveState("Changes pending");
   }
-
-  async function handlePause() {
-    try {
-      setSaving(true);
-      setError("");
-
-      await pauseAttempt(attemptId, buildAnswerPayload());
-
-      navigate("/mock-tests");
-    } catch (err) {
-      setError(
-        getAttemptActionErrorMessage(
-          err,
-          "Failed to pause test. Please try again.",
-        ),
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function openSubmitConfirm() {
-    setConfirmState({
-      open: true,
-      type: "submit",
-    });
-  }
-
-  function openPauseConfirm() {
-    setConfirmState({
-      open: true,
-      type: "pause",
-    });
-  }
-
-  function closeConfirm() {
-    if (submitting || saving) return;
-
-    setConfirmState({
-      open: false,
-      type: "",
-    });
-  }
-
+  const answeredCount = answers.filter(a => hasSelectedOption(a.selectedOptionIndex)).length;
+  const totalQuestions = questions.length, unansweredCount = totalQuestions - answeredCount;
+  const progressPercent = totalQuestions ? Math.round(answeredCount / totalQuestions * 100) : 0;
+  const currentQuestion = questions[currentQuestionIndex], currentAnswer = answers[currentQuestionIndex];
+  const canGoPrevious = currentQuestionIndex > 0, canGoNext = currentQuestionIndex < totalQuestions - 1;
+  const isLowTime = remainingSeconds !== null && remainingSeconds <= 300, isTimeOver = remainingSeconds !== null && remainingSeconds <= 0;
+  const handleSave = () => saveNow().catch(() => {});
+  const openSubmitConfirm = () => setConfirmState({ open: true, type: "submit" });
+  const openPauseConfirm = () => setConfirmState({ open: true, type: "pause" });
+  const closeConfirm = () => setConfirmState({ open: false, type: "" });
   async function handleConfirmAction() {
-    if (confirmState.type === "submit") {
-      closeConfirm();
-      await handleSubmitAttempt();
-      return;
-    }
-
-    if (confirmState.type === "pause") {
-      closeConfirm();
-      await handlePause();
-    }
+    const action = confirmState.type; closeConfirm();
+    if (action === "submit") await handleSubmitAttempt();
+    else await saveNow({ pause: true }).catch(() => {});
   }
-
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8">
-        <div className="mx-auto max-w-6xl">
-          <LoadingState message="Loading test..." />
-        </div>
-      </main>
-    );
-  }
-
-  if (!questions.length) {
-    return (
-      <main className="min-h-screen bg-slate-50 px-4 py-8">
-        <div className="mx-auto max-w-4xl space-y-4">
-          <Link
-            to="/mock-tests"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
-          >
-            <FaArrowLeft />
-            Back to Mock Tests
-          </Link>
-
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-100 bg-slate-900 px-4 py-5 text-white sm:px-6">
-              <p className="text-xs font-black uppercase tracking-wide text-teal-200">
-                Recover Attempt
-              </p>
-              <h1 className="mt-2 text-xl font-black sm:text-2xl">
-                Resume your mock test
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200">
-                The page was refreshed or opened directly. Enter the same name
-                and mobile number used to start the test.
-              </p>
-            </div>
-
-            <form onSubmit={handleRecoverAttempt} className="p-4 sm:p-6">
-              {error ? (
-                <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium leading-6 text-red-700">
-                  {error}
-                </div>
-              ) : null}
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <RecoveryTextField
-                  label="Name"
-                  name="username"
-                  value={recoveryForm.username}
-                  error={recoveryErrors.username}
-                  placeholder="Enter same name"
-                  maxLength={16}
-                  autoComplete="name"
-                  onChange={(name, value) =>
-                    updateRecoveryField(name, sanitizeUsername(value))
-                  }
-                />
-
-                <RecoveryTextField
-                  label="Mobile Number"
-                  name="mobile"
-                  value={recoveryForm.mobile}
-                  error={recoveryErrors.mobile}
-                  placeholder="10-digit mobile number"
-                  inputMode="numeric"
-                  maxLength={10}
-                  autoComplete="tel"
-                  onChange={(name, value) =>
-                    updateRecoveryField(name, sanitizeMobile(value))
-                  }
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={recovering}
-                className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-teal-700 px-4 py-3 text-sm font-black text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-              >
-                {recovering ? "Recovering..." : "Recover Attempt"}
-              </button>
-
-              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-                <p className="font-black">Important</p>
-                <p className="mt-1">
-                  Use exactly the same name and mobile number entered when you
-                  started the attempt. If the attempt was already submitted, you
-                  will be taken to the result page.
-                </p>
-              </div>
-            </form>
-          </section>
-        </div>
-      </main>
-    );
-  }
-
+  if (loading) return <LoadingState message="Loading test..." />;
+  if (!questions.length) return <main className="min-h-screen bg-slate-50 p-4"><div className="mx-auto max-w-3xl space-y-5">
+    <Link to="/mock-tests" className="underline">Back to Mock Tests</Link><h1 className="text-2xl font-bold">Resume your mock test</h1>
+    <MockParticipantAccess onReady={setSession} />
+    {error ? <p role="alert" className="text-red-700">{error}</p> : null}
+    <button className="rounded-lg bg-teal-700 p-3 text-white disabled:opacity-50" disabled={!session} onClick={() => recover()}>Recover Attempt</button>
+    <p>Your original timer continues while you reconnect.</p>
+  </div></main>;
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
@@ -750,7 +264,7 @@ function MockAttemptPage() {
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={saving || submitting}
+                  disabled={saving || submitting || conflict || isTimeOver}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
                   <FaSave />
@@ -764,7 +278,7 @@ function MockAttemptPage() {
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-900 shadow-sm hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
                   <FaPause />
-                  <span>Pause</span>
+                  <span>Save & leave</span>
                 </button>
 
                 <button
@@ -781,6 +295,8 @@ function MockAttemptPage() {
           </div>
 
           <div className="mt-3">
+            <p role="status" aria-live="polite" className="mb-2 text-sm font-semibold">{saveState}</p>
+            <p className="mb-2 text-xs text-slate-600">The timer continues when you leave or reconnect.</p>
             <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               <span>Progress</span>
               <span>{progressPercent}% completed</span>
@@ -799,8 +315,10 @@ function MockAttemptPage() {
         <section ref={questionPanelRef} className="space-y-4 sm:space-y-5">
           {error ? (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium leading-6 text-amber-900 shadow-sm">
-              <p className="font-black">Temporary issue</p>
-              <p className="mt-1">{error}</p>
+              <p className="font-black">Please check</p>
+              <p className="mt-1" role="alert">{error}</p>
+              {conflict ? <button className="mt-2 underline" onClick={() => { clearMockDraft(session.account.id, attemptId); pendingSubmission.current = null; recover(true); }}>Reload saved answers</button> : null}
+              {pendingSubmission.current && !conflict ? <button className="mt-2 underline" onClick={handleSubmitAttempt} disabled={submitting}>Retry submission</button> : null}
             </div>
           ) : null}
 
@@ -825,13 +343,13 @@ function MockAttemptPage() {
           </div>
 
           {currentQuestion ? (
-            <QuestionAttemptCard
+            <fieldset disabled={isTimeOver || submitting || conflict || Boolean(pendingSubmission.current)}><QuestionAttemptCard
               question={currentQuestion}
               index={currentQuestionIndex}
               selectedOptionIndex={currentAnswer?.selectedOptionIndex}
               onSelect={updateAnswer}
               onClear={clearAnswer}
-            />
+            /><button type="button" aria-pressed={Boolean(currentAnswer?.isMarkedForReview)} onClick={toggleReview} className="mt-3 rounded-lg border bg-white p-3 text-sm">{currentAnswer?.isMarkedForReview ? "Unmark review" : "Mark for review"}</button></fieldset>
           ) : null}
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -900,13 +418,13 @@ function MockAttemptPage() {
 
       <ConfirmActionModal
         open={confirmState.open}
-        title={confirmState.type === "submit" ? "Submit test" : "Pause test"}
+        title={confirmState.type === "submit" ? "Submit test" : "Save and leave"}
         message={
           confirmState.type === "submit"
             ? `You have answered ${answeredCount} out of ${totalQuestions} questions. Submit the test now?`
-            : "Your current answers will be saved and you can resume within the mock test window."
+            : "Your answers will be saved. The timer continues while you are away; reconnect before your deadline."
         }
-        confirmLabel={confirmState.type === "submit" ? "Submit" : "Pause"}
+        confirmLabel={confirmState.type === "submit" ? "Submit" : "Save & leave"}
         loading={submitting || saving}
         onConfirm={handleConfirmAction}
         onCancel={closeConfirm}
@@ -1012,6 +530,7 @@ function QuestionNavigatorPanel({
               index={index}
               isAnswered={isAnswered}
               isCurrent={isCurrent}
+              isMarkedForReview={Boolean(answer?.isMarkedForReview)}
               onClick={() => onGoToQuestion(index)}
             />
           );
@@ -1029,7 +548,7 @@ function QuestionNavigatorPanel({
           {answeredCount}/{questions.length}
         </p>
         <p className="mt-1">
-          Use Save periodically. Submit only after reviewing all questions.
+          Answers save automatically. Check the save status before leaving or submitting.
         </p>
       </div>
     </div>
@@ -1118,6 +637,7 @@ function MobileQuestionNavigatorSheet({
                   index={index}
                   isAnswered={isAnswered}
                   isCurrent={isCurrent}
+              isMarkedForReview={Boolean(answer?.isMarkedForReview)}
                   onClick={() => onGoToQuestion(index)}
                 />
               );
@@ -1156,7 +676,7 @@ MobileQuestionNavigatorSheet.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-function QuestionNavigatorButton({ index, isAnswered, isCurrent, onClick }) {
+function QuestionNavigatorButton({ index, isAnswered, isCurrent, isMarkedForReview = false, onClick }) {
   return (
     <button
       type="button"
@@ -1169,12 +689,13 @@ function QuestionNavigatorButton({ index, isAnswered, isCurrent, onClick }) {
         isCurrent ? "ring-2 ring-slate-900 ring-offset-2" : "",
       ].join(" ")}
     >
-      {index + 1}
+      {index + 1}{isMarkedForReview ? " ★" : ""}
     </button>
   );
 }
 
 QuestionNavigatorButton.propTypes = {
+  isMarkedForReview: PropTypes.bool,
   index: PropTypes.number.isRequired,
   isAnswered: PropTypes.bool.isRequired,
   isCurrent: PropTypes.bool.isRequired,
@@ -1327,128 +848,5 @@ function isSameOption(selectedOptionIndex, optionIndex) {
   return Number(selectedOptionIndex) === Number(optionIndex);
 }
 
-function RecoveryTextField({
-  label,
-  name,
-  value,
-  error,
-  placeholder,
-  inputMode,
-  maxLength,
-  autoComplete,
-  onChange,
-}) {
-  const inputId = `recover-attempt-${name}`;
-
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3">
-        <label htmlFor={inputId} className="text-sm font-bold text-slate-800">
-          {label}
-        </label>
-
-        {maxLength ? (
-          <span className="text-xs font-semibold text-slate-400">
-            {String(value || "").length}/{maxLength}
-          </span>
-        ) : null}
-      </div>
-
-      <input
-        id={inputId}
-        name={name}
-        value={value}
-        placeholder={placeholder}
-        inputMode={inputMode}
-        maxLength={maxLength}
-        autoComplete={autoComplete}
-        onChange={(event) => onChange(name, event.target.value)}
-        className={[
-          "mt-1.5 w-full rounded-xl border bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:ring-2",
-          error
-            ? "border-red-300 focus:border-red-400 focus:ring-red-100"
-            : "border-slate-300 focus:border-teal-500 focus:ring-teal-100",
-        ].join(" ")}
-      />
-
-      {error ? (
-        <p className="mt-1.5 text-xs font-semibold text-red-600">{error}</p>
-      ) : null}
-    </div>
-  );
-}
-
-RecoveryTextField.propTypes = {
-  label: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  error: PropTypes.string,
-  placeholder: PropTypes.string,
-  inputMode: PropTypes.string,
-  maxLength: PropTypes.number,
-  autoComplete: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-};
-
-function getAttemptActionErrorMessage(error, fallback) {
-  if (error?.status === 429) {
-    return "The server is busy at the moment. Please wait a few seconds and try again.";
-  }
-
-  if (error?.status >= 500 || error?.isNetworkError) {
-    return "Temporary server load prevented this action. Please try again.";
-  }
-
-  return error?.message || fallback;
-}
-
-function sanitizeUsername(value) {
-  return String(value || "")
-    .replace(/[^a-zA-Z0-9 ]/g, "")
-    .replace(/\s+/g, " ")
-    .slice(0, 16);
-}
-
-function sanitizeMobile(value) {
-  return String(value || "")
-    .replace(/\D/g, "")
-    .slice(0, 10);
-}
-
-function validateRecoveryForm(form) {
-  const errors = {};
-
-  const username = String(form.username || "").trim();
-  const mobile = String(form.mobile || "").trim();
-
-  if (!username) {
-    errors.username = "Name is required.";
-  } else if (username.length < 2) {
-    errors.username = "Name must be at least 2 characters.";
-  } else if (username.length > 16) {
-    errors.username = "Name cannot exceed 16 characters.";
-  } else if (!/^[a-zA-Z0-9 ]+$/.test(username)) {
-    errors.username = "Name can contain only letters, numbers and spaces.";
-  }
-
-  if (!mobile) {
-    errors.mobile = "Mobile number is required.";
-  } else if (!/^[6-9]\d{9}$/.test(mobile)) {
-    errors.mobile = "Enter a valid 10-digit Indian mobile number.";
-  }
-
-  return errors;
-}
-
-function getInitialRemainingSeconds(attempt, mockTest) {
-  const windowEnd = new Date(mockTest?.endAt).getTime();
-  const windowRemaining = Number.isFinite(windowEnd)
-    ? Math.max(0, Math.floor((windowEnd - Date.now()) / 1000)) : Infinity;
-  const durationSeconds = Number(attempt?.durationSeconds) || Number(mockTest?.durationMinutes) * 60 || 1800;
-  const reported = attempt?.remainingSeconds;
-  const remaining = reported !== undefined && reported !== null
-    ? Math.max(0, Number(reported)) : Math.max(0, durationSeconds - Number(attempt?.usedSeconds || 0));
-  return Math.min(windowRemaining, remaining);
-}
 
 export default MockAttemptPage;

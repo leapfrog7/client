@@ -1,7 +1,8 @@
 import { SERVER_ORIGIN } from "../util/serverConfig.js";
 import Input from "../components/Input";
 import Label from "../components/Label";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { validateRegistration } from "../util/registrationValidation";
 import axios from "axios";
 import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
@@ -18,7 +19,6 @@ import {
   FaCrown,
   FaBookOpen,
 } from "react-icons/fa";
-import Button from "../components/Button";
 import RegistrationSteps from "../components/RegistrationSteps";
 
 export default function Register() {
@@ -36,6 +36,8 @@ export default function Register() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [runConfetti, setRunConfetti] = useState(false);
 
+  const [submitting, setSubmitting] = useState(false);
+  const submissionInFlight = useRef(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
@@ -70,65 +72,37 @@ export default function Register() {
   }
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!name) newErrors.name = "Name is required";
-    if (!mobile) {
-      newErrors.mobile = "Mobile number is required";
-    } else if (mobile.length !== 10) {
-      newErrors.mobile = "Mobile number must be 10 digits";
-    } else if (!/^[5-9]\d{9}$/.test(mobile)) {
-      newErrors.mobile = "Mobile number must start with 5 or higher digit";
-    }
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Invalid email format";
-    }
-    if (!password) newErrors.password = "Password is required";
-    if (password !== confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-    if (!agreeTerms)
-      newErrors.agreeTerms = "You must agree to the Terms & Conditions";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const result = validateRegistration({ name, mobile, email, password, batch });
+    const nextErrors = { ...result.errors };
+    if (password !== confirmPassword) nextErrors.confirmPassword = "Passwords do not match.";
+    if (!agreeTerms) nextErrors.agreeTerms = "You must agree to the Terms & Conditions.";
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length ? null : result.data;
   };
 
-  const registerUser = async () => {
-    if (!validateForm()) return;
-
+  const registerUser = async (event) => {
+    event.preventDefault();
+    if (submissionInFlight.current) return;
+    setError("");
+    const data = validateForm();
+    if (!data) return;
+    submissionInFlight.current = true;
+    setSubmitting(true);
     try {
-      await axios.post(BASE_URL + "/register", {
-        name,
-        password,
-        mobile,
-        batch,
-        email,
-      });
-
-      // clear fields
-      setName("");
-      setPassword("");
-      setMobile("");
-      setBatch("");
-      setEmail("");
-      setConfirmPassword("");
-
-      // optional: log if you still want to inspect the payload
-      // console.log(response.data);
-
-      setMsg(
-        "Registered Successfully! Your 24-hour free trial will start on your first login.",
-      );
+      await axios.post(BASE_URL + "/register", data, { timeout: 20000 });
+      setName(""); setPassword(""); setMobile(""); setBatch(""); setEmail(""); setConfirmPassword("");
+      setMsg("Registered Successfully! Your 24-hour free trial will start on your first login.");
       setIsRegistered(true);
-
-      setShowConfetti(true);
-      setRunConfetti(true);
+      setShowConfetti(true); setRunConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
     } catch (err) {
-      setError(
-        err?.response?.data?.msg || "Registration failed. Please try again.",
-      );
+      const serverErrors = err?.response?.data?.errors;
+      if (serverErrors && typeof serverErrors === "object") setErrors(serverErrors);
+      setError(err?.response?.data?.msg ||
+        "Registration could not be confirmed. If you already submitted, try logging in before retrying.");
+    } finally {
+      submissionInFlight.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -161,7 +135,7 @@ export default function Register() {
         </Helmet>
 
         {!isRegistered && (
-          <>
+          <form noValidate onSubmit={registerUser}>
             <h2 className="text-2xl font-bold text-center mt-8 p-2 bg-gradient-to-r from-emerald-200 to-cyan-200 rounded-lg text-gray-600">
               Create an Account
             </h2>
@@ -213,6 +187,13 @@ export default function Register() {
                 />
                 <Input
                   type="text"
+                  id="registration-name"
+                  name="name"
+                  aria-label="Name"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? "registration-name-error" : undefined}
+                  autoComplete="name"
+                  maxLength={80}
                   onChange={handleNameChange}
                   value={name}
                   onFocus={() => setIsNameFocused(true)}
@@ -220,7 +201,7 @@ export default function Register() {
                 />
                 <Label labelText="Name" />
                 {errors.name && (
-                  <div className="text-red-600 text-xs">{errors.name}</div>
+                  <div id="registration-name-error" className="text-red-600 text-xs">{errors.name}</div>
                 )}
               </div>
 
@@ -232,6 +213,14 @@ export default function Register() {
                 />
                 <Input
                   type="text"
+                  id="registration-mobile"
+                  name="mobile"
+                  aria-label="Mobile"
+                  aria-invalid={Boolean(errors.mobile)}
+                  aria-describedby={errors.mobile ? "registration-mobile-error" : undefined}
+                  autoComplete="tel-national"
+                  maxLength={10}
+                  inputMode="numeric"
                   onChange={handleMobileChange}
                   value={mobile}
                   onFocus={() => setIsMobileFocused(true)}
@@ -239,7 +228,7 @@ export default function Register() {
                 />
                 <Label labelText="Mobile" />
                 {errors.mobile && (
-                  <div className="text-red-600 text-xs">{errors.mobile}</div>
+                  <div id="registration-mobile-error" className="text-red-600 text-xs">{errors.mobile}</div>
                 )}
               </div>
 
@@ -251,6 +240,13 @@ export default function Register() {
                 />
                 <Input
                   type="text"
+                  id="registration-email"
+                  name="email"
+                  aria-label="Email"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? "registration-email-error" : undefined}
+                  autoComplete="email"
+                  maxLength={254}
                   onChange={handleEmailChange}
                   value={email}
                   className="pl-10"
@@ -259,7 +255,7 @@ export default function Register() {
                 />
                 <Label labelText="Email" />
                 {errors.email && (
-                  <div className="text-red-600 text-xs">{errors.email}</div>
+                  <div id="registration-email-error" className="text-red-600 text-xs">{errors.email}</div>
                 )}
               </div>
 
@@ -271,6 +267,13 @@ export default function Register() {
                 />
                 <Input
                   type="text"
+                  id="registration-batch"
+                  name="batch"
+                  aria-label="Batch Year"
+                  aria-invalid={Boolean(errors.batch)}
+                  aria-describedby={errors.batch ? "registration-batch-error" : undefined}
+                  autoComplete="off"
+                  maxLength={40}
                   onChange={handleBatchChange}
                   value={batch}
                   className="pl-10"
@@ -279,7 +282,7 @@ export default function Register() {
                 />
                 <Label labelText="Batch Year" />
                 {errors.batch && (
-                  <div className="text-red-600 text-xs">{errors.batch}</div>
+                  <div id="registration-batch-error" className="text-red-600 text-xs">{errors.batch}</div>
                 )}
               </div>
 
@@ -291,6 +294,13 @@ export default function Register() {
                 />
                 <Input
                   type="password"
+                  id="registration-password"
+                  name="password"
+                  aria-label="Password"
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? "registration-password-error" : undefined}
+                  autoComplete="new-password"
+                  maxLength={72}
                   onChange={handlePasswordChange}
                   value={password}
                   className="pl-10"
@@ -299,7 +309,7 @@ export default function Register() {
                 />
                 <Label labelText="Password" />
                 {errors.password && (
-                  <div className="text-red-600 text-xs">{errors.password}</div>
+                  <div id="registration-password-error" className="text-red-600 text-xs">{errors.password}</div>
                 )}
               </div>
 
@@ -311,6 +321,13 @@ export default function Register() {
                 />
                 <Input
                   type="password"
+                  id="registration-confirmPassword"
+                  name="confirmPassword"
+                  aria-label="Confirm Password"
+                  aria-invalid={Boolean(errors.confirmPassword)}
+                  aria-describedby={errors.confirmPassword ? "registration-confirmPassword-error" : undefined}
+                  autoComplete="new-password"
+                  maxLength={72}
                   onChange={handleConfirmPasswordChange}
                   value={confirmPassword}
                   className="pl-10"
@@ -319,7 +336,7 @@ export default function Register() {
                 />
                 <Label labelText="Confirm Password" />
                 {errors.confirmPassword && (
-                  <div className="text-red-600 text-xs">
+                  <div id="registration-confirmPassword-error" className="text-red-600 text-xs">
                     {errors.confirmPassword}
                   </div>
                 )}
@@ -349,10 +366,11 @@ export default function Register() {
               <div className="text-red-600 text-xs">{errors.agreeTerms}</div>
             )}
 
-            <div className="text-center" onClick={registerUser}>
-              <Button buttonText="Register" />
+            <p className="mt-4 text-sm text-slate-600">Use your name. Initials, single-word names and Indian scripts are welcome.</p>
+            <div className="text-center">
+              <button type="submit" disabled={submitting} className="mt-5 rounded-lg bg-blue-700 px-6 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{submitting ? "Registering..." : "Register"}</button>
             </div>
-          </>
+          </form>
         )}
 
         {showTermsModal && (
@@ -395,9 +413,7 @@ export default function Register() {
 
         {error && !isRegistered && (
           <div className="mt-6 text-center p-4 bg-red-100 text-red-800 rounded-lg">
-            <p className="text-lg font-semibold">
-              The Mobile Number or Email already exist!
-            </p>
+            <p role="alert" className="text-lg font-semibold">{error}</p>
           </div>
         )}
 

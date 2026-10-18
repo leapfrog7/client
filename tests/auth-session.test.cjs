@@ -29,7 +29,7 @@ async function fixture(options={}){
     if(state.delayQuiz){state.quizStarted?.();await state.delayQuiz;}
     data=status===200?[{_id:questionId,questionText:"Auth question batch "+state.questions,options:["Choice A","Choice B"],correctAnswer:"Choice A",explanation:"Fixture"}]:{code:status===402?"TRIAL_ENDED":"AUTH_INVALID",message:"Synthetic failure"};
    }else if(p==="/quiz/fetchAllBookmarks")data={bookmarks:[]};
-   else if(p==="/quiz/submitQuiz"){state.submissions.push(req.postDataJSON());data={result:{correct:0,total:1,percent:0}};}
+   else if(p==="/quiz/submitQuiz"){state.submissions.push(req.postDataJSON());data={result:{correct:0,total:1,percent:0},attempt:{attemptId:"synthetic-receipt"}};}
    else if(p==="/quiz/getUserStats")data={paperI:[],paperII:[]};
    return route.fulfill({status,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:JSON.stringify(data)});
   }
@@ -105,7 +105,7 @@ test("402 from quiz API opens trial-ended page rather than signing out",async()=
 });
 test("network/server errors keep session; late failures from an old token cannot remove a newer token",async()=>{
  const f=await fixture();
- try{await openQuiz(f);f.state.quizStatus=500;await f.page.getByText("Random Questions",{exact:true}).click();await f.page.getByText("Failed to fetch questions",{exact:true}).waitFor();assert.equal(await f.page.evaluate(()=>localStorage.getItem("jwtToken")),f.initial);
+ try{await openQuiz(f);f.state.quizStatus=500;await f.page.getByText("Random Questions",{exact:true}).click();await f.page.getByText("Synthetic failure",{exact:true}).waitFor();assert.equal(await f.page.evaluate(()=>localStorage.getItem("jwtToken")),f.initial);
   const fresh=token(Date.now()/1000+3600,true,"newer");
   let release, started;
   f.state.quizStatus=401;
