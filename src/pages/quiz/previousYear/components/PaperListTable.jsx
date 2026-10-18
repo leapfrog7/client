@@ -9,6 +9,8 @@ export default function PaperListTable({
   onResetTimer,
   onViewResult,
 }) {
+  const visiblePapers = filteredPapers.filter((paper) => !paper.isHidden);
+  const savedHiddenPapers = filteredPapers.filter((paper) => paper.isHidden);
   const renderActionButton = (paper) => {
     const isInProgress = paper.sessionStatus === "in_progress";
     const hasLatestResult = !!paper.hasLatestResult;
@@ -90,11 +92,14 @@ export default function PaperListTable({
         </div>
       </div>
 
-      <p className="mb-4 text-sm text-slate-600">New attempts keep separate results. Older saved attempts and latest scores remain available. Save and exit pauses practice.</p>
+      <p className="mb-4 text-sm text-slate-600">
+        New attempts keep separate results. Older saved attempts and latest
+        scores remain available. Save and exit pauses practice.
+      </p>
 
       {/* Mobile cards */}
       <div className="space-y-3 md:hidden">
-        {filteredPapers.map((paper) => {
+        {visiblePapers.map((paper) => {
           const isInProgress = paper.sessionStatus === "in_progress";
           const hasLatestResult = !!paper.hasLatestResult;
 
@@ -194,7 +199,7 @@ export default function PaperListTable({
           </thead>
 
           <tbody className="divide-y divide-slate-100">
-            {filteredPapers.map((paper) => {
+            {visiblePapers.map((paper) => {
               const isInProgress = paper.sessionStatus === "in_progress";
 
               return (
@@ -258,6 +263,46 @@ export default function PaperListTable({
         </table>
       </div>
 
+      {!!savedHiddenPapers.length && (
+        <section
+          aria-label="Saved practice from hidden papers"
+          className="mt-6 rounded-xl border bg-slate-50 p-3 sm:p-4"
+        >
+          <h2 className="font-semibold text-slate-800">Your saved practice</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            These papers are unavailable for new attempts. You can finish saved
+            work or review your results.
+          </p>
+          {savedHiddenPapers.map((paper) => (
+            <div
+              key={paper._id}
+              className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3"
+            >
+              <p className="font-medium">
+                {paper.year} · {paper.paperType}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {paper.sessionStatus === "in_progress" && (
+                  <button
+                    className="min-h-11 rounded-lg bg-indigo-700 px-3 py-2 text-sm text-white"
+                    onClick={() => onResume(paper)}
+                  >
+                    Resume saved attempt
+                  </button>
+                )}
+                {paper.hasLatestResult && (
+                  <button
+                    className="min-h-11 rounded-lg border bg-white px-3 py-2 text-sm"
+                    onClick={() => onViewResult(paper)}
+                  >
+                    Review saved result
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
       <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-3 shadow-sm sm:p-4">
         <p className="text-base font-semibold text-slate-900">
           Important Points

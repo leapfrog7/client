@@ -1,3 +1,4 @@
+import PYQYearVisibility from "./PYQYearVisibility";
 import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 // export default AddQuestionForm;
 import { useState, useEffect } from "react";
@@ -36,6 +37,9 @@ const TOPIC_OPTIONS = {
 const AddQuestionForm = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [year, setYear] = useState("2023");
+  const [availableYears, setAvailableYears] = useState([
+    "2015", "2016-17", "2018", "2019-20", "2021-22", "2023", "2024", "2025",
+  ]);
   const [paperType, setPaperType] = useState("Paper I");
 
   // listing & filters
@@ -252,8 +256,9 @@ const AddQuestionForm = () => {
       <div className="bg-white shadow rounded-lg p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block mb-1 font-medium">Year</label>
+            <label htmlFor="pyq-admin-year" className="block mb-1 font-medium">Year</label>
             <select
+              id="pyq-admin-year"
               value={year}
               onChange={(e) => {
                 setYear(e.target.value);
@@ -261,16 +266,7 @@ const AddQuestionForm = () => {
               }}
               className="w-full p-2 border rounded"
             >
-              {[
-                "2015",
-                "2016-17",
-                "2018",
-                "2019-20",
-                "2021-22",
-                "2023",
-                "2024",
-                "2025",
-              ].map((y) => (
+              {availableYears.map((y) => (
                 <option key={y} value={y}>
                   {y}
                 </option>
@@ -319,6 +315,8 @@ const AddQuestionForm = () => {
           </label>
         </div>
       </div>
+
+      <PYQYearVisibility year={year} onYearsLoaded={setAvailableYears} />
 
       {/* Add / Edit Form */}
       <form

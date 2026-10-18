@@ -40,3 +40,5 @@ The schedule suite covers guest/paid/unpaid banners, API-failure/mobile renderin
 Backend and integrated browser checks are in server/tests/mock-flow.test.cjs; see the workspace MOCK-TEST-RESTART.md for safe local-only database setup and commands.
 
 Authentication/trial regressions: tests/auth-session.test.cjs also runs against a local production vite preview via TEST_BASE_URL. Every API call is intercepted; synthetic credentials only. Covers expiry/relogin preserving quiz+URL, expired-page open,401/402/403, trial timer/payment activation, network failures and stale responses, cross-tab signout, autofill/safe redirects, free tools and cross-account draft isolation.
+
+PYQ year-visibility UI is verified by server/tests/pyq-flow.test.cjs through the real isolated API/Mongo fixture. The43-case Edge suite includes all prior PYQ regressions;10focused cases also run in WebKit. Covers Admin confirmation, save/reload failure,320px layout, hidden-year catalog exclusion and preserved saved review. See workspace PYQ-YEAR-VISIBILITY.md; never point tests at the normal backend/live.env.
