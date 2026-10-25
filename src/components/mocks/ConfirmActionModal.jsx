@@ -15,7 +15,7 @@ function ConfirmActionModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-xl">
+      <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[90dvh] w-full max-w-md overflow-y-auto break-words rounded-lg bg-white p-5 shadow-xl">
         <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
 
         <p className="mt-2 text-sm leading-6 text-gray-600">{message}</p>

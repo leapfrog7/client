@@ -43,6 +43,7 @@ function MockResultPage() {
   const { attemptId } = useParams();
   const [isLoggedIn] = useState(() => isUserLoggedIn());
   const [session, setSession] = useState(null), [result, setResult] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
   const [loading, setLoading] = useState(false), [error, setError] = useState("");
   useEffect(() => {
     let cancelled = false, timer;
@@ -61,12 +62,12 @@ function MockResultPage() {
     }
     load();
     return () => { cancelled = true; clearTimeout(timer); };
-  }, [attemptId, session]);
+  }, [attemptId, session, retryKey]);
   return <main className="min-h-screen bg-slate-50 p-4"><div className="mx-auto max-w-6xl space-y-5">
     <Link to="/mock-tests" className="underline">Back to Mock Tests</Link>
     <h1 className="text-2xl font-black">Your attempt summary</h1>
     <MockParticipantAccess onReady={setSession} />
-    {error ? <p role="alert" className="text-red-700">{error}</p> : null}
+    {error ? <div role="alert" className="space-y-2 text-red-700"><p>{error}</p><button type="button" disabled={loading || !session} onClick={() => setRetryKey(key => key + 1)} className="min-h-11 rounded-lg border border-red-300 px-4 py-2 font-bold disabled:opacity-50">Retry loading result</button></div> : null}
     {loading && !result ? <LoadingState message="Loading result..." /> : null}
     {result && !result.isFinal ? <div className="rounded-xl border bg-white p-4">
       <p>{result.submissionPending ? "The deadline has passed. Final submission is being processed; please wait for confirmation." : "Your attempt is still in progress."}</p>

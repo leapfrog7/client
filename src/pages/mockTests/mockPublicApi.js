@@ -4,13 +4,14 @@ import { getMockSession } from "./mockSession";
 // Deliberately separate from site auth interceptors: mock failures never expire membership.
 const client = axios.create({ baseURL: SERVER_ORIGIN + "/api/v1", timeout: 8000 });
 export async function mockRequest(method, url, data, options = {}) {
+  const startedAt = performance.now(), wallStartedAt = Date.now();
   try {
     const session = getMockSession();
     const response = await client.request({ method, url, data, ...options,
       headers: { ...(session ? { "X-Mock-Session": session.token } : {}), ...options.headers } });
-    return response.data;
+    return { ...response.data, requestTiming: { startedAt, wallStartedAt, receivedAt: performance.now(), wallReceivedAt: Date.now() } };
   } catch (error) {
-    throw Object.assign(new Error(error.response?.data?.message || "Connection interrupted. Your submission is not confirmed; please retry."), {
+    throw Object.assign(new Error(error.response?.data?.message || (url.endsWith("/submit") ? "Connection interrupted. Your submission is not confirmed; please retry." : "Connection interrupted. Please retry when connected.")), {
       status: error.response?.status || 0, code: error.response?.data?.code || "",
       data: error.response?.data, isNetworkError: !error.response,
     });
@@ -28,3 +29,5 @@ export const submitAttempt = (id, answers, metadata = {}) => mockRequest("post",
 export const lookupResults = () => mockRequest("post", "/mocks/attempts/results/lookup", {});
 export const getAttemptResult = id => mockRequest("post", "/mocks/attempts/" + id + "/result", {});
 export const getLeaderboard = (id, params = {}) => mockRequest("get", "/mocks/attempts/" + id + "/leaderboard", undefined, { params });
+
+export const getAttemptClock = id => mockRequest("get", "/mocks/attempts/" + id + "/clock");

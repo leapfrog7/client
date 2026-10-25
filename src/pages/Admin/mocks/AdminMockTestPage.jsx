@@ -10,6 +10,7 @@ import {
   FaRocket,
 } from "react-icons/fa";
 
+import MockParticipantRecovery from "./MockParticipantRecovery";
 import EmptyMockState from "../../../components/mocks/EmptyMockState";
 import LoadingState from "../../../components/mocks/LoadingState";
 import MockStatusBadge from "../../../components/mocks/MockStatusBadge";
@@ -115,6 +116,7 @@ function AdminMockTestsPage() {
 
   return (
     <div className="space-y-5">
+      <MockParticipantRecovery />
       <div className="rounded-lg border bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -303,7 +305,7 @@ function AdminMockTestsPage() {
         }
         message={
           confirmState.type === "publish"
-            ? `Publish "${confirmState.mockTest?.title}"? Users will be able to see this mock test as per its schedule.`
+            ? `Publish "${confirmState.mockTest?.title}"? Opens ${formatDateTime(confirmState.mockTest?.startAt)}; closes ${formatDateTime(confirmState.mockTest?.endAt)} (36 hours). ${confirmState.mockTest?.activeQuestionCount}/${confirmState.mockTest?.totalQuestions} active questions; ${confirmState.mockTest?.durationMinutes} continuous minutes; +${confirmState.mockTest?.correctMarks}/-${confirmState.mockTest?.negativeMarks}; capacity ${confirmState.mockTest?.maxActiveAttempts || 40}. Score: ${confirmState.mockTest?.showScoreImmediately ? "after submission" : "after window closes"}. Leaderboard: ${confirmState.mockTest?.showLeaderboardAfterEnd ? "after window closes" : "disabled"}. Participation is free.`
             : `Archive "${confirmState.mockTest?.title}"? It will be hidden from normal listing.`
         }
         confirmLabel={confirmState.type === "publish" ? "Publish" : "Archive"}

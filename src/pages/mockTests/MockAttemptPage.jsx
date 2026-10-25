@@ -17,6 +17,7 @@ import ConfirmActionModal from "../../components/mocks/ConfirmActionModal";
 import LoadingState from "../../components/mocks/LoadingState";
 
 import {
+  getAttemptClock,
   pauseAttempt,
   resumeAttemptById,
   saveAttemptAnswers,
@@ -28,9 +29,16 @@ import MockParticipantAccess from "./MockParticipantAccess";
 import { getMockSession, clearMockSession, readMockDraft, writeMockDraft, clearMockDraft } from "./mockSession";
 
 
+import { attemptDeadline, millisecondsLeft } from "./mockClock";
+
+function newSaveId() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
 function MockAttemptPage() {
   const { attemptId } = useParams(), navigate = useNavigate();
   const [session, setSession] = useState(getMockSession);
+  const [accessKey, setAccessKey] = useState(0);
   const [attempt, setAttempt] = useState(null), [mockTest, setMockTest] = useState(null);
   const [questions, setQuestions] = useState([]), [answers, setAnswers] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -40,7 +48,8 @@ function MockAttemptPage() {
   const [error, setError] = useState(""), [saveState, setSaveState] = useState("Saved"), [conflict, setConflict] = useState(false);
   const [confirmState, setConfirmState] = useState({ open: false, type: "" });
   const live = useRef({ answers: [], currentQuestionIndex: 0 }), revision = useRef(0);
-  const deadlineRef = useRef(0), inFlight = useRef(null), submitInFlight = useRef(false);
+  const pendingSave = useRef(null);
+  const deadlineRef = useRef(null), inFlight = useRef(null), submitInFlight = useRef(false);
   const confirmedSignature = useRef(""), pendingSubmission = useRef(null), lastRetry = useRef(0);
   const submitRef = useRef(null), saveRef = useRef(null), questionPanelRef = useRef(null);
   const mounted = useRef(true), recoverySequence = useRef(0);
@@ -53,7 +62,7 @@ function MockAttemptPage() {
     if (!sessionRef.current) return;
     const ok = writeMockDraft(sessionRef.current.account.id, attemptId, {
       ...value, revision: revision.current, pending: signature(value) !== confirmedSignature.current,
-      submissionPending: Boolean(pendingSubmission.current), deadlineAt: attempt?.deadlineAt,
+      submissionPending: Boolean(pendingSubmission.current), pendingSave: pendingSave.current, deadlineAt: attempt?.deadlineAt,
     });
     if (!ok) setError("This browser could not keep a local backup. Keep the page open and check that answers are saved.");
   }
@@ -64,7 +73,7 @@ function MockAttemptPage() {
     if (err.code === "ANSWER_CONFLICT") { conflictRef.current = true; setConflict(true); setSaveState("Newer answers exist in another tab"); }
     else setSaveState(navigator.onLine ? "Not saved — retry pending" : "Offline — changes pending");
     setError(err.message);
-    if (err.code === "MOCK_SESSION_REQUIRED") { clearMockSession(); setSession(null); setQuestions([]); }
+    if (["MOCK_SESSION_REQUIRED", "MOCK_SESSION_EXPIRING"].includes(err.code)) { clearMockSession(); setSession(null); setQuestions([]); setAccessKey(key => key + 1); }
   }
   async function recover(discardLocal = false) {
     const sequence = ++recoverySequence.current;
@@ -87,15 +96,17 @@ function MockAttemptPage() {
       let value = serverValue;
       const usable = draft?.pending || draft?.submissionPending;
       const differs = usable && signature({ answers: draft.answers, currentQuestionIndex: draft.currentQuestionIndex }) !== confirmedSignature.current;
-      const conflicting = differs && draft.revision !== saved.answerRevision;
+      const ownLostAcknowledgement = draft?.pendingSave?.id && draft.pendingSave.id === saved.lastSaveId && draft.pendingSave.baseRevision === draft.revision && saved.answerRevision === draft.revision + 1;
+      const conflicting = differs && draft.revision !== saved.answerRevision && !ownLostAcknowledgement;
+      pendingSave.current = !conflicting && !ownLostAcknowledgement && draft?.pendingSave && draft.revision === saved.answerRevision ? draft.pendingSave : null;
       if (differs && !conflicting) value = { answers: draft.answers, currentQuestionIndex: Math.min(draft.currentQuestionIndex || 0, data.questions.length - 1) };
       pendingSubmission.current = draft?.submissionPending && !conflicting ? value : null;
       conflictRef.current = Boolean(conflicting); setConflict(Boolean(conflicting));
       setSaveState(conflicting ? "Newer answers exist in another tab" : differs ? "Restored local changes — waiting to save" : "Saved");
       if (conflicting) setError("Another tab saved a newer version. Your local backup was kept. Use Reload saved answers to continue with the server version.");
       setAttempt(saved); setMockTest(data.mockTest); setQuestions(data.questions); applyAnswers(value);
-      deadlineRef.current = performance.now() + Math.max(0, new Date(saved.deadlineAt) - new Date(saved.serverNow));
-      setRemainingSeconds(Math.max(0, Math.ceil((deadlineRef.current - performance.now()) / 1000)));
+      deadlineRef.current = attemptDeadline(response);
+      setRemainingSeconds(Math.max(0, Math.ceil(millisecondsLeft(deadlineRef.current) / 1000)));
     } catch (err) { if (mounted.current && sequence === recoverySequence.current) { actionFailure(err); setQuestions([]); } }
     finally { if (mounted.current && sequence === recoverySequence.current) setLoading(false); }
   }
@@ -109,20 +120,23 @@ function MockAttemptPage() {
 
   async function saveNow({ pause = false } = {}) {
     if (inFlight.current) return inFlight.current;
-    if (submitInFlight.current || conflictRef.current || !questions.length || performance.now() >= deadlineRef.current) return;
+    if (submitInFlight.current || conflictRef.current || !questions.length || millisecondsLeft(deadlineRef.current) <= 8000 || pendingSubmission.current) return;
     const sequence = recoverySequence.current;
-    const snapshot = { ...live.current, answers: live.current.answers.map(a => ({ ...a })) };
+    const snapshot = pendingSave.current?.snapshot || { ...live.current, answers: live.current.answers.map(a => ({ ...a })) };
     if (!pause && signature(snapshot) === confirmedSignature.current) return;
-    setSaving(true); setSaveState("Saving...");
+    pendingSave.current ||= { id: newSaveId(), baseRevision: revision.current, snapshot };
+    const saveOperation = pendingSave.current;
+    persist(); setSaving(true); setSaveState("Saving...");
     const operation = (async () => {
       try {
         const response = await (pause ? pauseAttempt : saveAttemptAnswers)(attemptId, snapshot.answers,
-          { revision: revision.current, currentQuestionIndex: snapshot.currentQuestionIndex });
+          { revision: saveOperation.baseRevision, saveId: saveOperation.id, currentQuestionIndex: snapshot.currentQuestionIndex });
         if (!mounted.current || sequence !== recoverySequence.current) return;
         const saved = response.data.attempt;
         if (saved.isFinal) { navigate("/mock-tests/result/" + attemptId); return; }
         if (response.code === "MOCK_DEADLINE") return;
         revision.current = saved.answerRevision;
+        pendingSave.current = null;
         confirmedSignature.current = signature(snapshot);
         setSaveState(signature(live.current) === confirmedSignature.current ? "Saved at " + new Date().toLocaleTimeString() : "Changes pending");
         setError(""); persist();
@@ -142,9 +156,12 @@ function MockAttemptPage() {
     persist();
     try {
       // Autosave stops eight seconds before expiry and has a four-second timeout.
-      if (inFlight.current) await inFlight.current;
+      if (inFlight.current) {
+        try { await inFlight.current; }
+        catch (err) { if (["ANSWER_CONFLICT", "MOCK_SESSION_REQUIRED"].includes(err.code)) throw err; }
+      }
       if (conflictRef.current) return;
-      const response = await submitAttempt(attemptId, pendingSubmission.current.answers, { revision: revision.current });
+      const response = await submitAttempt(attemptId, pendingSubmission.current.answers, { revision: revision.current, pendingSaveId: pendingSave.current?.id });
       if (!mounted.current || sequence !== recoverySequence.current) return;
       if (!response.data.attempt.isFinal) throw new Error("Submission is still pending. Please retry.");
       clearMockDraft(sessionRef.current.account.id, attemptId);
@@ -157,11 +174,12 @@ function MockAttemptPage() {
   useEffect(() => {
     if (loading || !questions.length) return;
     const timer = setInterval(() => {
-      const left = Math.max(0, Math.ceil((deadlineRef.current - performance.now()) / 1000));
+      const left = Math.max(0, Math.ceil(millisecondsLeft(deadlineRef.current) / 1000));
       setRemainingSeconds(left);
-      if (!left && Date.now() - lastRetry.current > 5000 && !conflictRef.current) submitRef.current();
+      const stillInGrace = Math.min(deadlineRef.current.monotonic - performance.now(), deadlineRef.current.wall - Date.now()) > -4000;
+      if (!left && Date.now() - lastRetry.current > (stillInGrace ? 1000 : 5000) && !conflictRef.current) submitRef.current();
     }, 250);
-    const retryOnline = () => { if (pendingSubmission.current || performance.now() >= deadlineRef.current) submitRef.current(); else saveRef.current().catch(() => {}); };
+    const retryOnline = () => { if (pendingSubmission.current || millisecondsLeft(deadlineRef.current) <= 0) submitRef.current(); else saveRef.current().catch(() => {}); };
     const warnUnsaved = event => {
       if (signature(live.current) !== confirmedSignature.current || pendingSubmission.current) {
         event.preventDefault(); event.returnValue = "";
@@ -174,10 +192,39 @@ function MockAttemptPage() {
 
   useEffect(() => {
     if (loading || !questions.length || submitting || conflict) return;
-    const run = () => { if (deadlineRef.current - performance.now() > 8000 && !pendingSubmission.current) saveRef.current().catch(() => {}); };
-    const debounce = setTimeout(run, 1500), maximum = setInterval(run, 10000);
-    return () => { clearTimeout(debounce); clearInterval(maximum); };
+    const run = () => { if (millisecondsLeft(deadlineRef.current) > 8000 && !pendingSubmission.current) saveRef.current().catch(() => {}); };
+    const debounce = setTimeout(run, 1500);
+    return () => clearTimeout(debounce);
   }, [answers, currentQuestionIndex, loading, questions.length, submitting, conflict]);
+
+  useEffect(() => {
+    if (loading || !questions.length) return;
+    const heartbeat = setInterval(() => { if (!pendingSubmission.current) saveRef.current().catch(() => {}); }, 10000);
+    return () => clearInterval(heartbeat);
+  }, [loading, questions.length]);
+  useEffect(() => {
+    if (loading || !questions.length) return;
+    let busy = false, cancelled = false;
+    const syncClock = async () => {
+      if (document.visibilityState !== "visible" || busy || submitInFlight.current) return;
+      busy = true;
+      try {
+        const response = await getAttemptClock(attemptId);
+        if (cancelled) return;
+        if (response.data.isFinal) { navigate("/mock-tests/result/" + attemptId, { replace: true }); return; }
+        deadlineRef.current = attemptDeadline(response);
+        setRemainingSeconds(Math.ceil(millisecondsLeft(deadlineRef.current) / 1000));
+      } catch (err) { if (!cancelled) {
+        if (err.code === "MOCK_SESSION_REQUIRED") actionFailure(err);
+        else setError("Unable to recheck the timer. Your existing timer and local answers are preserved. Check your connection.");
+      } }
+      finally { busy = false; }
+    };
+    document.addEventListener("visibilitychange", syncClock); window.addEventListener("pageshow", syncClock);
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", syncClock); window.removeEventListener("pageshow", syncClock); };
+    // Clock synchronization must never replace unsaved answers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attemptId, loading, questions.length, navigate]);
 
   function updateAnswer(questionId, selectedOptionIndex) {
     if (remainingSeconds <= 0 || submitting || pendingSubmission.current || conflict) return;
@@ -203,6 +250,7 @@ function MockAttemptPage() {
   const currentQuestion = questions[currentQuestionIndex], currentAnswer = answers[currentQuestionIndex];
   const canGoPrevious = currentQuestionIndex > 0, canGoNext = currentQuestionIndex < totalQuestions - 1;
   const isLowTime = remainingSeconds !== null && remainingSeconds <= 300, isTimeOver = remainingSeconds !== null && remainingSeconds <= 0;
+  const finalSeconds = remainingSeconds !== null && remainingSeconds <= 8;
   const handleSave = () => saveNow().catch(() => {});
   const openSubmitConfirm = () => setConfirmState({ open: true, type: "submit" });
   const openPauseConfirm = () => setConfirmState({ open: true, type: "pause" });
@@ -215,7 +263,7 @@ function MockAttemptPage() {
   if (loading) return <LoadingState message="Loading test..." />;
   if (!questions.length) return <main className="min-h-screen bg-slate-50 p-4"><div className="mx-auto max-w-3xl space-y-5">
     <Link to="/mock-tests" className="underline">Back to Mock Tests</Link><h1 className="text-2xl font-bold">Resume your mock test</h1>
-    <MockParticipantAccess onReady={setSession} />
+    <MockParticipantAccess key={accessKey} onReady={setSession} />
     {error ? <p role="alert" className="text-red-700">{error}</p> : null}
     <button className="rounded-lg bg-teal-700 p-3 text-white disabled:opacity-50" disabled={!session} onClick={() => recover()}>Recover Attempt</button>
     <p>Your original timer continues while you reconnect.</p>
@@ -264,7 +312,7 @@ function MockAttemptPage() {
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={saving || submitting || conflict || isTimeOver}
+                  disabled={saving || submitting || conflict || finalSeconds}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
                   <FaSave />
@@ -274,7 +322,7 @@ function MockAttemptPage() {
                 <button
                   type="button"
                   onClick={openPauseConfirm}
-                  disabled={saving || submitting}
+                  disabled={saving || submitting || conflict || finalSeconds}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-xs font-bold text-amber-900 shadow-sm hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm"
                 >
                   <FaPause />
@@ -297,6 +345,7 @@ function MockAttemptPage() {
           <div className="mt-3">
             <p role="status" aria-live="polite" className="mb-2 text-sm font-semibold">{saveState}</p>
             <p className="mb-2 text-xs text-slate-600">The timer continues when you leave or reconnect.</p>
+            {finalSeconds ? <p role="status" className="mb-2 text-xs text-amber-900">Final seconds: answers will be included in submission. Save and leave is unavailable.</p> : null}
             <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               <span>Progress</span>
               <span>{progressPercent}% completed</span>

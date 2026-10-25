@@ -1,3 +1,4 @@
+import useMockWindowRefresh from "./useMockWindowRefresh";
 import MockTestSchedule from "../../components/mocks/MockTestSchedule";
 import { useEffect, useMemo, useState } from "react";
 import PropTypes from "prop-types";
@@ -26,6 +27,7 @@ import Seo from "../../components/Seo";
 
 function MockTestsPage() {
   const [mockTests, setMockTests] = useState([]);
+  const [windowResponse, setWindowResponse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshingId, setRefreshingId] = useState("");
@@ -43,6 +45,7 @@ function MockTestsPage() {
 
       const response = await getPublicMockTests();
       setMockTests(Array.isArray(response?.data) ? response.data : []);
+      setWindowResponse(response);
     } catch (err) {
       setError(err.message || "Failed to load mock tests.");
     } finally {
@@ -54,6 +57,8 @@ function MockTestsPage() {
   useEffect(() => {
     loadMockTests();
   }, []);
+
+  useMockWindowRefresh(mockTests, windowResponse, () => loadMockTests({ silent: true }));
 
   async function refreshSingleMockTest(mockTestId) {
     try {

@@ -213,3 +213,8 @@ export async function restoreAttempt(attemptId) {
     throw new Error(getErrorMessage(error, "Failed to restore attempt."));
   }
 }
+
+export async function issueMockRecovery(payload) {
+  try { return (await AxiosInstance.post("/mocks/admin/participants/recovery", payload)).data; }
+  catch(error) { throw new Error(getErrorMessage(error, "Failed to issue recovery code.")); }
+}

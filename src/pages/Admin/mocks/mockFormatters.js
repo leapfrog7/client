@@ -54,7 +54,7 @@ export function getStoredStatusLabel(status) {
 export function getAttemptStatusLabel(status) {
   const labels = {
     in_progress: "In Progress",
-    paused: "Paused",
+    paused: "Away (timer running)",
     submitted: "Submitted",
     auto_submitted: "Auto-submitted",
     expired: "Expired",
