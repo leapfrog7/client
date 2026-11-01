@@ -134,7 +134,8 @@ function MockTestsPage() {
                 <HeroStat label="Closed" value={summary.closed} />
               </div>
             </div>
-            <div className="flex justify-end mt-2 md:mt-0">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <Link to="/mock-tests/results" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-black text-teal-800 shadow-sm hover:bg-teal-50">View my results</Link>
               <button
                 type="button"
                 onClick={() => loadMockTests({ silent: true })}
@@ -153,6 +154,8 @@ function MockTestsPage() {
             <PatternItem label="Marking" value="+1.25 / -0.4167" />
           </div>
         </section>
+
+        <p className="rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm leading-6 text-teal-900">Already submitted? Use <Link to="/mock-tests/results" className="font-bold underline underline-offset-4">View my results</Link> to find your score. Questions, your answers and correct answers become available after that test’s window closes.</p>
 
         <MockTestSchedule />
 
