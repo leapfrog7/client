@@ -155,7 +155,7 @@ function MockTestsPage() {
           </div>
         </section>
 
-        <p className="rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm leading-6 text-teal-900">Already submitted? Use <Link to="/mock-tests/results" className="font-bold underline underline-offset-4">View my results</Link> to find your score. Questions, your answers and correct answers become available after that test’s window closes.</p>
+        <p className="rounded-xl border border-teal-100 bg-teal-50 px-4 py-3 text-sm leading-6 text-teal-900">Already submitted? Use <Link to="/mock-tests/results" className="font-bold underline underline-offset-4">View my results</Link> to find your score. After the test closes, anyone who took it can review their answers free through View my results. Paid subscribers can also review papers they did not take.</p>
 
         <MockTestSchedule />
 
@@ -354,6 +354,8 @@ function MockTestCard({ mockTest, refreshing, onRefresh }) {
                   {status === "upcoming" ? "Not Started Yet" : "Test Closed"}
                 </button>
               )}
+
+              {status === "closed" ? <><Link to={"/mock-tests/" + mockTest._id + "/review"} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-teal-700 px-4 py-3 text-sm font-bold text-white hover:bg-teal-800">View paper (subscribers)</Link><Link to="/mock-tests/results" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-teal-300 px-4 py-3 text-sm font-bold text-teal-800 hover:bg-teal-50">Review my attempt (free)</Link></> : null}
 
               {/* Secondary actions */}
               <div className="grid w-full grid-cols-1 gap-3 sm:flex sm:w-auto sm:flex-wrap sm:items-center">

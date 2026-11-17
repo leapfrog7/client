@@ -1,3 +1,4 @@
+import ClosedMockReviewPage from "./ClosedMockReviewPage";
 import { Route, Routes } from "react-router-dom";
 
 import MockTestsPage from "./MockTestsPage";
@@ -11,6 +12,7 @@ function MockPublicRoutes() {
   return (
     <Routes>
       <Route index element={<MockTestsPage />} />
+      <Route path=":mockTestId/review" element={<ClosedMockReviewPage />} />
       <Route path="results" element={<MockResultLookupPage />} />
       <Route path=":mockTestId/start" element={<MockTestStartPage />} />
       <Route path="attempt/:attemptId" element={<MockAttemptPage />} />
