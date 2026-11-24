@@ -314,7 +314,7 @@ const item = (delay = 0) => ({
 });
 
 export default function CTA({ isLoggedIn = false, onStartTrial }) {
-  const primaryLabel = isLoggedIn ? "Start Free Trial (24h)" : "Register";
+  const primaryLabel = isLoggedIn ? "Request trial access" : "Register";
 
   return (
     <section aria-labelledby="cta-heading" className="w-full bg-white">
@@ -401,7 +401,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
                   type="button"
                   onClick={onStartTrial}
                   disabled={!onStartTrial}
-                  aria-label="Start free trial"
+                  aria-label="Request trial access"
                   className={`group inline-flex items-center justify-center gap-2
                     w-full rounded-xl px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold
                     shadow-lg transition active:scale-[0.99]
@@ -416,7 +416,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
               ) : (
                 <Link
                   to="/register"
-                  aria-label="Register and start free trial"
+                  aria-label="Create an account"
                   className="group inline-flex items-center justify-center gap-2
                     w-full rounded-xl px-3 lg:px-8 lg:py-4 text-base lg:text-lg font-semibold
                     bg-customBlue text-white shadow-lg transition
@@ -459,8 +459,7 @@ export default function CTA({ isLoggedIn = false, onStartTrial }) {
             </div>
 
             <p className="mt-2 font-thin text-center text-xs lg:text-sm text-gray-500">
-              No payment needed to start the trial · Ends automatically after 24
-              hours
+              24-hour trials require Admin approval. Register, then contact us on WhatsApp.
             </p>
           </div>
         </div>

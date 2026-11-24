@@ -20,6 +20,7 @@ import {
   FaBookOpen,
 } from "react-icons/fa";
 import RegistrationSteps from "../components/RegistrationSteps";
+import TrialApprovalNotice from "../components/TrialApprovalNotice";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -33,6 +34,7 @@ export default function Register() {
   const [error, setError] = useState(""); // server error
   const [errors, setErrors] = useState({}); // client-side validation
   const [isRegistered, setIsRegistered] = useState(false);
+  const [registeredMobile, setRegisteredMobile] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
   const [runConfetti, setRunConfetti] = useState(false);
 
@@ -91,7 +93,8 @@ export default function Register() {
     try {
       await axios.post(BASE_URL + "/register", data, { timeout: 20000 });
       setName(""); setPassword(""); setMobile(""); setBatch(""); setEmail(""); setConfirmPassword("");
-      setMsg("Registered Successfully! Your 24-hour free trial will start on your first login.");
+      setRegisteredMobile(data.mobile);
+      setMsg("Registered successfully. Trial access requires UnderSigned Admin approval.");
       setIsRegistered(true);
       setShowConfetti(true); setRunConfetti(true);
       setTimeout(() => setShowConfetti(false), 2000);
@@ -122,13 +125,13 @@ export default function Register() {
           <title>Register - UnderSigned</title>
           <meta
             name="description"
-            content="Create an account on UnderSigned to start your 24-hour full-access trial. Practice quizzes, Previous Year Questions, and more."
+            content="Create an UnderSigned account. Request a 24-hour trial through WhatsApp; access starts only after Admin approval."
           />
           <link rel="canonical" href="https://undersigned.in/register" />
           <meta property="og:title" content="Register - UnderSigned" />
           <meta
             property="og:description"
-            content="Register to unlock a 24-hour full-access trial: dashboard, quizzes, PYQ, and progress reset included."
+            content="Register with UnderSigned and contact us on WhatsApp to request trial approval."
           />
           <meta property="og:url" content="https://undersigned.in/register" />
           <meta property="og:type" content="website" />
@@ -147,14 +150,14 @@ export default function Register() {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-amber-900 font-semibold">
                 <FaCrown className="shrink-0" />
-                <span>Enjoy a 24-hour Full-Access Trial</span>
+                <span>24-hour trial by Admin approval</span>
               </div>
               <ul className="mt-3 text-sm text-amber-900 space-y-2 list-disc list-inside">
                 <li className="flex items-start gap-2">
                   <FaClock className="mt-[2px] shrink-0" />
                   <span>
-                    Trial starts on your <strong>first login</strong> and ends
-                    automatically after 24 hours.
+                    Registration does not start a trial. Contact UnderSigned on
+                    WhatsApp using your registered mobile number to request approval.
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -174,9 +177,10 @@ export default function Register() {
                 </li> */}
               </ul>
               <p className="mt-3 text-xs text-amber-700">
-                Upgrade anytime to keep full access after your trial ends.
+                If approved, the trial starts when the Admin enables it and ends after 24 hours. Paid subscription options remain available.
               </p>
             </div>
+            <div className="mb-6"><TrialApprovalNotice compact mobile={mobile} /></div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
               <div className="relative h-11 sm:min-w-[50px] mx-2 md:min-w-[200px]">
@@ -401,7 +405,8 @@ export default function Register() {
         {msg && (
           <div className="mt-6 text-center p-4 bg-green-100 text-green-800 rounded-lg">
             <p className="text-lg font-semibold">{msg}</p>
-            <p className="text-sm mt-1">Log in now to begin your trial.</p>
+            <p className="text-sm mt-1">You can sign in now. Study access requires trial approval or paid activation.</p>
+            <div className="mt-4 text-left"><TrialApprovalNotice compact mobile={registeredMobile} /></div>
             <Link
               to="/login"
               className="text-blue-700 underline mt-2 inline-block"

@@ -8,6 +8,7 @@ import Dashboard from "../components/Dashboard";
 import QuizDetails from "../components/QuizDetails";
 import PricingSection from "../components/PricingSection";
 import AccountActivationNotice from "../components/AccountActivationNotice";
+import TrialApprovalNotice from "../components/TrialApprovalNotice";
 import NewCarousel from "../components/NewCarousel";
 import CTA from "../components/CTA";
 import QuickLinksCarousel from "../components/QuickLinksCarousel";
@@ -64,7 +65,9 @@ const Home = ({
     setCheckingActivation(true); setActivationMessage("");
     const result = await refreshAccess(true);
     setCheckingActivation(false);
-    setActivationMessage(result ? "Activation is still pending. You can continue using the free tools below." : "Could not check activation. Please retry.");
+    setActivationMessage(result?.tier === "paid" || result?.tier === "trial_active"
+      ? "Access is enabled."
+      : result ? "Approval or paid activation is still pending. You can continue using the free tools below." : "Could not check activation. Please retry.");
   }
   const trialEndsAt = access.trialExpiresAt;
   const accessTier = useMemo(() => {
@@ -171,6 +174,9 @@ const Home = ({
         {showUnpaidLoggedIn && (
           <>
             <Section className="mt-3 sm:mt-4">
+              {access.tier === "trial_not_started" && (
+                <div className="mx-auto mb-4 max-w-3xl"><TrialApprovalNotice /></div>
+              )}
               <AccountActivationNotice />
               <div className="mx-auto mt-4 max-w-xl text-center">
                 <button className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50" disabled={checkingActivation} onClick={checkActivation}>{checkingActivation ? "Checking..." : "Check activation status"}</button>

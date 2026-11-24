@@ -20,18 +20,18 @@ async function fixture(options={}){
   if(u.pathname.startsWith("/api/v1/")){
    const p=u.pathname.slice(7);state.calls.push(p);
    let status=200,data={};
-   if(p==="/auth/access"){status=state.accessStatus;data={tier:state.tier,paymentMade:state.tier==="paid",trialExpiresAt:state.trialExpiresAt,userType:"ordinary"};}
+   if(p==="/auth/access"){if(state.tier==="trial_active" && Date.parse(state.trialExpiresAt)<=Date.now())state.tier="trial_expired";status=state.accessStatus;data={tier:state.tier,paymentMade:state.tier==="paid",trialExpiresAt:state.trialExpiresAt,userType:"ordinary"};}
    else if(p==="/login")data={name:"Auth Fixture",token:state.loginToken||token(Date.now()/1000+604800,state.tier==="paid","new-session")};
    else if(p==="/quiz/getTopicId")data={topicId};
    else if(p.startsWith("/quiz/progress/"))data={attemptedQuestions:20,progress:20};
    else if(p==="/quiz/getQuiz"||p==="/quiz/getRandomQuiz"){
-    status=state.quizStatus;state.questions++;
+    status=state.quizStatus;if(status===402)state.tier="trial_expired";state.questions++;
     if(state.delayQuiz){state.quizStarted?.();await state.delayQuiz;}
     data=status===200?[{_id:questionId,questionText:"Auth question batch "+state.questions,options:["Choice A","Choice B"],correctAnswer:"Choice A",explanation:"Fixture"}]:{code:status===402?"TRIAL_ENDED":"AUTH_INVALID",message:"Synthetic failure"};
    }else if(p==="/quiz/fetchAllBookmarks")data={bookmarks:[]};
    else if(p==="/quiz/submitQuiz"){state.submissions.push(req.postDataJSON());data={result:{correct:0,total:1,percent:0},attempt:{attemptId:"synthetic-receipt"}};}
    else if(p==="/quiz/getUserStats")data={paperI:[],paperII:[]};
-   return route.fulfill({status,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*"},body:JSON.stringify(data)});
+   return route.fulfill({status,contentType:"application/json",headers:{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Authorization, Content-Type","Access-Control-Allow-Methods":"GET, POST, PATCH, DELETE, OPTIONS"},body:JSON.stringify(data)});
   }
   if(u.origin===new URL(base).origin)return route.continue();
   return route.abort();

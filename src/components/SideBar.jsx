@@ -531,14 +531,14 @@ export default function SideBar({
                   Try it free for 24 hours
                 </h2>
                 <p className="text-gray-600 mb-4 text-sm">
-                  Register now and unlock quizzes, PYQs, and dashboard tools.
+                  Create an account. Trial access requires Admin approval.
                 </p>
                 <Link
                   to="/register"
                   onClick={closeSidebar}
                   className="bg-pink-500 hover:bg-pink-400 text-white px-4 py-2 rounded-full shadow-md font-medium text-sm sm:text-base transition duration-300 inline-flex items-center justify-center gap-2 w-full"
                 >
-                  Start Free Trial
+                  Register
                 </Link>
                 <p className="mt-2 text-xs text-gray-500">No payment needed.</p>
               </div>

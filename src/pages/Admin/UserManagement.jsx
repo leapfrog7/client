@@ -1,6 +1,7 @@
 import { SERVER_ORIGIN } from "../../util/serverConfig.js";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import TrialAccessControl from "../../components/admin/TrialAccessControl";
 import { jwtDecode } from "jwt-decode";
 import { FaTrash, FaRedo, FaEdit, FaSearch } from "react-icons/fa";
 
@@ -144,6 +145,12 @@ const UserManagement = () => {
     });
   };
 
+  const handleTrialApproved = (granted) => {
+    setUsers((previous) => previous.map((user) => user._id === granted._id
+      ? { ...user, trialStartedAt: granted.trialStartedAt, trialExpiresAt: granted.trialExpiresAt }
+      : user));
+  };
+
   // ---- Handlers ----
   const handleEditUser = (user) => setEditingUser({ ...user });
 
@@ -156,7 +163,7 @@ const UserManagement = () => {
 
     setActionLoadingId(user._id);
     try {
-      await axios.patch(
+      const response = await axios.patch(
         `${BASE_URL}userManagement/${user._id}`,
         user,
         authHeaders,
@@ -164,7 +171,11 @@ const UserManagement = () => {
 
       // ✅ Update local state instead of refetching everything
       setUsers((prev) =>
-        prev.map((u) => (u._id === user._id ? { ...u, ...user } : u)),
+        prev.map((u) => (u._id === user._id ? {
+          ...u, ...user,
+          trialStartedAt: response.data.trialStartedAt ?? null,
+          trialExpiresAt: response.data.trialExpiresAt ?? null,
+        } : u)),
       );
       setEditingUser(null);
     } catch (error) {
@@ -463,6 +474,12 @@ const UserManagement = () => {
                         >
                           {user.paymentMade ? "Mark Unpaid" : "Mark Paid"}
                         </button>
+                        <TrialAccessControl
+                          user={user}
+                          requestConfig={authHeaders}
+                          onApproved={handleTrialApproved}
+                          disabled={isRowBusy}
+                        />
 
                         <div className="flex gap-2 items-center justify-center">
                           <button
